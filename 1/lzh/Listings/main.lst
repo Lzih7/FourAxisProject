@@ -1,0 +1,243 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000         ; STM32F103C8 LED控制汇编程序
+    2 00000000         ; 功能：控制PC13引脚的LED
+    3 00000000         
+    4 00000000                 AREA             |.text|, CODE, READONLY
+    5 00000000                 THUMB
+    6 00000000                 REQUIRE8
+    7 00000000                 PRESERVE8
+    8 00000000         
+    9 00000000         ; 寄存器地址定义
+   10 00000000 40021018 
+                       RCC_APB2ENR
+                               EQU              0x40021018  ; RCC APB2外设时
+                                                            钟使能寄存器
+   11 00000000 40011004 
+                       GPIOC_CRH
+                               EQU              0x40011004  ; GPIOC配置寄存
+                                                            器高位(控制引
+                                                            脚8-15)
+   12 00000000 4001100C 
+                       GPIOC_ODR
+                               EQU              0x4001100C  ; GPIOC输出数据
+                                                            寄存器
+   13 00000000         
+   14 00000000         ; 位定义
+   15 00000000 00000010 
+                       RCC_APB2ENR_IOPCEN
+                               EQU              0x00000010  ; GPIOC时钟使能
+                                                            位(bit 4)
+   16 00000000 00C00000 
+                       GPIO_CRH_CNF13
+                               EQU              0x00C00000  ; PC13配置位[23:
+                                                            22]
+   17 00000000 00300000 
+                       GPIO_CRH_MODE13
+                               EQU              0x00300000  ; PC13模式位[21:
+                                                            20]
+   18 00000000 00002000 
+                       GPIO_ODR_ODR13
+                               EQU              0x00002000  ; PC13输出数据�
+                                                            ��(bit 13)
+   19 00000000         
+   20 00000000                 EXPORT           main
+   21 00000000                 EXPORT           __main
+   22 00000000                 ENTRY                        ; 添加这行指�
+                                                            �入口点
+   23 00000000         
+   24 00000000         main
+   25 00000000         __main
+   26 00000000         ; 1. 开启GPIOC时钟
+   27 00000000         ; RCC->APB2ENR |= RCC_APB2ENR_IOPCEN
+   28 00000000 480E            LDR              r0, =RCC_APB2ENR ; 加载RCC_AP
+                                                            B2ENR寄存器地�
+                                                            �
+   29 00000002 6801            LDR              r1, [r0]    ; 读取当前寄�
+                                                            �器值
+   30 00000004 F04F 0210       LDR              r2, =RCC_APB2ENR_IOPCEN ; 加�
+                                                            �GPIOC时钟使能�
+                                                            ��
+   31 00000008 EA41 0102       ORR              r1, r1, r2  ; 设置GPIOC时钟
+
+
+
+ARM Macro Assembler    Page 2 
+
+
+                                                            使能位
+   32 0000000C 6001            STR              r1, [r0]    ; 写回寄存器
+   33 0000000E         
+   34 0000000E         ; 2. 配置PC13为推挽输出模式，50MHz
+   35 0000000E         ; GPIOC->CRH &= ~(GPIO_CRH_CNF13 | GPIO_CRH_MODE13)
+   36 0000000E         ; GPIOC->CRH |= GPIO_CRH_MODE13_1 | GPIO_CRH_MODE13_0  ;
+                        50MHz输出
+   37 0000000E 480C            LDR              r0, =GPIOC_CRH ; 加载GPIOC_CR
+                                                            H寄存器地址
+   38 00000010 6801            LDR              r1, [r0]    ; 读取当前寄�
+                                                            �器值
+   39 00000012         
+   40 00000012         ; 清除PC13的配置位和模式位
+   41 00000012 F44F 0240       LDR              r2, =GPIO_CRH_CNF13
+   42 00000016 F44F 1340       LDR              r3, =GPIO_CRH_MODE13
+   43 0000001A EA42 0203       ORR              r2, r2, r3  ; 合并需要清�
+                                                            �的位
+   44 0000001E EA21 0102       BIC              r1, r1, r2  ; 清除这些位
+   45 00000022         
+   46 00000022         ; 设置PC13为推挽输出，50MHz (MODE13[1:0] = 11)
+   47 00000022 F44F 1240       LDR              r2, =GPIO_CRH_MODE13
+   48 00000026 EA41 0102       ORR              r1, r1, r2  ; 设置模式位�
+                                                            �11(50MHz输出)
+   49 0000002A 6001            STR              r1, [r0]    ; 写回寄存器
+   50 0000002C         
+   51 0000002C         ; 3. 设置PC13输出低电平(点亮LED)
+   52 0000002C         ; GPIOC->ODR &= ~GPIO_ODR_ODR13
+   53 0000002C 4805            LDR              r0, =GPIOC_ODR ; 加载GPIOC_OD
+                                                            R寄存器地址
+   54 0000002E 6801            LDR              r1, [r0]    ; 读取当前寄�
+                                                            �器值
+   55 00000030 F44F 5200       LDR              r2, =GPIO_ODR_ODR13 ; 加载PC1
+                                                            3输出位
+   56 00000034 EA21 0102       BIC              r1, r1, r2  ; 清除PC13位(设
+                                                            置为低电平)
+   57 00000038 6001            STR              r1, [r0]    ; 写回寄存器
+   58 0000003A         
+   59 0000003A         ;; 3.1. 设置PC13输出高电平(熄灭LED)
+   60 0000003A         ;; GPIOC->ODR |= GPIO_ODR_ODR13
+   61 0000003A         ;LDR     r0, =GPIOC_ODR          ; 加载GPIOC_ODR寄存
+                       器地址
+   62 0000003A         ;LDR     r1, [r0]                ; 读取当前寄存器
+                       值
+   63 0000003A         ;LDR     r2, =GPIO_ODR_ODR13     ; 加载PC13输出位
+   64 0000003A         ;ORR     r1, r1, r2              ; 设置PC13位(设置�
+                       ��高电平)
+   65 0000003A         ;STR     r1, [r0]                ; 写回寄存器
+   66 0000003A         
+   67 0000003A         ; 4. 无限循环
+   68 0000003A         loop
+   69 0000003A E7FE            B                loop        ; 无条件跳转�
+                                                            �loop标签
+   70 0000003C         
+   71 0000003C                 END
+              40021018 
+              40011004 
+              4001100C 
+Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M3 --apcs=interw
+ork --depend=.\objects\main.d -o.\objects\main.o -I.\RTE\_Target_1 -IC:\Keil_v5
+
+
+
+ARM Macro Assembler    Page 3 
+
+
+\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include -IC:\Keil_v5\ARM\CMSIS\Includ
+e --predefine="__UVISION_VERSION SETA 524" --predefine="STM32F10X_MD SETA 1" --
+list=.\listings\main.lst User\main.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+.text 00000000
+
+Symbol: .text
+   Definitions
+      At line 4 in file User\main.s
+   Uses
+      None
+Comment: .text unused
+__main 00000000
+
+Symbol: __main
+   Definitions
+      At line 25 in file User\main.s
+   Uses
+      At line 21 in file User\main.s
+Comment: __main used once
+loop 0000003A
+
+Symbol: loop
+   Definitions
+      At line 68 in file User\main.s
+   Uses
+      At line 69 in file User\main.s
+Comment: loop used once
+main 00000000
+
+Symbol: main
+   Definitions
+      At line 24 in file User\main.s
+   Uses
+      At line 20 in file User\main.s
+Comment: main used once
+4 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Absolute symbols
+
+GPIOC_CRH 40011004
+
+Symbol: GPIOC_CRH
+   Definitions
+      At line 11 in file User\main.s
+   Uses
+      At line 37 in file User\main.s
+Comment: GPIOC_CRH used once
+GPIOC_ODR 4001100C
+
+Symbol: GPIOC_ODR
+   Definitions
+      At line 12 in file User\main.s
+   Uses
+      At line 53 in file User\main.s
+Comment: GPIOC_ODR used once
+GPIO_CRH_CNF13 00C00000
+
+Symbol: GPIO_CRH_CNF13
+   Definitions
+      At line 16 in file User\main.s
+   Uses
+      At line 41 in file User\main.s
+Comment: GPIO_CRH_CNF13 used once
+GPIO_CRH_MODE13 00300000
+
+Symbol: GPIO_CRH_MODE13
+   Definitions
+      At line 17 in file User\main.s
+   Uses
+      At line 42 in file User\main.s
+      At line 47 in file User\main.s
+
+GPIO_ODR_ODR13 00002000
+
+Symbol: GPIO_ODR_ODR13
+   Definitions
+      At line 18 in file User\main.s
+   Uses
+      At line 55 in file User\main.s
+Comment: GPIO_ODR_ODR13 used once
+RCC_APB2ENR 40021018
+
+Symbol: RCC_APB2ENR
+   Definitions
+      At line 10 in file User\main.s
+   Uses
+      At line 28 in file User\main.s
+Comment: RCC_APB2ENR used once
+RCC_APB2ENR_IOPCEN 00000010
+
+Symbol: RCC_APB2ENR_IOPCEN
+   Definitions
+      At line 15 in file User\main.s
+   Uses
+      At line 30 in file User\main.s
+Comment: RCC_APB2ENR_IOPCEN used once
+7 symbols
+345 symbols in table
