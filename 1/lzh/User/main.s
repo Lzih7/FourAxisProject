@@ -116,7 +116,7 @@ delay
 delay_loop
                 LDR     r1, [r2]
                 ANDS    r1, r1, #0x00010000
-                BNE     delay_loop
+                BEQ     delay_loop
 
                 LDR     r2, =Systick_CTRL
                 MOV     r1, #0x04
