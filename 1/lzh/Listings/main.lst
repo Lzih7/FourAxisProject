@@ -217,7 +217,7 @@ ARM Macro Assembler    Page 4
   116 00000074         delay_loop
   117 00000074 6811            LDR              r1, [r2]
   118 00000076 F411 3180       ANDS             r1, r1, #0x00010000
-  119 0000007A D1FB            BNE              delay_loop
+  119 0000007A D0FB            BEQ              delay_loop
   120 0000007C         
   121 0000007C 4A08            LDR              r2, =Systick_CTRL
   122 0000007E F04F 0104       MOV              r1, #0x04
