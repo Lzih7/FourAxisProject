@@ -165,6 +165,7 @@ delay_loop
                 BX      lr
 
 delay_ms
+                PUSH    {r3, lr}
                 LDR     r3, =1000
 delay_ms_loop
                 LDR     r0, =500
@@ -172,6 +173,7 @@ delay_ms_loop
                 SUBS    r3, r3, #1
                 BNE     delay_ms_loop
 
+                POP     {r3, lr}
                 BX      lr
 ;==============================================================================
 ; 程序结束
