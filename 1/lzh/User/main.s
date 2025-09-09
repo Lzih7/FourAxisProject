@@ -61,7 +61,7 @@ main
                 LDR     r2, =GPIO_CRH_CNF13     ; 加载配置位掩码
                 LDR     r3, =GPIO_CRH_MODE13    ; 加载模式位掩码
                 ORR     r2, r2, r3              ; 合并需要清除的位
-                BIC     r1, r1, r2              ; 清除这些位
+                BIC     r1, r1, r2              ; 清除这些位，即r1 = r1 AND (NOT r2)
                 
                 ; 设置PC13为推挽输出，50MHz (MODE13[1:0] = 11)
                 LDR     r2, =GPIO_CRH_MODE13    ; 加载模式位

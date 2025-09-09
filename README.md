@@ -1,7 +1,7 @@
 ## git 操作
 ### 1. 克隆项目
 ```
-git clone https://github.com/liuzhihan429/FourAxisProject.git
+git clone https://github.com/Lzih7/FourAxisProject.git
 ```
 ### 2.push
 ```
