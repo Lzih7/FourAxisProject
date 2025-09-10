@@ -56,3 +56,31 @@ void Delay_us(uint32_t xus)
 3. 跳转执行 → 跳转到Reset_Handler函数开始执行
 4. 系统初始化 → Reset_Handler通常会调用SystemInit等初始化函数
 5. 进入主程序 → 最终跳转到main函数
+```asm
+Reset_Handler    PROC
+                 EXPORT  Reset_Handler             [WEAK]
+     IMPORT  __main
+     IMPORT  SystemInit
+                 LDR     R0, =SystemInit
+                 BLX     R0
+                 LDR     R0, =__main
+                 BX      R0
+                 ENDP
+```
+- 在复位函数中导入了__main函数，并调用了SystemInit函数(配置系统时钟等)
+- 在main.s中，`EXPORT __main`，使__main函数可被Reset_Handler函数调用
+```c
+// C运行时库提供的__main（简化版）
+void __main(void) {
+    // C环境初始化
+    init_heap_and_stack();     // 初始化堆和栈
+    init_global_variables();   // 初始化全局变量
+    clear_bss_section();       // 清零BSS段
+    
+    // 调用用户main函数
+    int result = main();       // 执行用户代码
+    
+    // 处理程序退出
+    exit(result);              // 程序结束处理
+}
+```
