@@ -34,6 +34,22 @@
 3. 指令缩进
 4. 调用函数后**不能指望函数未使用的寄存器不变**，若需要，则要在调用之前`PUSH`
 ## 延时函数优化
+```c
+void Delay_us(uint32_t xus)
+{
+	SysTick->LOAD = 72 * xus;				//设置定时器重装值
+	SysTick->VAL = 0x00;					//清空当前计数值
+	SysTick->CTRL = 0x00000005;				//设置时钟源为HCLK，启动定时器
+	while(!(SysTick->CTRL & 0x00010000));	//等待计数到0
+	SysTick->CTRL = 0x00000004;				//关闭定时器
+}
+```
+- SysTick->LOAD：设置定时器重装值
+- SysTick->VAL：设置当前计数值
+- SysTick->CTRL: 0x05
+    - bit0: 使能SysTick
+    - bit2: 选择时钟源(HCLK)
+    - bit16: COUNTFLAG标志位，表示计数完成
 ## ARM Cortex-M3启动机制
 1. 上电/复位 → 处理器从逻辑地址0x00000000（通过地址重映射指向Flash物理地址0x08000000）读取向量表
 2. 加载栈指针 → 将0x20005000加载到SP寄存器
