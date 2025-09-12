@@ -989,7 +989,20 @@
   <RTE>
     <apis/>
     <components/>
-    <files/>
+    <files>
+      <file attr="config" category="source" condition="STM32F401xE_ARMCC" name="Drivers\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm\startup_stm32f401xe.s" version="2.5.0">
+        <instance index="0" removed="1">RTE\Device\STM32F401RETx\startup_stm32f401xe.s</instance>
+        <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="2.5.0" condition="STM32F4 CMSIS"/>
+        <package name="STM32F4xx_DFP" schemaVersion="1.3" url="http://www.keil.com/pack" vendor="Keil" version="2.9.0"/>
+        <targetInfos/>
+      </file>
+      <file attr="config" category="source" name="Drivers\CMSIS\Device\ST\STM32F4xx\Source\Templates\system_stm32f4xx.c" version="2.5.0">
+        <instance index="0" removed="1">RTE\Device\STM32F401RETx\system_stm32f4xx.c</instance>
+        <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="2.5.0" condition="STM32F4 CMSIS"/>
+        <package name="STM32F4xx_DFP" schemaVersion="1.3" url="http://www.keil.com/pack" vendor="Keil" version="2.9.0"/>
+        <targetInfos/>
+      </file>
+    </files>
   </RTE>
 
 </Project>
