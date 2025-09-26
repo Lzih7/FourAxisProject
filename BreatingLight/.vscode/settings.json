@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "xutility": "c",
+        "gpio_set.h": "c"
+    }
+}
