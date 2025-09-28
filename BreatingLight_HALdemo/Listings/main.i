@@ -27800,8 +27800,7 @@ void SystemClock_Config(void)
 
   
  
-  RCC_ClkInitStruct.ClockType = ((uint32_t)0x00000002U)|((uint32_t)0x00000001U)
-                              |((uint32_t)0x00000004U)|((uint32_t)0x00000008U);
+  RCC_ClkInitStruct.ClockType = ((uint32_t)0x00000002U) | ((uint32_t)0x00000001U) | ((uint32_t)0x00000004U) | ((uint32_t)0x00000008U);
   RCC_ClkInitStruct.SYSCLKSource = 0x00000000U;
   RCC_ClkInitStruct.AHBCLKDivider = 0x00000000U;
   RCC_ClkInitStruct.APB1CLKDivider = 0x00000000U;
@@ -27823,13 +27822,13 @@ int main(void)
 
    
   do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1ENR) |= (0x00000001U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1ENR) & (0x00000001U)); ((void)(tmpreg)); } while(0);
-  do { GPIO_InitTypeDef GPIO_InitStructure = {0}; GPIO_InitStructure .((uint16_t)0x0020U) = ((uint16_t)0x0020U); GPIO_InitStructure .((uint32_t)0x00000001U) = ((uint32_t)0x00000001U); GPIO_InitStructure .((uint32_t)0x00000003U) = ((uint32_t)0x00000003U); GPIO_InitStructure .((uint32_t)0x00000000U) = ((uint32_t)0x00000000U); HAL_GPIO_Init(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0000U)), &GPIO_InitStructure); } while(0);
+  do { GPIO_InitTypeDef GPIO_InitStructure = {0}; GPIO_InitStructure . Pin = ((uint16_t)0x0020U); GPIO_InitStructure . Mode = ((uint32_t)0x00000001U); GPIO_InitStructure . Speed = ((uint32_t)0x00000003U); GPIO_InitStructure . Pull = ((uint32_t)0x00000000U); HAL_GPIO_Init(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0000U)), &GPIO_InitStructure); } while(0);
    
   while (1)
   {
      
     HAL_GPIO_TogglePin(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0000U)), ((uint16_t)0x0020U));
-    
+
      
     HAL_Delay(500);
   }
