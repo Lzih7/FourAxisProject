@@ -1,6 +1,18 @@
 {
     "files.associations": {
         "xutility": "c",
-        "gpio_set.h": "c"
+        "gpio_set.h": "c",
+        "memory": "cpp",
+        "string": "cpp",
+        "initializer_list": "cpp",
+        "xstring": "cpp",
+        "limits": "cpp",
+        "new": "cpp",
+        "atomic": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "utility": "cpp",
+        "xmemory": "cpp",
+        "main.h": "c"
     }
 }
