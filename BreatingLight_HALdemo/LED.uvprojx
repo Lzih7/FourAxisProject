@@ -1040,6 +1040,31 @@
               <FileType>5</FileType>
               <FilePath>.\MyLib\GPIO_Set.h</FilePath>
             </File>
+            <File>
+              <FileName>PWM_Set.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\MyLib\PWM_Set.h</FilePath>
+            </File>
+            <File>
+              <FileName>MyI2C.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\MyLib\MyI2C.c</FilePath>
+            </File>
+            <File>
+              <FileName>Delay.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\MyLib\Delay.c</FilePath>
+            </File>
+            <File>
+              <FileName>Delay.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\MyLib\Delay.h</FilePath>
+            </File>
+            <File>
+              <FileName>MyI2C.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\MyLib\MyI2C.h</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

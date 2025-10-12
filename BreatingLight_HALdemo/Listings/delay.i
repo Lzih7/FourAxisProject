@@ -1,4 +1,4 @@
-#line 1 "Src\\main.c"
+#line 1 "MyLib\\Delay.c"
 #line 1 ".\\Inc\\main.h"
 
 
@@ -27761,121 +27761,24 @@ void HAL_DisableCompensationCell(void);
 void SystemClock_Config(void);
 void Error_Handler(void);
 
-#line 2 "Src\\main.c"
-#line 1 ".\\MyLib\\GPIO_Set.h"
+#line 2 "MyLib\\Delay.c"
 
-
-
-
-#line 6 ".\\MyLib\\GPIO_Set.h"
-
-#line 16 ".\\MyLib\\GPIO_Set.h"
-
-#line 27 ".\\MyLib\\GPIO_Set.h"
-
-#line 3 "Src\\main.c"
-#line 1 ".\\MyLib\\PWM_Set.h"
-
-
-
-
-#line 6 ".\\MyLib\\PWM_Set.h"
-
-
-extern TIM_HandleTypeDef htim3;
-
-#line 22 ".\\MyLib\\PWM_Set.h"
-
-#line 33 ".\\MyLib\\PWM_Set.h"
-
-#line 4 "Src\\main.c"
-
-TIM_HandleTypeDef htim3;
-int direction = 1;
-
-
-
-
-
-void SystemClock_Config(void)
-{
-  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-
-  
-  RCC_OscInitStruct.OscillatorType = ((uint32_t)0x00000001U);
-  RCC_OscInitStruct.HSEState = ((uint8_t)0x01U);
-  RCC_OscInitStruct.PLL.PLLState = ((uint8_t)0x02U);
-  RCC_OscInitStruct.PLL.PLLSource = 0x00400000U;
-  RCC_OscInitStruct.PLL.PLLM = 8;   
-  RCC_OscInitStruct.PLL.PLLN = 336; 
-  RCC_OscInitStruct.PLL.PLLP = ((uint32_t)0x00000004U); 
-  RCC_OscInitStruct.PLL.PLLQ = 7;   
-
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  
-  RCC_ClkInitStruct.ClockType = ((uint32_t)0x00000002U) | ((uint32_t)0x00000001U) | ((uint32_t)0x00000004U) | ((uint32_t)0x00000008U);
-  RCC_ClkInitStruct.SYSCLKSource = 0x00000002U;
-  RCC_ClkInitStruct.AHBCLKDivider = 0x00000000U;   
-  RCC_ClkInitStruct.APB1CLKDivider = 0x00001000U;    
-  RCC_ClkInitStruct.APB2CLKDivider = 0x00000000U;    
-
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, 0x00000002U) != HAL_OK)
-  {
-    Error_Handler();
-  }
-}
-
-int main(void)
-{
-   
-  HAL_Init();
-
-   
-  SystemClock_Config();
-
-   
-  do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1ENR) |= (0x00000004U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1ENR) & (0x00000004U)); ((void)(tmpreg)); } while(0);
-  do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x00000002U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x00000002U)); ((void)(tmpreg)); } while(0);
-  do { GPIO_InitTypeDef GPIO_InitStructure = {0}; GPIO_InitStructure . Pin = ((uint16_t)0x0040U); GPIO_InitStructure . Mode = ((uint32_t)0x00000002U); GPIO_InitStructure . Speed = ((uint32_t)0x00000003U); GPIO_InitStructure . Pull = ((uint32_t)0x00000000U); GPIO_InitStructure . Alternate = ((uint8_t)0x02U); HAL_GPIO_Init(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0800U)), &GPIO_InitStructure); } while(0);
-  HAL_GPIO_WritePin(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0800U)), ((uint16_t)0x0040U), GPIO_PIN_RESET);
-  do { TIM_Base_InitTypeDef TIM_Base_InitStruct = {0}; TIM_Base_InitStruct . Prescaler = 83; TIM_Base_InitStruct . Period = 999; TIM_Base_InitStruct . ClockDivision = ((uint32_t)0x00000000U); TIM_Base_InitStruct . CounterMode = ((uint32_t)0x00000000U); htim3 . Instance = ((TIM_TypeDef *) (0x40000000U + 0x0400U)); htim3 . Init = TIM_Base_InitStruct; if(HAL_TIM_Base_Init(&htim3) != HAL_OK) { Error_Handler(); } } while(0);
-  do { TIM_OC_InitTypeDef TIM_OC_InitStruct = {0}; TIM_OC_InitStruct . OCMode = (0x0020U | 0x0040U); TIM_OC_InitStruct . Pulse = 0; TIM_OC_InitStruct . OCPolarity = ((uint32_t)0x00000000U); TIM_OC_InitStruct . OCFastMode = ((uint32_t)0x00000000U); if(HAL_TIM_PWM_ConfigChannel(&htim3, &TIM_OC_InitStruct, ((uint32_t)0x00000000U)) != HAL_OK) { Error_Handler(); } } while(0);
-  HAL_TIM_PWM_Start(&htim3, ((uint32_t)0x00000000U));
-
-  int pwm_val = 0;
-   
-  while (1)
-  {
-    if(direction) {
-      pwm_val += 5;
-      if(pwm_val >= 1000) {
-        direction = 0;
-      }
-    } else {
-      pwm_val -= 5;
-      if(pwm_val <= 0) {
-        direction = 1;
-      }
-    }
-    (*(volatile uint32_t *)(&((&htim3)->Instance ->CCR1) + ((((uint32_t)0x00000000U)) >> 2U)) = (pwm_val));
-    HAL_Delay(5);
-  }
-}
-
-
-
-
- 
-void Error_Handler(void)
-{
-   
-  __disable_irq();
-  while (1)
-  {
-  }
+void Timer_Delay_us(uint8_t xus) {
+	TIM_HandleTypeDef htim2;
+	htim2.Instance = ((TIM_TypeDef *) (0x40000000U + 0x0000U));
+	htim2.Init.Prescaler = 42 - 1;
+	htim2.Init.Period = xus - 1;
+	htim2.Init.CounterMode = ((uint32_t)0x00000000U);
+	htim2.Init.ClockDivision = ((uint32_t)0x00000000U);
+	
+	if(HAL_TIM_Base_Init(&htim2) != HAL_OK) {
+		Error_Handler();
+	}
+	if(HAL_TIM_Base_Start(&htim2) != HAL_OK) {
+		Error_Handler();
+	}
+	while(((&htim2)->Instance ->CNT) < xus) {
+		
+	}
+	HAL_TIM_Base_Stop(&htim2);
 }
