@@ -3,16 +3,16 @@
         {
             "name": "Sample",
             "includePath": [
-                "d:\\github\\FourAxisProject\\BreatingLight_HALdemo\\Drivers\\CMSIS\\Device\\ST\\STM32F4xx\\Include",
-                "d:\\github\\FourAxisProject\\BreatingLight_HALdemo\\Drivers\\CMSIS\\Include",
-                "d:\\github\\FourAxisProject\\BreatingLight_HALdemo\\Drivers\\STM32F4xx_HAL_Driver\\Inc",
-                "d:\\github\\FourAxisProject\\BreatingLight_HALdemo\\Inc",
-                "d:\\github\\FourAxisProject\\BreatingLight_HALdemo\\MyLib",
+                "d:\\github\\FourAxisProject\\GY86_test\\Drivers\\CMSIS\\Device\\ST\\STM32F4xx\\Include",
+                "d:\\github\\FourAxisProject\\GY86_test\\Drivers\\CMSIS\\Include",
+                "d:\\github\\FourAxisProject\\GY86_test\\Drivers\\STM32F4xx_HAL_Driver\\Inc",
+                "d:\\github\\FourAxisProject\\GY86_test\\Inc",
+                "d:\\github\\FourAxisProject\\GY86_test\\MyLib",
                 "C:\\Keil_v5\\ARM\\ARMCC\\include",
                 "C:\\Keil_v5\\ARM\\ARMCC\\include\\rw",
-                "d:\\github\\FourAxisProject\\BreatingLight_HALdemo\\Drivers\\CMSIS\\Device\\ST\\STM32F4xx\\Source",
-                "d:\\github\\FourAxisProject\\BreatingLight_HALdemo\\Drivers\\STM32F4xx_HAL_Driver\\Src",
-                "d:\\github\\FourAxisProject\\BreatingLight_HALdemo\\Src"
+                "d:\\github\\FourAxisProject\\GY86_test\\Drivers\\CMSIS\\Device\\ST\\STM32F4xx\\Source",
+                "d:\\github\\FourAxisProject\\GY86_test\\Drivers\\STM32F4xx_HAL_Driver\\Src",
+                "d:\\github\\FourAxisProject\\GY86_test\\Src"
             ],
             "defines": [
                 "USE_HAL_DRIVER",

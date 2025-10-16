@@ -1,4 +1,4 @@
-#line 1 "Src\\main.c"
+#line 1 "MyLib\\GY86.c"
 #line 1 ".\\Inc\\main.h"
 
 
@@ -27761,45 +27761,34 @@ void HAL_DisableCompensationCell(void);
 void SystemClock_Config(void);
 void Error_Handler(void);
 
-#line 2 "Src\\main.c"
-#line 1 ".\\MyLib\\GPIO_Set.h"
+#line 2 "MyLib\\GY86.c"
+#line 1 "MyLib\\MyI2C.h"
 
 
 
-
-#line 6 ".\\MyLib\\GPIO_Set.h"
-
-#line 16 ".\\MyLib\\GPIO_Set.h"
-
-#line 27 ".\\MyLib\\GPIO_Set.h"
-
-#line 3 "Src\\main.c"
-#line 1 ".\\MyLib\\OLED.h"
-
-
-
-void OLED_Init(void);
-void OLED_Clear(void);
-void OLED_ShowChar(uint8_t Line, uint8_t Column, char Char);
-void OLED_ShowString(uint8_t Line, uint8_t Column, char *String);
-void OLED_ShowNum(uint8_t Line, uint8_t Column, uint32_t Number, uint8_t Length);
-void OLED_ShowSignedNum(uint8_t Line, uint8_t Column, int32_t Number, uint8_t Length);
-void OLED_ShowHexNum(uint8_t Line, uint8_t Column, uint32_t Number, uint8_t Length);
-void OLED_ShowBinNum(uint8_t Line, uint8_t Column, uint32_t Number, uint8_t Length);
-
-#line 4 "Src\\main.c"
-#line 1 ".\\MyLib\\GY86.h"
+void MyI2C_W_SCL(uint8_t BitValue);
+void MyI2C_W_SDA(uint8_t BitValue);
+uint8_t MyI2C_R_SDA(void);
+void MyI2C_Init(void); 
+void MyI2C_Start(void);
+void MyI2C_Stop(void);
+void MyI2C_SendByte(uint8_t Byte);
+uint8_t MyI2C_ReceiveByte(void);
+void MyI2C_SendAck(uint8_t AckBit);
+uint8_t MyI2C_ReceiveAck(void);
+#line 3 "MyLib\\GY86.c"
+#line 1 "MyLib\\GY86.h"
 
 
 
-extern uint8_t already_init;
+uint8_t already_init = 0;
 
 
 
 
 
 
-#line 25 ".\\MyLib\\GY86.h"
+#line 25 "MyLib\\GY86.h"
 
 
 
@@ -27811,67 +27800,134 @@ uint8_t MPU6050_ReadReg(uint8_t RegAddr);
 void MPU6050_GetData(int16_t* AccX, int16_t* AccY, int16_t* AccZ, int16_t* GyroX, int16_t* GyroY, int16_t* GyroZ);
 uint8_t MPU6050_GetId(void);
 
-#line 50 ".\\MyLib\\GY86.h"
+#line 50 "MyLib\\GY86.h"
 
-#line 57 ".\\MyLib\\GY86.h"
+#line 57 "MyLib\\GY86.h"
 
-#line 5 "Src\\main.c"
+#line 4 "MyLib\\GY86.c"
+
+extern uint8_t already_init;
 
 
 
-void SystemClock_Config(void)
-{
-    RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-    RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-
-    
-    RCC_OscInitStruct.OscillatorType = ((uint32_t)0x00000001U);
-    RCC_OscInitStruct.HSEState = ((uint8_t)0x01U);
-    RCC_OscInitStruct.PLL.PLLState = ((uint8_t)0x02U);
-    RCC_OscInitStruct.PLL.PLLSource = 0x00400000U;
-    RCC_OscInitStruct.PLL.PLLM = 8;   
-    RCC_OscInitStruct.PLL.PLLN = 336; 
-    RCC_OscInitStruct.PLL.PLLP = ((uint32_t)0x00000004U); 
-    RCC_OscInitStruct.PLL.PLLQ = 7;   
-
-    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-    {
-        Error_Handler();
-    }
-
-    
-    RCC_ClkInitStruct.ClockType = ((uint32_t)0x00000002U) | ((uint32_t)0x00000001U) | ((uint32_t)0x00000004U) | ((uint32_t)0x00000008U);
-    RCC_ClkInitStruct.SYSCLKSource = 0x00000002U;
-    RCC_ClkInitStruct.AHBCLKDivider = 0x00000000U;   
-    RCC_ClkInitStruct.APB1CLKDivider = 0x00001000U;    
-    RCC_ClkInitStruct.APB2CLKDivider = 0x00000000U;    
-
-    if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, 0x00000002U) != HAL_OK)
-    {
-        Error_Handler();
-    }
+ 
+void MPU6050_WriteReg(uint8_t RegAddr, uint8_t data) {
+	MyI2C_Start();
+	MyI2C_SendByte(0xD0);
+	MyI2C_ReceiveAck();
+	MyI2C_SendByte(RegAddr);
+	MyI2C_ReceiveAck();
+	MyI2C_SendByte(data);
+	MyI2C_ReceiveAck();
+	MyI2C_Stop();
 }
 
-int main(void)
-{
-     
-    HAL_Init();
-
-     
-    SystemClock_Config();
-	OLED_Init();
-	
-	
-    
-	OLED_ShowString(1, 1, "hello!");
-	
+void MPU6050_Init(void) {
+	if(!already_init){
+		MyI2C_Init();
+		already_init = 1;
+	}
+	MPU6050_WriteReg(0x6B,0x01);
+	MPU6050_WriteReg(0x6C,0x00);
+	MPU6050_WriteReg(0x19,0x09);
+	MPU6050_WriteReg(0x1A,0x02);
+	MPU6050_WriteReg(0x1B,0x18);
+	MPU6050_WriteReg(0x1C,0x18);
 }
 
-void Error_Handler(void)
-{
-     
-    __disable_irq();
-    while (1)
-    {
-    }
+uint8_t MPU6050_ReadReg(uint8_t RegAddr) {
+	uint8_t RecByte;
+	MyI2C_Start();
+	MyI2C_SendByte(0xD0);
+	MyI2C_ReceiveAck();
+	MyI2C_SendByte(RegAddr);
+	MyI2C_ReceiveAck();
+	
+	MyI2C_Start();
+	MyI2C_SendByte(0xD0 | 0x01);
+	MyI2C_ReceiveAck();
+	RecByte = MyI2C_ReceiveByte();
+	MyI2C_SendAck(1);
+	MyI2C_Stop();
+	return RecByte;
 }
+
+void MPU6050_GetData(int16_t* AccX, int16_t* AccY, int16_t* AccZ, int16_t* GyroX, int16_t* GyroY, int16_t* GyroZ) {
+	uint8_t High, Low;
+	High = MPU6050_ReadReg(0x3B);
+	Low = MPU6050_ReadReg(0x3C);
+	*AccX = Low | (High << 8);
+	High = MPU6050_ReadReg(0x3D);
+	Low = MPU6050_ReadReg(0x3E);
+	*AccY = Low | (High << 8);
+	High = MPU6050_ReadReg(0x3F);
+	Low = MPU6050_ReadReg(0x40);
+	*AccZ = Low | (High << 8);
+	High = MPU6050_ReadReg(0x43);
+	Low = MPU6050_ReadReg(0x44);
+	*GyroX = Low | (High << 8);
+	High = MPU6050_ReadReg(0x45);
+	Low = MPU6050_ReadReg(0x46);
+	*GyroY = Low | (High << 8);	
+	High = MPU6050_ReadReg(0x47);
+	Low = MPU6050_ReadReg(0x48);
+	*GyroZ = Low | (High << 8);
+}
+
+uint8_t MPU6050_GetId(void) {
+	return MPU6050_ReadReg(0x75);
+}
+
+
+
+ 
+void HMC5883L_WriteReg(uint8_t RegAddr, uint8_t data) {
+	MyI2C_Start();
+	MyI2C_SendByte(0x3C);
+	MyI2C_ReceiveAck();
+	MyI2C_SendByte(RegAddr);
+	MyI2C_ReceiveAck();
+	MyI2C_SendByte(data);
+	MyI2C_ReceiveAck();
+	MyI2C_Stop();
+}
+void HMC5883L_Init(void) {
+	if(!already_init){
+		MyI2C_Init();
+		already_init = 1;
+	}
+	HMC5883L_WriteReg(0x00,0x18);
+	HMC5883L_WriteReg(0x01,0x20);
+	HMC5883L_WriteReg(0x02,0x00);
+}
+
+uint8_t HMC5883L_ReadReg(uint8_t RegAddr) {
+	uint8_t RecByte;
+	MyI2C_Start();
+	MyI2C_SendByte(0x3C);
+	MyI2C_ReceiveAck();
+	MyI2C_SendByte(RegAddr);
+	MyI2C_ReceiveAck();
+
+	MyI2C_Start();
+	MyI2C_SendByte(0x3C | 0x01);
+	MyI2C_ReceiveAck();
+	RecByte = MyI2C_ReceiveByte();
+	MyI2C_SendAck(1);
+	MyI2C_Stop();
+	return RecByte;
+}
+
+void HMC5883L_GetData(int16_t* X, int16_t* Y, int16_t* Z) {
+	uint8_t High, Low;
+	High = HMC5883L_ReadReg(0x03);
+	Low = HMC5883L_ReadReg(0x04);
+	*X = Low | (High << 8);
+	High = HMC5883L_ReadReg(0x07);
+	Low = HMC5883L_ReadReg(0x08);
+	*Y = Low | (High << 8);
+	High = HMC5883L_ReadReg(0x05);
+	Low = HMC5883L_ReadReg(0x06);
+	*Z = Low | (High << 8);
+}
+

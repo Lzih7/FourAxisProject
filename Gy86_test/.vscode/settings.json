@@ -13,6 +13,8 @@
         "type_traits": "cpp",
         "utility": "cpp",
         "xmemory": "cpp",
-        "main.h": "c"
+        "main.h": "c",
+        "compare": "c",
+        "cstddef": "c"
     }
 }

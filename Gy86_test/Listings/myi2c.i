@@ -27797,13 +27797,6 @@ void MyI2C_W_SDA(uint8_t BitValue) {
 	Timer_Delay_us(10);
 }
 
-uint8_t MyI2C_R_SCL(void) {
-	uint8_t BitValue;
-	BitValue = HAL_GPIO_ReadPin(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0400U)), ((uint16_t)0x0100U));
-	Timer_Delay_us(10);
-	return BitValue;
-}
-
 uint8_t MyI2C_R_SDA(void) {
 	uint8_t BitValue;
 	BitValue = HAL_GPIO_ReadPin(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0400U)), ((uint16_t)0x0200U));
@@ -27832,10 +27825,8 @@ void MyI2C_Stop(void) {
 }
 
 void MyI2C_SendByte(uint8_t Byte) {
-	uint8_t ByteSend;
 	for(uint8_t i = 0; i < 8; i++) {
-		ByteSend = Byte & ((1 << 7) >> i);
-		HAL_GPIO_WritePin(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0400U)), ((uint16_t)0x0200U), (GPIO_PinState)ByteSend);
+		MyI2C_W_SDA(Byte & ((1 << 7) >> i));
 		MyI2C_W_SCL(1);
 		MyI2C_W_SCL(0);
 	}
@@ -27843,6 +27834,7 @@ void MyI2C_SendByte(uint8_t Byte) {
 
 uint8_t MyI2C_ReceiveByte(void) {
 	uint8_t ByteRec = 0x0;
+	MyI2C_W_SDA(1);
 	for(uint8_t i = 0; i < 8; i++) {
 		MyI2C_W_SCL(1);
 		if(MyI2C_R_SDA() == 1) {

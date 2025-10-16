@@ -1065,6 +1065,31 @@
               <FileType>5</FileType>
               <FilePath>.\MyLib\MyI2C.h</FilePath>
             </File>
+            <File>
+              <FileName>GY86.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\MyLib\GY86.c</FilePath>
+            </File>
+            <File>
+              <FileName>GY86.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\MyLib\GY86.h</FilePath>
+            </File>
+            <File>
+              <FileName>OLED.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\MyLib\OLED.c</FilePath>
+            </File>
+            <File>
+              <FileName>OLED.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\MyLib\OLED.h</FilePath>
+            </File>
+            <File>
+              <FileName>OLED_Font.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\MyLib\OLED_Font.h</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
