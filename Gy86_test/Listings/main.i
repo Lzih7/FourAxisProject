@@ -27813,7 +27813,19 @@ uint8_t MPU6050_GetId(void);
 
 #line 50 ".\\MyLib\\GY86.h"
 
-#line 57 ".\\MyLib\\GY86.h"
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #line 5 "Src\\main.c"
 
@@ -27860,11 +27872,15 @@ int main(void)
      
     SystemClock_Config();
 	OLED_Init();
+	MPU6050_Init();
 	
-	
-    
-	OLED_ShowString(1, 1, "hello!");
-	
+    uint8_t MPU_id = MPU6050_GetId();
+	OLED_ShowString(1, 1, "ID: ");
+	OLED_ShowHexNum(1, 4, MPU_id, 4);
+
+    while(1) {
+        
+    }
 }
 
 void Error_Handler(void)

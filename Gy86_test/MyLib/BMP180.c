@@ -1,6 +1,6 @@
 #include "BMP180.h"
 #include "MyI2C.h"
-#include "Delay.h"
+#include "main.h"
 #include <math.h>
 
 // 全局校准数据
@@ -17,22 +17,11 @@ HAL_StatusTypeDef BMP180_WriteReg(uint8_t reg_addr, uint8_t data)
 {
     MyI2C_Start();
     MyI2C_SendByte(BMP180_ADDRESS);
-    if (MyI2C_ReceiveAck() != 0) {
-        MyI2C_Stop();
-        return HAL_ERROR;
-    }
-    
+    MyI2C_ReceiveAck();
     MyI2C_SendByte(reg_addr);
-    if (MyI2C_ReceiveAck() != 0) {
-        MyI2C_Stop();
-        return HAL_ERROR;
-    }
-    
+    MyI2C_ReceiveAck();
     MyI2C_SendByte(data);
-    if (MyI2C_ReceiveAck() != 0) {
-        MyI2C_Stop();
-        return HAL_ERROR;
-    }
+    MyI2C_ReceiveAck();
     
     MyI2C_Stop();
     return HAL_OK;
@@ -48,23 +37,12 @@ HAL_StatusTypeDef BMP180_ReadReg(uint8_t reg_addr, uint8_t* data)
 {
     MyI2C_Start();
     MyI2C_SendByte(BMP180_ADDRESS);
-    if (MyI2C_ReceiveAck() != 0) {
-        MyI2C_Stop();
-        return HAL_ERROR;
-    }
-    
+    MyI2C_ReceiveAck();
     MyI2C_SendByte(reg_addr);
-    if (MyI2C_ReceiveAck() != 0) {
-        MyI2C_Stop();
-        return HAL_ERROR;
-    }
-    
+    MyI2C_ReceiveAck();
     MyI2C_Start();  // 重新开始
     MyI2C_SendByte(BMP180_ADDRESS_READ);
-    if (MyI2C_ReceiveAck() != 0) {
-        MyI2C_Stop();
-        return HAL_ERROR;
-    }
+    MyI2C_ReceiveAck();
     
     *data = MyI2C_ReceiveByte();
     MyI2C_SendAck(1);  // NACK
@@ -84,23 +62,12 @@ HAL_StatusTypeDef BMP180_ReadRegs(uint8_t reg_addr, uint8_t* data, uint8_t lengt
 {
     MyI2C_Start();
     MyI2C_SendByte(BMP180_ADDRESS);
-    if (MyI2C_ReceiveAck() != 0) {
-        MyI2C_Stop();
-        return HAL_ERROR;
-    }
-    
+    MyI2C_ReceiveAck();
     MyI2C_SendByte(reg_addr);
-    if (MyI2C_ReceiveAck() != 0) {
-        MyI2C_Stop();
-        return HAL_ERROR;
-    }
-    
+    MyI2C_ReceiveAck();
     MyI2C_Start();  // 重新开始
     MyI2C_SendByte(BMP180_ADDRESS_READ);
-    if (MyI2C_ReceiveAck() != 0) {
-        MyI2C_Stop();
-        return HAL_ERROR;
-    }
+    MyI2C_ReceiveAck();
     
     for (uint8_t i = 0; i < length; i++) {
         data[i] = MyI2C_ReceiveByte();
@@ -151,11 +118,10 @@ HAL_StatusTypeDef BMP180_ReadCalibration(BMP180_CalibData_t* calib_data)
  */
 HAL_StatusTypeDef BMP180_Init(void)
 {
-    // 初始化I2C
     MyI2C_Init();
     
     // 延时等待传感器稳定
-    Delay_ms(10);
+    HAL_Delay(10);
     
     // 读取校准系数
     if (BMP180_ReadCalibration(&g_calib_data) != HAL_OK) {
@@ -178,7 +144,7 @@ int32_t BMP180_ReadUncompensatedTemperature(void)
     BMP180_WriteReg(BMP180_REG_CTRL_MEAS, BMP180_CMD_TEMP);
     
     // 等待转换完成 (4.5ms)
-    Delay_ms(5);
+    HAL_Delay(5);
     
     // 读取温度数据
     BMP180_ReadRegs(BMP180_REG_OUT_MSB, data, 2);
@@ -225,7 +191,7 @@ int32_t BMP180_ReadUncompensatedPressure(BMP180_OSS_t oss)
     BMP180_WriteReg(BMP180_REG_CTRL_MEAS, cmd);
     
     // 等待转换完成
-    Delay_ms(delay_time);
+    HAL_Delay(delay_time);
     
     // 读取压力数据
     BMP180_ReadRegs(BMP180_REG_OUT_MSB, data, 3);

@@ -1,8 +1,7 @@
 #ifndef __BMP180_H
 #define __BMP180_H
 
-#include "stm32f4xx_hal.h"
-#include <stdint.h>
+#include "main.h"
 
 // BMP180 I2C设备地址
 #define BMP180_ADDRESS          0xEE    // 写地址 (0x77 << 1)

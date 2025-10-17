@@ -27802,7 +27802,19 @@ uint8_t MPU6050_GetId(void);
 
 #line 50 "MyLib\\GY86.h"
 
-#line 57 "MyLib\\GY86.h"
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #line 4 "MyLib\\GY86.c"
 

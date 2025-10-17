@@ -46,11 +46,15 @@ int main(void)
     /* 配置系统时钟 */
     SystemClock_Config();
 	OLED_Init();
-	//MPU6050_Init();
+	MPU6050_Init();
 	
-    //uint8_t MPU_id = MPU6050_GetId();
-	OLED_ShowString(1, 1, "hello!");
-	//OLED_ShowHexNum(2, 1, MPU_id, 4);
+    uint8_t MPU_id = MPU6050_GetId();
+	OLED_ShowString(1, 1, "ID: ");
+	OLED_ShowHexNum(1, 5, MPU_id, 4);
+
+    while(1) {
+
+    }
 }
 
 void Error_Handler(void)
