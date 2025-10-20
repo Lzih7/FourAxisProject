@@ -1,7 +1,9 @@
 #include "main.h"
 #include "MyI2C.h"
 #include "GY86.h"
-
+/*
+ * MS561101BA代码尚未完成，使用BMP180芯片代替
+ */
 uint8_t already_init = 0;
 
 /*

@@ -1,4 +1,8 @@
-#line 1 "MyLib\\GY86.c"
+#line 1 "MyLib\\BMP180.c"
+#line 1 "MyLib\\BMP180.h"
+
+
+
 #line 1 ".\\Inc\\main.h"
 
 
@@ -27761,7 +27765,73 @@ void HAL_DisableCompensationCell(void);
 void SystemClock_Config(void);
 void Error_Handler(void);
 
-#line 2 "MyLib\\GY86.c"
+#line 5 "MyLib\\BMP180.h"
+
+
+
+
+
+
+
+#line 34 "MyLib\\BMP180.h"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+typedef enum {
+    BMP180_OSS_ULTRA_LOW_POWER = 0,    
+    BMP180_OSS_STANDARD = 1,           
+    BMP180_OSS_HIGH_RESOLUTION = 2,    
+    BMP180_OSS_ULTRA_HIGH_RES = 3      
+} BMP180_OSS_t;
+
+
+typedef struct {
+    int16_t AC1;    
+    int16_t AC2;    
+    int16_t AC3;    
+    uint16_t AC4;   
+    uint16_t AC5;   
+    uint16_t AC6;   
+    int16_t B1;     
+    int16_t B2;     
+    int16_t MB;     
+    int16_t MC;     
+    int16_t MD;     
+} BMP180_CalibData_t;
+
+
+typedef struct {
+    float temperature;      
+    float pressure;         
+    float altitude;         
+} BMP180_Data_t;
+
+
+HAL_StatusTypeDef BMP180_Init(void);
+HAL_StatusTypeDef BMP180_ReadCalibration(BMP180_CalibData_t* calib_data);
+int32_t BMP180_ReadUncompensatedTemperature(void);
+int32_t BMP180_ReadUncompensatedPressure(BMP180_OSS_t oss);
+float BMP180_CalculateTemperature(int32_t ut, BMP180_CalibData_t* calib_data);
+float BMP180_CalculatePressure(int32_t up, int32_t ut, BMP180_OSS_t oss, BMP180_CalibData_t* calib_data);
+float BMP180_CalculateAltitude(float pressure, float sea_level_pressure);
+HAL_StatusTypeDef BMP180_GetData(BMP180_Data_t* data, BMP180_OSS_t oss);
+HAL_StatusTypeDef BMP180_WriteReg(uint8_t reg_addr, uint8_t data);
+HAL_StatusTypeDef BMP180_ReadReg(uint8_t reg_addr, uint8_t* data);
+HAL_StatusTypeDef BMP180_ReadRegs(uint8_t reg_addr, uint8_t* data, uint8_t length);
+
+#line 2 "MyLib\\BMP180.c"
 #line 1 "MyLib\\MyI2C.h"
 
 
@@ -27776,172 +27846,1132 @@ void MyI2C_SendByte(uint8_t Byte);
 uint8_t MyI2C_ReceiveByte(void);
 void MyI2C_SendAck(uint8_t AckBit);
 uint8_t MyI2C_ReceiveAck(void);
-#line 3 "MyLib\\GY86.c"
-#line 1 "MyLib\\GY86.h"
+#line 3 "MyLib\\BMP180.c"
+#line 4 "MyLib\\BMP180.c"
+#line 1 "C:\\Keil_v5\\ARM\\ARMCC\\Bin\\..\\include\\math.h"
 
-
-
-extern uint8_t already_init;
-
-
-
-
-
-
-#line 25 "MyLib\\GY86.h"
-
-
-
-
-
-void MPU6050_WriteReg(uint8_t RegAddr, uint8_t data);
-void MPU6050_Init(void);
-uint8_t MPU6050_ReadReg(uint8_t RegAddr);
-void MPU6050_GetData(int16_t* AccX, int16_t* AccY, int16_t* AccZ, int16_t* GyroX, int16_t* GyroY, int16_t* GyroZ);
-uint8_t MPU6050_GetId(void);
-
-#line 50 "MyLib\\GY86.h"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#line 4 "MyLib\\GY86.c"
-
-
- 
-uint8_t already_init = 0;
 
 
 
  
-void MPU6050_WriteReg(uint8_t RegAddr, uint8_t data) {
-	MyI2C_Start();
-	MyI2C_SendByte(0xD0);
-	MyI2C_ReceiveAck();
-	MyI2C_SendByte(RegAddr);
-	MyI2C_ReceiveAck();
-	MyI2C_SendByte(data);
-	MyI2C_ReceiveAck();
-	MyI2C_Stop();
-}
 
-void MPU6050_Init(void) {
-	if(!already_init){
-		MyI2C_Init();
-		already_init = 1;
-	}
-	MPU6050_WriteReg(0x6B,0x01);
-	MPU6050_WriteReg(0x6C,0x00);
-	MPU6050_WriteReg(0x19,0x09);
-	MPU6050_WriteReg(0x1A,0x02);
-	MPU6050_WriteReg(0x1B,0x18);
-	MPU6050_WriteReg(0x1C,0x18);
-}
 
-uint8_t MPU6050_ReadReg(uint8_t RegAddr) {
-	uint8_t RecByte;
-	MyI2C_Start();
-	MyI2C_SendByte(0xD0);
-	MyI2C_ReceiveAck();
-	MyI2C_SendByte(RegAddr);
-	MyI2C_ReceiveAck();
-	
-	MyI2C_Start();
-	MyI2C_SendByte(0xD0 | 0x01);
-	MyI2C_ReceiveAck();
-	RecByte = MyI2C_ReceiveByte();
-	MyI2C_SendAck(1);
-	MyI2C_Stop();
-	return RecByte;
-}
-
-void MPU6050_GetData(int16_t* AccX, int16_t* AccY, int16_t* AccZ, int16_t* GyroX, int16_t* GyroY, int16_t* GyroZ) {
-	uint8_t High, Low;
-	High = MPU6050_ReadReg(0x3B);
-	Low = MPU6050_ReadReg(0x3C);
-	*AccX = Low | (High << 8);
-	High = MPU6050_ReadReg(0x3D);
-	Low = MPU6050_ReadReg(0x3E);
-	*AccY = Low | (High << 8);
-	High = MPU6050_ReadReg(0x3F);
-	Low = MPU6050_ReadReg(0x40);
-	*AccZ = Low | (High << 8);
-	High = MPU6050_ReadReg(0x43);
-	Low = MPU6050_ReadReg(0x44);
-	*GyroX = Low | (High << 8);
-	High = MPU6050_ReadReg(0x45);
-	Low = MPU6050_ReadReg(0x46);
-	*GyroY = Low | (High << 8);	
-	High = MPU6050_ReadReg(0x47);
-	Low = MPU6050_ReadReg(0x48);
-	*GyroZ = Low | (High << 8);
-}
-
-uint8_t MPU6050_GetId(void) {
-	return MPU6050_ReadReg(0x75);
-}
 
 
 
  
-void HMC5883L_WriteReg(uint8_t RegAddr, uint8_t data) {
-	MyI2C_Start();
-	MyI2C_SendByte(0x3C);
-	MyI2C_ReceiveAck();
-	MyI2C_SendByte(RegAddr);
-	MyI2C_ReceiveAck();
-	MyI2C_SendByte(data);
-	MyI2C_ReceiveAck();
-	MyI2C_Stop();
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+   
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+#line 61 "C:\\Keil_v5\\ARM\\ARMCC\\Bin\\..\\include\\math.h"
+
+#line 75 "C:\\Keil_v5\\ARM\\ARMCC\\Bin\\..\\include\\math.h"
+
+
+
+
+
+
+
+   
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+#line 112 "C:\\Keil_v5\\ARM\\ARMCC\\Bin\\..\\include\\math.h"
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+extern __attribute__((__pcs__("aapcs"))) unsigned __ARM_dcmp4(double  , double  );
+extern __attribute__((__pcs__("aapcs"))) unsigned __ARM_fcmp4(float  , float  );
+    
+
+
+
+
+ 
+
+extern __declspec(__nothrow) __attribute__((__pcs__("aapcs"))) int __ARM_fpclassifyf(float  );
+extern __declspec(__nothrow) __attribute__((__pcs__("aapcs"))) int __ARM_fpclassify(double  );
+     
+     
+
+static inline __declspec(__nothrow) __attribute__((__pcs__("aapcs"))) int __ARM_isfinitef(float __x)
+{
+    return (((*(unsigned *)&(__x)) >> 23) & 0xff) != 0xff;
 }
-void HMC5883L_Init(void) {
-	if(!already_init){
-		MyI2C_Init();
-		already_init = 1;
-	}
-	HMC5883L_WriteReg(0x00,0x18);
-	HMC5883L_WriteReg(0x01,0x20);
-	HMC5883L_WriteReg(0x02,0x00);
+static inline __declspec(__nothrow) __attribute__((__pcs__("aapcs"))) int __ARM_isfinite(double __x)
+{
+    return (((*(1 + (unsigned *)&(__x))) >> 20) & 0x7ff) != 0x7ff;
+}
+     
+     
+
+static inline __declspec(__nothrow) __attribute__((__pcs__("aapcs"))) int __ARM_isinff(float __x)
+{
+    return ((*(unsigned *)&(__x)) << 1) == 0xff000000;
+}
+static inline __declspec(__nothrow) __attribute__((__pcs__("aapcs"))) int __ARM_isinf(double __x)
+{
+    return (((*(1 + (unsigned *)&(__x))) << 1) == 0xffe00000) && ((*(unsigned *)&(__x)) == 0);
+}
+     
+     
+
+static inline __declspec(__nothrow) __attribute__((__pcs__("aapcs"))) int __ARM_islessgreaterf(float __x, float __y)
+{
+    unsigned __f = __ARM_fcmp4(__x, __y) >> 28;
+    return (__f == 8) || (__f == 2);  
+}
+static inline __declspec(__nothrow) __attribute__((__pcs__("aapcs"))) int __ARM_islessgreater(double __x, double __y)
+{
+    unsigned __f = __ARM_dcmp4(__x, __y) >> 28;
+    return (__f == 8) || (__f == 2);  
+}
+    
+
+
+ 
+
+static inline __declspec(__nothrow) __attribute__((__pcs__("aapcs"))) int __ARM_isnanf(float __x)
+{
+    return (0x7f800000 - ((*(unsigned *)&(__x)) & 0x7fffffff)) >> 31;
+}
+static inline __declspec(__nothrow) __attribute__((__pcs__("aapcs"))) int __ARM_isnan(double __x)
+{
+    unsigned __xf = (*(1 + (unsigned *)&(__x))) | (((*(unsigned *)&(__x)) == 0) ? 0 : 1);
+    return (0x7ff00000 - (__xf & 0x7fffffff)) >> 31;
+}
+     
+     
+
+static inline __declspec(__nothrow) __attribute__((__pcs__("aapcs"))) int __ARM_isnormalf(float __x)
+{
+    unsigned __xe = ((*(unsigned *)&(__x)) >> 23) & 0xff;
+    return (__xe != 0xff) && (__xe != 0);
+}
+static inline __declspec(__nothrow) __attribute__((__pcs__("aapcs"))) int __ARM_isnormal(double __x)
+{
+    unsigned __xe = ((*(1 + (unsigned *)&(__x))) >> 20) & 0x7ff;
+    return (__xe != 0x7ff) && (__xe != 0);
+}
+     
+     
+
+static inline __declspec(__nothrow) __attribute__((__pcs__("aapcs"))) int __ARM_signbitf(float __x)
+{
+    return (*(unsigned *)&(__x)) >> 31;
+}
+static inline __declspec(__nothrow) __attribute__((__pcs__("aapcs"))) int __ARM_signbit(double __x)
+{
+    return (*(1 + (unsigned *)&(__x))) >> 31;
+}
+     
+     
+
+
+
+
+
+
+
+
+#line 230 "C:\\Keil_v5\\ARM\\ARMCC\\Bin\\..\\include\\math.h"
+
+
+
+
+
+
+
+   
+  typedef float float_t;
+  typedef double double_t;
+#line 251 "C:\\Keil_v5\\ARM\\ARMCC\\Bin\\..\\include\\math.h"
+
+
+
+extern const int math_errhandling;
+#line 261 "C:\\Keil_v5\\ARM\\ARMCC\\Bin\\..\\include\\math.h"
+
+extern __declspec(__nothrow) double acos(double  );
+    
+    
+    
+extern __declspec(__nothrow) double asin(double  );
+    
+    
+    
+    
+
+extern __declspec(__nothrow) __attribute__((const)) double atan(double  );
+    
+    
+
+extern __declspec(__nothrow) double atan2(double  , double  );
+    
+    
+    
+    
+
+extern __declspec(__nothrow) double cos(double  );
+    
+    
+    
+    
+extern __declspec(__nothrow) double sin(double  );
+    
+    
+    
+    
+
+extern void __use_accurate_range_reduction(void);
+    
+    
+
+extern __declspec(__nothrow) double tan(double  );
+    
+    
+    
+    
+
+extern __declspec(__nothrow) double cosh(double  );
+    
+    
+    
+    
+extern __declspec(__nothrow) double sinh(double  );
+    
+    
+    
+    
+    
+
+extern __declspec(__nothrow) __attribute__((const)) double tanh(double  );
+    
+    
+
+extern __declspec(__nothrow) double exp(double  );
+    
+    
+    
+    
+    
+
+extern __declspec(__nothrow) double frexp(double  , int *  ) __attribute__((__nonnull__(2)));
+    
+    
+    
+    
+    
+    
+
+extern __declspec(__nothrow) double ldexp(double  , int  );
+    
+    
+    
+    
+extern __declspec(__nothrow) double log(double  );
+    
+    
+    
+    
+    
+extern __declspec(__nothrow) double log10(double  );
+    
+    
+    
+extern __declspec(__nothrow) double modf(double  , double *  ) __attribute__((__nonnull__(2)));
+    
+    
+    
+    
+
+extern __declspec(__nothrow) double pow(double  , double  );
+    
+    
+    
+    
+    
+    
+extern __declspec(__nothrow) double sqrt(double  );
+    
+    
+    
+
+
+
+
+    inline double _sqrt(double __x) { return sqrt(__x); }
+
+
+    inline float _sqrtf(float __x) { return __sqrtf(__x); }
+
+
+
+    
+
+
+
+ 
+
+extern __declspec(__nothrow) __attribute__((const)) double ceil(double  );
+    
+    
+extern __declspec(__nothrow) __attribute__((const)) double fabs(double  );
+    
+    
+
+extern __declspec(__nothrow) __attribute__((const)) double floor(double  );
+    
+    
+
+extern __declspec(__nothrow) double fmod(double  , double  );
+    
+    
+    
+    
+    
+
+    
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+extern __declspec(__nothrow) double acosh(double  );
+    
+
+ 
+extern __declspec(__nothrow) double asinh(double  );
+    
+
+ 
+extern __declspec(__nothrow) double atanh(double  );
+    
+
+ 
+extern __declspec(__nothrow) double cbrt(double  );
+    
+
+ 
+inline __declspec(__nothrow) __attribute__((const)) double copysign(double __x, double __y)
+    
+
+ 
+{
+    (*(1 + (unsigned *)&(__x))) = ((*(1 + (unsigned *)&(__x))) & 0x7fffffff) | ((*(1 + (unsigned *)&(__y))) & 0x80000000);
+    return __x;
+}
+inline __declspec(__nothrow) __attribute__((const)) float copysignf(float __x, float __y)
+    
+
+ 
+{
+    (*(unsigned *)&(__x)) = ((*(unsigned *)&(__x)) & 0x7fffffff) | ((*(unsigned *)&(__y)) & 0x80000000);
+    return __x;
+}
+extern __declspec(__nothrow) double erf(double  );
+    
+
+ 
+extern __declspec(__nothrow) double erfc(double  );
+    
+
+ 
+extern __declspec(__nothrow) double expm1(double  );
+    
+
+ 
+
+
+
+    
+
+ 
+
+
+
+
+
+
+#line 479 "C:\\Keil_v5\\ARM\\ARMCC\\Bin\\..\\include\\math.h"
+
+
+extern __declspec(__nothrow) double hypot(double  , double  );
+    
+
+
+
+
+ 
+extern __declspec(__nothrow) int ilogb(double  );
+    
+
+ 
+extern __declspec(__nothrow) int ilogbf(float  );
+    
+
+ 
+extern __declspec(__nothrow) int ilogbl(long double  );
+    
+
+ 
+
+
+
+
+
+
+
+    
+
+ 
+
+
+
+
+
+    
+
+
+
+ 
+
+
+
+
+
+    
+
+
+
+ 
+
+
+
+
+
+    
+
+ 
+
+
+
+
+
+    
+
+
+
+ 
+
+
+
+
+
+    
+
+
+
+ 
+
+
+
+
+
+    
+
+
+
+ 
+
+
+
+
+
+    
+
+ 
+
+
+
+
+
+    
+
+ 
+
+
+
+
+
+    
+
+
+ 
+
+extern __declspec(__nothrow) double lgamma (double  );
+    
+
+
+ 
+extern __declspec(__nothrow) double log1p(double  );
+    
+
+ 
+extern __declspec(__nothrow) double logb(double  );
+    
+
+ 
+extern __declspec(__nothrow) float logbf(float  );
+    
+
+ 
+extern __declspec(__nothrow) long double logbl(long double  );
+    
+
+ 
+extern __declspec(__nothrow) double nextafter(double  , double  );
+    
+
+
+ 
+extern __declspec(__nothrow) float nextafterf(float  , float  );
+    
+
+
+ 
+extern __declspec(__nothrow) long double nextafterl(long double  , long double  );
+    
+
+
+ 
+extern __declspec(__nothrow) double nexttoward(double  , long double  );
+    
+
+
+ 
+extern __declspec(__nothrow) float nexttowardf(float  , long double  );
+    
+
+
+ 
+extern __declspec(__nothrow) long double nexttowardl(long double  , long double  );
+    
+
+
+ 
+extern __declspec(__nothrow) double remainder(double  , double  );
+    
+
+ 
+extern __declspec(__nothrow) __attribute__((const)) double rint(double  );
+    
+
+ 
+extern __declspec(__nothrow) double scalbln(double  , long int  );
+    
+
+ 
+extern __declspec(__nothrow) float scalblnf(float  , long int  );
+    
+
+ 
+extern __declspec(__nothrow) long double scalblnl(long double  , long int  );
+    
+
+ 
+extern __declspec(__nothrow) double scalbn(double  , int  );
+    
+
+ 
+extern __declspec(__nothrow) float scalbnf(float  , int  );
+    
+
+ 
+extern __declspec(__nothrow) long double scalbnl(long double  , int  );
+    
+
+ 
+
+
+
+
+    
+
+ 
+
+
+
+ 
+extern __declspec(__nothrow) __attribute__((const)) float _fabsf(float);  
+inline __declspec(__nothrow) __attribute__((const)) float fabsf(float __f) { return _fabsf(__f); }
+extern __declspec(__nothrow) float sinf(float  );
+extern __declspec(__nothrow) float cosf(float  );
+extern __declspec(__nothrow) float tanf(float  );
+extern __declspec(__nothrow) float acosf(float  );
+extern __declspec(__nothrow) float asinf(float  );
+extern __declspec(__nothrow) float atanf(float  );
+extern __declspec(__nothrow) float atan2f(float  , float  );
+extern __declspec(__nothrow) float sinhf(float  );
+extern __declspec(__nothrow) float coshf(float  );
+extern __declspec(__nothrow) float tanhf(float  );
+extern __declspec(__nothrow) float expf(float  );
+extern __declspec(__nothrow) float logf(float  );
+extern __declspec(__nothrow) float log10f(float  );
+extern __declspec(__nothrow) float powf(float  , float  );
+extern __declspec(__nothrow) float sqrtf(float  );
+extern __declspec(__nothrow) float ldexpf(float  , int  );
+extern __declspec(__nothrow) float frexpf(float  , int *  ) __attribute__((__nonnull__(2)));
+extern __declspec(__nothrow) __attribute__((const)) float ceilf(float  );
+extern __declspec(__nothrow) __attribute__((const)) float floorf(float  );
+extern __declspec(__nothrow) float fmodf(float  , float  );
+extern __declspec(__nothrow) float modff(float  , float *  ) __attribute__((__nonnull__(2)));
+
+ 
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+__declspec(__nothrow) long double acosl(long double );
+__declspec(__nothrow) long double asinl(long double );
+__declspec(__nothrow) long double atanl(long double );
+__declspec(__nothrow) long double atan2l(long double , long double );
+__declspec(__nothrow) long double ceill(long double );
+__declspec(__nothrow) long double cosl(long double );
+__declspec(__nothrow) long double coshl(long double );
+__declspec(__nothrow) long double expl(long double );
+__declspec(__nothrow) long double fabsl(long double );
+__declspec(__nothrow) long double floorl(long double );
+__declspec(__nothrow) long double fmodl(long double , long double );
+__declspec(__nothrow) long double frexpl(long double , int* ) __attribute__((__nonnull__(2)));
+__declspec(__nothrow) long double ldexpl(long double , int );
+__declspec(__nothrow) long double logl(long double );
+__declspec(__nothrow) long double log10l(long double );
+__declspec(__nothrow) long double modfl(long double  , long double *  ) __attribute__((__nonnull__(2)));
+__declspec(__nothrow) long double powl(long double , long double );
+__declspec(__nothrow) long double sinl(long double );
+__declspec(__nothrow) long double sinhl(long double );
+__declspec(__nothrow) long double sqrtl(long double );
+__declspec(__nothrow) long double tanl(long double );
+__declspec(__nothrow) long double tanhl(long double );
+
+
+
+
+
+ 
+extern __declspec(__nothrow) float acoshf(float  );
+__declspec(__nothrow) long double acoshl(long double );
+extern __declspec(__nothrow) float asinhf(float  );
+__declspec(__nothrow) long double asinhl(long double );
+extern __declspec(__nothrow) float atanhf(float  );
+__declspec(__nothrow) long double atanhl(long double );
+__declspec(__nothrow) long double copysignl(long double , long double );
+extern __declspec(__nothrow) float cbrtf(float  );
+__declspec(__nothrow) long double cbrtl(long double );
+extern __declspec(__nothrow) float erff(float  );
+__declspec(__nothrow) long double erfl(long double );
+extern __declspec(__nothrow) float erfcf(float  );
+__declspec(__nothrow) long double erfcl(long double );
+extern __declspec(__nothrow) float expm1f(float  );
+__declspec(__nothrow) long double expm1l(long double );
+extern __declspec(__nothrow) float log1pf(float  );
+__declspec(__nothrow) long double log1pl(long double );
+extern __declspec(__nothrow) float hypotf(float  , float  );
+__declspec(__nothrow) long double hypotl(long double , long double );
+extern __declspec(__nothrow) float lgammaf(float  );
+__declspec(__nothrow) long double lgammal(long double );
+extern __declspec(__nothrow) float remainderf(float  , float  );
+__declspec(__nothrow) long double remainderl(long double , long double );
+extern __declspec(__nothrow) float rintf(float  );
+__declspec(__nothrow) long double rintl(long double );
+
+
+
+
+
+
+ 
+extern __declspec(__nothrow) double exp2(double  );  
+extern __declspec(__nothrow) float exp2f(float  );
+__declspec(__nothrow) long double exp2l(long double );
+extern __declspec(__nothrow) double fdim(double  , double  );
+extern __declspec(__nothrow) float fdimf(float  , float  );
+__declspec(__nothrow) long double fdiml(long double , long double );
+#line 803 "C:\\Keil_v5\\ARM\\ARMCC\\Bin\\..\\include\\math.h"
+extern __declspec(__nothrow) double fma(double  , double  , double  );
+extern __declspec(__nothrow) float fmaf(float  , float  , float  );
+
+inline __declspec(__nothrow) long double fmal(long double __x, long double __y, long double __z)     { return (long double)fma((double)__x, (double)__y, (double)__z); }
+
+
+extern __declspec(__nothrow) __attribute__((const)) double fmax(double  , double  );
+extern __declspec(__nothrow) __attribute__((const)) float fmaxf(float  , float  );
+__declspec(__nothrow) long double fmaxl(long double , long double );
+extern __declspec(__nothrow) __attribute__((const)) double fmin(double  , double  );
+extern __declspec(__nothrow) __attribute__((const)) float fminf(float  , float  );
+__declspec(__nothrow) long double fminl(long double , long double );
+extern __declspec(__nothrow) double log2(double  );  
+extern __declspec(__nothrow) float log2f(float  );
+__declspec(__nothrow) long double log2l(long double );
+extern __declspec(__nothrow) long lrint(double  );
+extern __declspec(__nothrow) long lrintf(float  );
+
+inline __declspec(__nothrow) long lrintl(long double __x)     { return lrint((double)__x); }
+
+
+extern __declspec(__nothrow) long long llrint(double  );
+extern __declspec(__nothrow) long long llrintf(float  );
+
+inline __declspec(__nothrow) long long llrintl(long double __x)     { return llrint((double)__x); }
+
+
+extern __declspec(__nothrow) long lround(double  );
+extern __declspec(__nothrow) long lroundf(float  );
+
+inline __declspec(__nothrow) long lroundl(long double __x)     { return lround((double)__x); }
+
+
+extern __declspec(__nothrow) long long llround(double  );
+extern __declspec(__nothrow) long long llroundf(float  );
+
+inline __declspec(__nothrow) long long llroundl(long double __x)     { return llround((double)__x); }
+
+
+extern __declspec(__nothrow) __attribute__((const)) double nan(const char * );
+extern __declspec(__nothrow) __attribute__((const)) float nanf(const char * );
+
+inline __declspec(__nothrow) __attribute__((const)) long double nanl(const char *__t)     { return (long double)nan(__t); }
+#line 856 "C:\\Keil_v5\\ARM\\ARMCC\\Bin\\..\\include\\math.h"
+extern __declspec(__nothrow) __attribute__((const)) double nearbyint(double  );
+extern __declspec(__nothrow) __attribute__((const)) float nearbyintf(float  );
+__declspec(__nothrow) long double nearbyintl(long double );
+extern  double remquo(double  , double  , int * );
+extern  float remquof(float  , float  , int * );
+
+inline long double remquol(long double __x, long double __y, int *__q)     { return (long double)remquo((double)__x, (double)__y, __q); }
+
+
+extern __declspec(__nothrow) __attribute__((const)) double round(double  );
+extern __declspec(__nothrow) __attribute__((const)) float roundf(float  );
+__declspec(__nothrow) long double roundl(long double );
+extern __declspec(__nothrow) double tgamma(double  );  
+extern __declspec(__nothrow) float tgammaf(float  );
+__declspec(__nothrow) long double tgammal(long double );
+extern __declspec(__nothrow) __attribute__((const)) double trunc(double  );
+extern __declspec(__nothrow) __attribute__((const)) float truncf(float  );
+__declspec(__nothrow) long double truncl(long double );
+
+
+
+
+
+
+#line 896 "C:\\Keil_v5\\ARM\\ARMCC\\Bin\\..\\include\\math.h"
+
+#line 1087 "C:\\Keil_v5\\ARM\\ARMCC\\Bin\\..\\include\\math.h"
+
+
+
+
+
+
+
+
+
+
+
+#line 1317 "C:\\Keil_v5\\ARM\\ARMCC\\Bin\\..\\include\\math.h"
+
+
+
+
+
+ 
+#line 5 "MyLib\\BMP180.c"
+
+
+static BMP180_CalibData_t g_calib_data;
+static uint8_t g_calib_loaded = 0;
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef BMP180_WriteReg(uint8_t reg_addr, uint8_t data)
+{
+    MyI2C_Start();
+    MyI2C_SendByte(0xEE);
+    MyI2C_ReceiveAck();
+    MyI2C_SendByte(reg_addr);
+    MyI2C_ReceiveAck();
+    MyI2C_SendByte(data);
+    MyI2C_ReceiveAck();
+    
+    MyI2C_Stop();
+    return HAL_OK;
 }
 
-uint8_t HMC5883L_ReadReg(uint8_t RegAddr) {
-	uint8_t RecByte;
-	MyI2C_Start();
-	MyI2C_SendByte(0x3C);
-	MyI2C_ReceiveAck();
-	MyI2C_SendByte(RegAddr);
-	MyI2C_ReceiveAck();
 
-	MyI2C_Start();
-	MyI2C_SendByte(0x3C | 0x01);
-	MyI2C_ReceiveAck();
-	RecByte = MyI2C_ReceiveByte();
-	MyI2C_SendAck(1);
-	MyI2C_Stop();
-	return RecByte;
+
+
+
+
+ 
+HAL_StatusTypeDef BMP180_ReadReg(uint8_t reg_addr, uint8_t* data)
+{
+    MyI2C_Start();
+    MyI2C_SendByte(0xEE);
+    MyI2C_ReceiveAck();
+    MyI2C_SendByte(reg_addr);
+    MyI2C_ReceiveAck();
+    MyI2C_Start();  
+    MyI2C_SendByte(0xEF);
+    MyI2C_ReceiveAck();
+    
+    *data = MyI2C_ReceiveByte();
+    MyI2C_SendAck(1);  
+    MyI2C_Stop();
+    
+    return HAL_OK;
 }
 
-void HMC5883L_GetData(int16_t* X, int16_t* Y, int16_t* Z) {
-	uint8_t High, Low;
-	High = HMC5883L_ReadReg(0x03);
-	Low = HMC5883L_ReadReg(0x04);
-	*X = Low | (High << 8);
-	High = HMC5883L_ReadReg(0x07);
-	Low = HMC5883L_ReadReg(0x08);
-	*Y = Low | (High << 8);
-	High = HMC5883L_ReadReg(0x05);
-	Low = HMC5883L_ReadReg(0x06);
-	*Z = Low | (High << 8);
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef BMP180_ReadRegs(uint8_t reg_addr, uint8_t* data, uint8_t length)
+{
+    MyI2C_Start();
+    MyI2C_SendByte(0xEE);
+    MyI2C_ReceiveAck();
+    MyI2C_SendByte(reg_addr);
+    MyI2C_ReceiveAck();
+    MyI2C_Start();  
+    MyI2C_SendByte(0xEF);
+    MyI2C_ReceiveAck();
+    
+    for (uint8_t i = 0; i < length; i++) {
+        data[i] = MyI2C_ReceiveByte();
+        if (i < length - 1) {
+            MyI2C_SendAck(0);  
+        } else {
+            MyI2C_SendAck(1);  
+        }
+    }
+    
+    MyI2C_Stop();
+    return HAL_OK;
 }
 
+
+
+
+
+ 
+HAL_StatusTypeDef BMP180_ReadCalibration(BMP180_CalibData_t* calib_data)
+{
+    uint8_t calib_buffer[22];
+    
+    
+    if (BMP180_ReadRegs(0xAA, calib_buffer, 22) != HAL_OK) {
+        return HAL_ERROR;
+    }
+    
+    
+    calib_data->AC1 = (int16_t)((calib_buffer[0] << 8) | calib_buffer[1]);
+    calib_data->AC2 = (int16_t)((calib_buffer[2] << 8) | calib_buffer[3]);
+    calib_data->AC3 = (int16_t)((calib_buffer[4] << 8) | calib_buffer[5]);
+    calib_data->AC4 = (uint16_t)((calib_buffer[6] << 8) | calib_buffer[7]);
+    calib_data->AC5 = (uint16_t)((calib_buffer[8] << 8) | calib_buffer[9]);
+    calib_data->AC6 = (uint16_t)((calib_buffer[10] << 8) | calib_buffer[11]);
+    calib_data->B1 = (int16_t)((calib_buffer[12] << 8) | calib_buffer[13]);
+    calib_data->B2 = (int16_t)((calib_buffer[14] << 8) | calib_buffer[15]);
+    calib_data->MB = (int16_t)((calib_buffer[16] << 8) | calib_buffer[17]);
+    calib_data->MC = (int16_t)((calib_buffer[18] << 8) | calib_buffer[19]);
+    calib_data->MD = (int16_t)((calib_buffer[20] << 8) | calib_buffer[21]);
+    
+    return HAL_OK;
+}
+
+
+
+
+ 
+HAL_StatusTypeDef BMP180_Init(void)
+{
+    MyI2C_Init();
+    
+    
+    HAL_Delay(10);
+    
+    
+    if (BMP180_ReadCalibration(&g_calib_data) != HAL_OK) {
+        return HAL_ERROR;
+    }
+    
+    g_calib_loaded = 1;
+    return HAL_OK;
+}
+
+
+
+
+ 
+int32_t BMP180_ReadUncompensatedTemperature(void)
+{
+    uint8_t data[2];
+    
+    
+    BMP180_WriteReg(0xF4, 0x2E);
+    
+    
+    HAL_Delay(5);
+    
+    
+    BMP180_ReadRegs(0xF6, data, 2);
+    
+    return (int32_t)((data[0] << 8) | data[1]);
+}
+
+
+
+
+
+ 
+int32_t BMP180_ReadUncompensatedPressure(BMP180_OSS_t oss)
+{
+    uint8_t data[3];
+    uint8_t cmd;
+    uint16_t delay_time;
+    
+    
+    switch (oss) {
+        case BMP180_OSS_ULTRA_LOW_POWER:
+            cmd = 0x34;
+            delay_time = 5;  
+            break;
+        case BMP180_OSS_STANDARD:
+            cmd = 0x74;
+            delay_time = 8;  
+            break;
+        case BMP180_OSS_HIGH_RESOLUTION:
+            cmd = 0xB4;
+            delay_time = 14; 
+            break;
+        case BMP180_OSS_ULTRA_HIGH_RES:
+            cmd = 0xF4;
+            delay_time = 26; 
+            break;
+        default:
+            cmd = 0x34;
+            delay_time = 5;
+            break;
+    }
+    
+    
+    BMP180_WriteReg(0xF4, cmd);
+    
+    
+    HAL_Delay(delay_time);
+    
+    
+    BMP180_ReadRegs(0xF6, data, 3);
+    
+    return (int32_t)(((data[0] << 16) | (data[1] << 8) | data[2]) >> (8 - oss));
+}
+
+
+
+
+
+
+ 
+float BMP180_CalculateTemperature(int32_t ut, BMP180_CalibData_t* calib_data)
+{
+    int32_t X1, X2, B5;
+    
+    X1 = ((ut - calib_data->AC6) * calib_data->AC5) >> 15;
+    X2 = (calib_data->MC << 11) / (X1 + calib_data->MD);
+    B5 = X1 + X2;
+    
+    return ((B5 + 8) >> 4) / 10.0f;
+}
+
+
+
+
+
+
+
+
+ 
+float BMP180_CalculatePressure(int32_t up, int32_t ut, BMP180_OSS_t oss, BMP180_CalibData_t* calib_data)
+{
+    int32_t X1, X2, X3, B3, B5, B6, p;
+    uint32_t B4, B7;
+    
+    
+    X1 = ((ut - calib_data->AC6) * calib_data->AC5) >> 15;
+    X2 = (calib_data->MC << 11) / (X1 + calib_data->MD);
+    B5 = X1 + X2;
+    
+    
+    B6 = B5 - 4000;
+    X1 = (calib_data->B2 * ((B6 * B6) >> 12)) >> 11;
+    X2 = (calib_data->AC2 * B6) >> 11;
+    X3 = X1 + X2;
+    B3 = (((calib_data->AC1 * 4 + X3) << oss) + 2) >> 2;
+    
+    X1 = (calib_data->AC3 * B6) >> 13;
+    X2 = (calib_data->B1 * ((B6 * B6) >> 12)) >> 16;
+    X3 = ((X1 + X2) + 2) >> 2;
+    B4 = (calib_data->AC4 * (uint32_t)(X3 + 32768)) >> 15;
+    B7 = ((uint32_t)up - B3) * (50000 >> oss);
+    
+    if (B7 < 0x80000000) {
+        p = (B7 << 1) / B4;
+    } else {
+        p = (B7 / B4) << 1;
+    }
+    
+    X1 = (p >> 8) * (p >> 8);
+    X1 = (X1 * 3038) >> 16;
+    X2 = (-7357 * p) >> 16;
+    p = p + ((X1 + X2 + 3791) >> 4);
+    
+    return (float)p;
+}
+
+
+
+
+
+
+ 
+float BMP180_CalculateAltitude(float pressure, float sea_level_pressure)
+{
+    if (sea_level_pressure == 0) {
+        sea_level_pressure = 101325.0f;  
+    }
+    
+    return 44330.0f * (1.0f - powf(pressure / sea_level_pressure, 0.1903f));
+}
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef BMP180_GetData(BMP180_Data_t* data, BMP180_OSS_t oss)
+{
+    int32_t ut, up;
+    
+    if (!g_calib_loaded) {
+        return HAL_ERROR;
+    }
+    
+    
+    ut = BMP180_ReadUncompensatedTemperature();
+    
+    
+    up = BMP180_ReadUncompensatedPressure(oss);
+    
+    
+    data->temperature = BMP180_CalculateTemperature(ut, &g_calib_data);
+    data->pressure = BMP180_CalculatePressure(up, ut, oss, &g_calib_data);
+    data->altitude = BMP180_CalculateAltitude(data->pressure, 101325.0f);
+    
+    return HAL_OK;
+}

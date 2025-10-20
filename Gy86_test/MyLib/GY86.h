@@ -48,18 +48,18 @@ uint8_t MPU6050_GetId(void);
 #define HMC5883L_ID_B           0x0B
 #define HMC5883L_ID_C           0x0C
 
-#define BMP180_ADDRESS          0x77
-#define BMP180_ID               0xD0
-// 控制和数据寄存器
-#define BMP180_CTRL_MEAS        0x2E
-#define BMP_OUT_MSB             0x32
-#define BMP_OUT_LSB             0x33
-#define BMP_OUT_XLSB            0x34
-// 测量命令
-#define BMP180_CMD_TEMP         0x2E    // 温度测量命令
-#define BMP180_CMD_PRESSURE_0   0x34    // 气压测量命令 (OSS=0)
-#define BMP180_CMD_PRESSURE_1   0x74    // 气压测量命令 (OSS=1)
-#define BMP180_CMD_PRESSURE_2   0xB4    // 气压测量命令 (OSS=2)
-#define BMP180_CMD_PRESSURE_3   0xF4    // 气压测量命令 (OSS=3)
+// #define BMP180_ADDRESS          0x77
+// #define BMP180_ID               0xD0
+// // 控制和数据寄存器
+// #define BMP180_CTRL_MEAS        0x2E
+// #define BMP_OUT_MSB             0x32
+// #define BMP_OUT_LSB             0x33
+// #define BMP_OUT_XLSB            0x34
+// // 测量命令
+// #define BMP180_CMD_TEMP         0x2E    // 温度测量命令
+// #define BMP180_CMD_PRESSURE_0   0x34    // 气压测量命令 (OSS=0)
+// #define BMP180_CMD_PRESSURE_1   0x74    // 气压测量命令 (OSS=1)
+// #define BMP180_CMD_PRESSURE_2   0xB4    // 气压测量命令 (OSS=2)
+// #define BMP180_CMD_PRESSURE_3   0xF4    // 气压测量命令 (OSS=3)
 
 #endif

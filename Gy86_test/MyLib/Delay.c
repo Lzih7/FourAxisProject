@@ -2,6 +2,7 @@
 
 static uint8_t timer_initialized = 0;
 static TIM_HandleTypeDef htim2;
+
 void Timer_Delay_us(uint8_t xus) {
 	if(!timer_initialized) {
 		__HAL_RCC_TIM2_CLK_ENABLE();

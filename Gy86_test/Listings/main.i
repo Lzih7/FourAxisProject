@@ -27828,6 +27828,77 @@ uint8_t MPU6050_GetId(void);
 
 
 #line 5 "Src\\main.c"
+#line 1 ".\\MyLib\\BMP180.h"
+
+
+
+#line 5 ".\\MyLib\\BMP180.h"
+
+
+
+
+
+
+
+#line 34 ".\\MyLib\\BMP180.h"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+typedef enum {
+    BMP180_OSS_ULTRA_LOW_POWER = 0,    
+    BMP180_OSS_STANDARD = 1,           
+    BMP180_OSS_HIGH_RESOLUTION = 2,    
+    BMP180_OSS_ULTRA_HIGH_RES = 3      
+} BMP180_OSS_t;
+
+
+typedef struct {
+    int16_t AC1;    
+    int16_t AC2;    
+    int16_t AC3;    
+    uint16_t AC4;   
+    uint16_t AC5;   
+    uint16_t AC6;   
+    int16_t B1;     
+    int16_t B2;     
+    int16_t MB;     
+    int16_t MC;     
+    int16_t MD;     
+} BMP180_CalibData_t;
+
+
+typedef struct {
+    float temperature;      
+    float pressure;         
+    float altitude;         
+} BMP180_Data_t;
+
+
+HAL_StatusTypeDef BMP180_Init(void);
+HAL_StatusTypeDef BMP180_ReadCalibration(BMP180_CalibData_t* calib_data);
+int32_t BMP180_ReadUncompensatedTemperature(void);
+int32_t BMP180_ReadUncompensatedPressure(BMP180_OSS_t oss);
+float BMP180_CalculateTemperature(int32_t ut, BMP180_CalibData_t* calib_data);
+float BMP180_CalculatePressure(int32_t up, int32_t ut, BMP180_OSS_t oss, BMP180_CalibData_t* calib_data);
+float BMP180_CalculateAltitude(float pressure, float sea_level_pressure);
+HAL_StatusTypeDef BMP180_GetData(BMP180_Data_t* data, BMP180_OSS_t oss);
+HAL_StatusTypeDef BMP180_WriteReg(uint8_t reg_addr, uint8_t data);
+HAL_StatusTypeDef BMP180_ReadReg(uint8_t reg_addr, uint8_t* data);
+HAL_StatusTypeDef BMP180_ReadRegs(uint8_t reg_addr, uint8_t* data, uint8_t length);
+
+#line 6 "Src\\main.c"
 
 
 
@@ -27873,13 +27944,37 @@ int main(void)
     SystemClock_Config();
 	OLED_Init();
 	MPU6050_Init();
+	BMP180_Init();
 	
     uint8_t MPU_id = MPU6050_GetId();
 	OLED_ShowString(1, 1, "ID: ");
-	OLED_ShowHexNum(1, 4, MPU_id, 4);
+	OLED_ShowHexNum(1, 5, MPU_id, 4);
 
     while(1) {
         
+        BMP180_Data_t bmp_data;
+        if (BMP180_GetData(&bmp_data, BMP180_OSS_HIGH_RESOLUTION) == HAL_OK) {
+            
+            OLED_ShowString(2, 1, "T:");
+            OLED_ShowNum(2, 3, bmp_data.temperature, 4);
+            OLED_ShowString(2, 8, "C");
+            
+            
+            OLED_ShowString(3, 1, "P:");
+            OLED_ShowNum(3, 3, bmp_data.pressure / 100.0f, 4);
+            OLED_ShowString(3, 9, "hPa");
+            
+            
+            OLED_ShowString(4, 1, "A:");
+            OLED_ShowNum(4, 3, bmp_data.altitude, 3);
+            OLED_ShowString(4, 8, "m");
+        } else {
+            
+            OLED_ShowString(2, 1, "BMP180 Error");
+        }
+        
+        
+        HAL_Delay(10);
     }
 }
 
