@@ -1,8 +1,46 @@
-#line 1 "MyLib\\Delay.c"
-#line 1 ".\\Inc\\main.h"
+#line 1 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_rcc_ex.c"
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+ 
 #line 1 ".\\Drivers\\STM32F4xx_HAL_Driver\\Inc\\stm32f4xx_hal.h"
 
 
@@ -27756,36 +27794,304 @@ void HAL_DisableCompensationCell(void);
 
 
  
-#line 5 ".\\Inc\\main.h"
+#line 44 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_rcc_ex.c"
 
-void SystemClock_Config(void);
-void Error_Handler(void);
 
-#line 2 "MyLib\\Delay.c"
 
-static uint8_t timer_initialized = 0;
-static TIM_HandleTypeDef htim2;
+ 
 
-void Timer_Delay_us(uint8_t xus) {
-	if(!timer_initialized) {
-		do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x00000001U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x00000001U)); ((void)(tmpreg)); } while(0);
-		timer_initialized = 1;
 
-		htim2.Instance = ((TIM_TypeDef *) (0x40000000U + 0x0000U));
-		htim2.Init.Prescaler = 84 - 1;
-		htim2.Init.Period = 0xFFFFFFFF;
-		htim2.Init.CounterMode = ((uint32_t)0x00000000U);
-		htim2.Init.ClockDivision = ((uint32_t)0x00000000U);
-		if(HAL_TIM_Base_Init(&htim2) != HAL_OK) {
-			Error_Handler();
-		}
-	}
-	((&htim2)->Instance ->CNT = (0));
-	if(HAL_TIM_Base_Start(&htim2) != HAL_OK) {
-		Error_Handler();
-	}
-	while(((&htim2)->Instance ->CNT) < xus) {
-		
-	}
-	HAL_TIM_Base_Stop(&htim2);
+
+
+ 
+
+
+
+ 
+ 
+
+
+ 
+
+
+  
+ 
+ 
+ 
+ 
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+void HAL_RCC_DeInit(void)
+{
+   
+  ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR) |= (0x00000001U | 0x00000080U)); 
+  
+   
+  ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR) = (0x0));
+  
+   
+  ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR) &= ~(0x00010000U | 0x00080000U | 0x01000000U| 0x04000000U)); 
+  
+   
+  ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->PLLCFGR) = (0x0));
+  ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->PLLCFGR) |= (0x00000010U | 0x00001000U | 0x00002000U | 0x04000000U)); 
+  
+   
+  ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->PLLI2SCFGR) = (0x0));
+  ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->PLLI2SCFGR) |= (0x00001000U | 0x00002000U | 0x20000000U));
+  
+   
+  ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR) &= ~(0x00040000U));
+  
+   
+  ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CIR) = (0x0));
+  
+   
+  SystemCoreClock = ((uint32_t)16000000U);
 }
+
+
+
+
+#line 180 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_rcc_ex.c"
+
+#line 792 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_rcc_ex.c"
+
+#line 1135 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_rcc_ex.c"
+
+#line 1443 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_rcc_ex.c"
+
+#line 1594 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_rcc_ex.c"
+
+#line 1867 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_rcc_ex.c"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_RCCEx_PeriphCLKConfig(RCC_PeriphCLKInitTypeDef  *PeriphClkInit)
+{
+  uint32_t tickstart = 0U;
+  uint32_t tmpreg1 = 0U;
+    
+   
+  ((void)0);
+  
+   
+  if(((PeriphClkInit->PeriphClockSelection) & ((uint32_t)0x00000001U)) == (((uint32_t)0x00000001U)))
+  {
+     
+    ((void)0);
+    ((void)0);
+
+
+
+     
+    (*(volatile uint32_t *) (0x42000000U + (((((0x40000000U + 0x00020000U) + 0x3800U) - 0x40000000U) + 0x00U) * 32) + (0x1A * 4)) = DISABLE);
+     
+    tickstart = HAL_GetTick();
+     
+    while((((((((((uint8_t)0x3BU)) >> 5U) == 1U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR :((((((uint8_t)0x3BU)) >> 5U) == 2U) ? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->BDCR :((((((uint8_t)0x3BU)) >> 5U) == 3U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CSR :((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CIR))) & ((uint32_t)1U << ((((uint8_t)0x3BU)) & ((uint8_t)0x1FU))))!= 0U)? 1U : 0U)  != RESET)
+    {
+      if((HAL_GetTick() - tickstart ) > ((uint32_t)2))
+      {
+         
+        return HAL_TIMEOUT;
+      } 
+    }
+
+#line 1919 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_rcc_ex.c"
+     
+     
+     
+    (((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->PLLI2SCFGR = (((PeriphClkInit->PLLI2S . PLLI2SN) << (__clz(__rbit(0x00007FC0U)))) | ((PeriphClkInit->PLLI2S . PLLI2SR) << (__clz(__rbit(0x70000000U))))));
+
+    
+     
+    (*(volatile uint32_t *) (0x42000000U + (((((0x40000000U + 0x00020000U) + 0x3800U) - 0x40000000U) + 0x00U) * 32) + (0x1A * 4)) = ENABLE);
+     
+    tickstart = HAL_GetTick();
+     
+    while((((((((((uint8_t)0x3BU)) >> 5U) == 1U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR :((((((uint8_t)0x3BU)) >> 5U) == 2U) ? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->BDCR :((((((uint8_t)0x3BU)) >> 5U) == 3U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CSR :((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CIR))) & ((uint32_t)1U << ((((uint8_t)0x3BU)) & ((uint8_t)0x1FU))))!= 0U)? 1U : 0U)  == RESET)
+    {
+      if((HAL_GetTick() - tickstart ) > ((uint32_t)2))
+      {
+         
+        return HAL_TIMEOUT;
+      }
+    }
+  }
+  
+   
+  if(((PeriphClkInit->PeriphClockSelection) & ((uint32_t)0x00000002U)) == (((uint32_t)0x00000002U)))
+  {
+     
+    ((void)0);
+    
+     
+    do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x10000000U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x10000000U)); ((void)(tmpreg)); } while(0);
+    
+     
+    ((PWR_TypeDef *) (0x40000000U + 0x7000U))->CR |= 0x00000100U;
+    
+     
+    tickstart = HAL_GetTick();
+    
+    while((((PWR_TypeDef *) (0x40000000U + 0x7000U))->CR & 0x00000100U) == RESET)
+    {
+      if((HAL_GetTick() - tickstart ) > ((uint32_t)2U))
+      {
+        return HAL_TIMEOUT;
+      }
+    }
+      
+    tmpreg1 = (((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->BDCR & 0x00000300U);
+    if((tmpreg1 != 0x00000000U) && ((tmpreg1) != (PeriphClkInit->RTCClockSelection & 0x00000300U)))
+    {
+       
+      tmpreg1 = (((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->BDCR & ~(0x00000300U));
+       
+      (*(volatile uint32_t *) (0x42000000U + (((((0x40000000U + 0x00020000U) + 0x3800U) - 0x40000000U) + 0x70U) * 32U) + (0x10U * 4U)) = ENABLE);
+      (*(volatile uint32_t *) (0x42000000U + (((((0x40000000U + 0x00020000U) + 0x3800U) - 0x40000000U) + 0x70U) * 32U) + (0x10U * 4U)) = DISABLE);
+       
+      ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->BDCR = tmpreg1;
+
+       
+      if((((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->BDCR) & (0x00000001U)) != RESET))
+      {
+         
+        tickstart = HAL_GetTick();
+        
+           
+        while((((((((((uint8_t)0x41U)) >> 5U) == 1U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR :((((((uint8_t)0x41U)) >> 5U) == 2U) ? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->BDCR :((((((uint8_t)0x41U)) >> 5U) == 3U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CSR :((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CIR))) & ((uint32_t)1U << ((((uint8_t)0x41U)) & ((uint8_t)0x1FU))))!= 0U)? 1U : 0U) == RESET)
+        {
+          if((HAL_GetTick() - tickstart ) > ((uint32_t)5000U))
+          {
+            return HAL_TIMEOUT;
+          }
+        }
+      }
+    }
+    do { (((PeriphClkInit->RTCClockSelection) & 0x00000300U) == 0x00000300U) ? (((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR)) = ((((((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR))) & (~(0x001F0000U))) | (((PeriphClkInit->RTCClockSelection) & 0xFFFFCFFU))))) : ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR) &= ~(0x001F0000U)); ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->BDCR |= ((PeriphClkInit->RTCClockSelection) & 0x00000FFFU); } while (0);
+  }
+
+   
+  if(((PeriphClkInit->PeriphClockSelection) & ((uint32_t)0x00000008U)) == (((uint32_t)0x00000008U)))
+  {
+    (*(volatile uint32_t *) (0x42000000U + (((((0x40000000U + 0x00020000U) + 0x3800U) - 0x40000000U) + 0x8C) * 32) + (0x18 * 4)) = (PeriphClkInit->TIMPresSelection));
+  }
+
+  return HAL_OK;
+}
+
+
+
+
+
+
+
+ 
+void HAL_RCCEx_GetPeriphCLKConfig(RCC_PeriphCLKInitTypeDef  *PeriphClkInit)
+{
+  uint32_t tempreg;
+  
+   
+  PeriphClkInit->PeriphClockSelection = ((uint32_t)0x00000001U) | ((uint32_t)0x00000002U);
+  
+   
+  PeriphClkInit->PLLI2S.PLLI2SN = (uint32_t)((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->PLLI2SCFGR & 0x00007FC0U) >> (__clz(__rbit(0x00007FC0U))));
+  PeriphClkInit->PLLI2S.PLLI2SR = (uint32_t)((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->PLLI2SCFGR & 0x70000000U) >> (__clz(__rbit(0x70000000U))));
+
+
+
+   
+  tempreg = (((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR & 0x001F0000U);
+  PeriphClkInit->RTCClockSelection = (uint32_t)((tempreg) | (((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->BDCR & 0x00000300U));
+
+
+   
+  if ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->DCKCFGR & 0x01000000U) == RESET)
+  {
+    PeriphClkInit->TIMPresSelection = ((uint8_t)0x00U);
+  }
+  else
+  {
+    PeriphClkInit->TIMPresSelection = ((uint8_t)0x01U);
+  }
+
+}
+
+
+#line 2451 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_rcc_ex.c"
+
+#line 2480 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_rcc_ex.c"
+
+#line 2585 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_rcc_ex.c"
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+ 
+
+ 

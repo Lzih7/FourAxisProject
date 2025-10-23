@@ -1,8 +1,139 @@
-#line 1 "MyLib\\Delay.c"
-#line 1 ".\\Inc\\main.h"
+#line 1 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_usart.c"
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+ 
 #line 1 ".\\Drivers\\STM32F4xx_HAL_Driver\\Inc\\stm32f4xx_hal.h"
 
 
@@ -27756,36 +27887,1893 @@ void HAL_DisableCompensationCell(void);
 
 
  
-#line 5 ".\\Inc\\main.h"
+#line 137 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_usart.c"
 
-void SystemClock_Config(void);
-void Error_Handler(void);
 
-#line 2 "MyLib\\Delay.c"
 
-static uint8_t timer_initialized = 0;
-static TIM_HandleTypeDef htim2;
+ 
 
-void Timer_Delay_us(uint8_t xus) {
-	if(!timer_initialized) {
-		do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x00000001U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x00000001U)); ((void)(tmpreg)); } while(0);
-		timer_initialized = 1;
 
-		htim2.Instance = ((TIM_TypeDef *) (0x40000000U + 0x0000U));
-		htim2.Init.Prescaler = 84 - 1;
-		htim2.Init.Period = 0xFFFFFFFF;
-		htim2.Init.CounterMode = ((uint32_t)0x00000000U);
-		htim2.Init.ClockDivision = ((uint32_t)0x00000000U);
-		if(HAL_TIM_Base_Init(&htim2) != HAL_OK) {
-			Error_Handler();
-		}
-	}
-	((&htim2)->Instance ->CNT = (0));
-	if(HAL_TIM_Base_Start(&htim2) != HAL_OK) {
-		Error_Handler();
-	}
-	while(((&htim2)->Instance ->CNT) < xus) {
-		
-	}
-	HAL_TIM_Base_Stop(&htim2);
+
+
+ 
+
+ 
+ 
+
+
+ 
+
+
+
+
+ 
+ 
+ 
+ 
+ 
+
+
+ 
+static void USART_EndTxTransfer(USART_HandleTypeDef *husart);
+static void USART_EndRxTransfer(USART_HandleTypeDef *husart);
+static HAL_StatusTypeDef USART_Transmit_IT(USART_HandleTypeDef *husart);
+static HAL_StatusTypeDef USART_EndTransmit_IT(USART_HandleTypeDef *husart);
+static HAL_StatusTypeDef USART_Receive_IT(USART_HandleTypeDef *husart);
+static HAL_StatusTypeDef USART_TransmitReceive_IT(USART_HandleTypeDef *husart);
+static void USART_SetConfig (USART_HandleTypeDef *husart);
+static void USART_DMATransmitCplt(DMA_HandleTypeDef *hdma);
+static void USART_DMATxHalfCplt(DMA_HandleTypeDef *hdma);
+static void USART_DMAReceiveCplt(DMA_HandleTypeDef *hdma);
+static void USART_DMARxHalfCplt(DMA_HandleTypeDef *hdma);
+static void USART_DMAError(DMA_HandleTypeDef *hdma);
+static void USART_DMAAbortOnError(DMA_HandleTypeDef *hdma);
+
+static HAL_StatusTypeDef USART_WaitOnFlagUntilTimeout(USART_HandleTypeDef *husart, uint32_t Flag, FlagStatus Status, uint32_t Tickstart, uint32_t Timeout);
+
+
+ 
+
+ 
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_USART_Init(USART_HandleTypeDef *husart)
+{
+   
+  if(husart == 0)
+  {
+    return HAL_ERROR;
+  }
+
+   
+  ((void)0);
+
+  if(husart->State == HAL_USART_STATE_RESET)
+  {
+     
+    husart->Lock = HAL_UNLOCKED;
+     
+    HAL_USART_MspInit(husart);
+  }
+
+  husart->State = HAL_USART_STATE_BUSY;
+
+   
+  USART_SetConfig(husart);
+
+  
+
+ 
+  ((husart->Instance ->CR2) &= ~(0x4000U));
+  ((husart->Instance ->CR3) &= ~((0x0020U | 0x0008U | 0x0002U)));
+
+   
+  ( (husart)->Instance ->CR1 |= 0x2000U);
+
+   
+  husart->ErrorCode = ((uint32_t)0x00000000U);
+  husart->State= HAL_USART_STATE_READY;
+
+  return HAL_OK;
 }
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_USART_DeInit(USART_HandleTypeDef *husart)
+{
+   
+  if(husart == 0)
+  {
+    return HAL_ERROR;
+  }
+
+   
+  ((void)0);
+
+  husart->State = HAL_USART_STATE_BUSY;
+
+   
+  ( (husart)->Instance ->CR1 &= ~0x2000U);
+
+   
+  HAL_USART_MspDeInit(husart);
+
+  husart->ErrorCode = ((uint32_t)0x00000000U);
+  husart->State = HAL_USART_STATE_RESET;
+
+   
+  do{ (husart)->Lock = HAL_UNLOCKED; }while (0);
+
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+ __weak void HAL_USART_MspInit(USART_HandleTypeDef *husart)
+{
+   
+  ((void)(husart));
+  
+
+ 
+}
+
+
+
+
+
+
+ 
+ __weak void HAL_USART_MspDeInit(USART_HandleTypeDef *husart)
+{
+   
+  ((void)(husart));
+  
+
+ 
+}
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_USART_Transmit(USART_HandleTypeDef *husart, uint8_t *pTxData, uint16_t Size, uint32_t Timeout)
+{
+  uint16_t* tmp;
+  uint32_t tickstart = 0U;
+
+  if(husart->State == HAL_USART_STATE_READY)
+  {
+    if((pTxData == 0) || (Size == 0U))
+    {
+      return  HAL_ERROR;
+    }
+
+     
+    do{ if((husart)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (husart)->Lock = HAL_LOCKED; } }while (0);
+
+    husart->ErrorCode = ((uint32_t)0x00000000U);
+    husart->State = HAL_USART_STATE_BUSY_TX;
+
+     
+    tickstart = HAL_GetTick();
+
+    husart->TxXferSize = Size;
+    husart->TxXferCount = Size;
+    while(husart->TxXferCount > 0U)
+    {
+      husart->TxXferCount--;
+      if(husart->Init.WordLength == ((uint32_t)0x1000U))
+      {
+         
+        if(USART_WaitOnFlagUntilTimeout(husart, ((uint32_t)0x00000080U), RESET, tickstart, Timeout) != HAL_OK)
+        {
+          return HAL_TIMEOUT;
+        }
+        tmp = (uint16_t*) pTxData;
+        husart->Instance->DR = (*tmp & (uint16_t)0x01FFU);
+        if(husart->Init.Parity == ((uint32_t)0x00000000U))
+        {
+          pTxData += 2U;
+        }
+        else
+        {
+          pTxData += 1U;
+        }
+      }
+      else
+      {
+        if(USART_WaitOnFlagUntilTimeout(husart, ((uint32_t)0x00000080U), RESET, tickstart, Timeout) != HAL_OK)
+        {
+          return HAL_TIMEOUT;
+        }
+        husart->Instance->DR = (*pTxData++ & (uint8_t)0xFFU);
+      }
+    }
+
+    if(USART_WaitOnFlagUntilTimeout(husart, ((uint32_t)0x00000040U), RESET, tickstart, Timeout) != HAL_OK)
+    {
+      return HAL_TIMEOUT;
+    }
+
+    husart->State = HAL_USART_STATE_READY;
+
+     
+    do{ (husart)->Lock = HAL_UNLOCKED; }while (0);
+
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_USART_Receive(USART_HandleTypeDef *husart, uint8_t *pRxData, uint16_t Size, uint32_t Timeout)
+{
+  uint16_t* tmp;
+  uint32_t tickstart = 0U;
+
+  if(husart->State == HAL_USART_STATE_READY)
+  {
+    if((pRxData == 0) || (Size == 0U))
+    {
+      return  HAL_ERROR;
+    }
+     
+    do{ if((husart)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (husart)->Lock = HAL_LOCKED; } }while (0);
+
+    husart->ErrorCode = ((uint32_t)0x00000000U);
+    husart->State = HAL_USART_STATE_BUSY_RX;
+
+     
+    tickstart = HAL_GetTick();
+
+    husart->RxXferSize = Size;
+    husart->RxXferCount = Size;
+     
+    while(husart->RxXferCount > 0U)
+    {
+      husart->RxXferCount--;
+      if(husart->Init.WordLength == ((uint32_t)0x1000U))
+      {
+         
+        if(USART_WaitOnFlagUntilTimeout(husart, ((uint32_t)0x00000080U), RESET, tickstart, Timeout) != HAL_OK)
+        {
+          return HAL_TIMEOUT;
+        }
+         
+        husart->Instance->DR = (0xFFFFU & (uint16_t)0x01FFU);
+
+         
+        if(USART_WaitOnFlagUntilTimeout(husart, ((uint32_t)0x00000020U), RESET, tickstart, Timeout) != HAL_OK)
+        {
+          return HAL_TIMEOUT;
+        }
+        tmp = (uint16_t*) pRxData ;
+        if(husart->Init.Parity == ((uint32_t)0x00000000U))
+        {
+          *tmp = (uint16_t)(husart->Instance->DR & (uint16_t)0x01FFU);
+          pRxData +=2;
+        }
+        else
+        {
+          *tmp = (uint16_t)(husart->Instance->DR & (uint16_t)0x00FFU);
+          pRxData +=1;
+        }
+      }
+      else
+      {
+         
+        if(USART_WaitOnFlagUntilTimeout(husart, ((uint32_t)0x00000080U), RESET, tickstart, Timeout) != HAL_OK)
+        {
+          return HAL_TIMEOUT;
+        }
+
+         
+        husart->Instance->DR = (0xFFFFU & (uint16_t)0x00FFU);
+
+         
+        if(USART_WaitOnFlagUntilTimeout(husart, ((uint32_t)0x00000020U), RESET, tickstart, Timeout) != HAL_OK)
+        {
+          return HAL_TIMEOUT;
+        }
+        if(husart->Init.Parity == ((uint32_t)0x00000000U))
+        {
+           
+          *pRxData++ = (uint8_t)(husart->Instance->DR & (uint8_t)0x00FFU);
+        }
+        else
+        {
+           
+          *pRxData++ = (uint8_t)(husart->Instance->DR & (uint8_t)0x007FU);
+        }
+
+      }
+    }
+
+    husart->State = HAL_USART_STATE_READY;
+
+     
+    do{ (husart)->Lock = HAL_UNLOCKED; }while (0);
+
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_USART_TransmitReceive(USART_HandleTypeDef *husart, uint8_t *pTxData, uint8_t *pRxData, uint16_t Size, uint32_t Timeout)
+{
+  uint16_t* tmp;
+  uint32_t tickstart = 0U;
+
+  if(husart->State == HAL_USART_STATE_READY)
+  {
+    if((pTxData == 0) || (pRxData == 0) || (Size == 0U))
+    {
+      return  HAL_ERROR;
+    }
+     
+    do{ if((husart)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (husart)->Lock = HAL_LOCKED; } }while (0);
+
+    husart->ErrorCode = ((uint32_t)0x00000000U);
+    husart->State = HAL_USART_STATE_BUSY_RX;
+
+     
+    tickstart = HAL_GetTick();
+
+    husart->RxXferSize = Size;
+    husart->TxXferSize = Size;
+    husart->TxXferCount = Size;
+    husart->RxXferCount = Size;
+
+     
+    while(husart->TxXferCount > 0U)
+    {
+      husart->TxXferCount--;
+      husart->RxXferCount--;
+      if(husart->Init.WordLength == ((uint32_t)0x1000U))
+      {
+         
+        if(USART_WaitOnFlagUntilTimeout(husart, ((uint32_t)0x00000080U), RESET, tickstart, Timeout) != HAL_OK)
+        {
+          return HAL_TIMEOUT;
+        }
+        tmp = (uint16_t*) pTxData;
+        husart->Instance->DR = (*tmp & (uint16_t)0x01FFU);
+        if(husart->Init.Parity == ((uint32_t)0x00000000U))
+        {
+          pTxData += 2U;
+        }
+        else
+        {
+          pTxData += 1U;
+        }
+
+         
+        if(USART_WaitOnFlagUntilTimeout(husart, ((uint32_t)0x00000020U), RESET, tickstart, Timeout) != HAL_OK)
+        {
+          return HAL_TIMEOUT;
+        }
+        tmp = (uint16_t*) pRxData ;
+        if(husart->Init.Parity == ((uint32_t)0x00000000U))
+        {
+          *tmp = (uint16_t)(husart->Instance->DR & (uint16_t)0x01FFU);
+          pRxData += 2U;
+        }
+        else
+        {
+          *tmp = (uint16_t)(husart->Instance->DR & (uint16_t)0x00FFU);
+          pRxData += 1U;
+        }
+      }
+      else
+      {
+         
+        if(USART_WaitOnFlagUntilTimeout(husart, ((uint32_t)0x00000080U), RESET, tickstart, Timeout) != HAL_OK)
+        {
+          return HAL_TIMEOUT;
+        }
+        husart->Instance->DR = (*pTxData++ & (uint8_t)0x00FFU);
+
+         
+        if(USART_WaitOnFlagUntilTimeout(husart, ((uint32_t)0x00000020U), RESET, tickstart, Timeout) != HAL_OK)
+        {
+          return HAL_TIMEOUT;
+        }
+        if(husart->Init.Parity == ((uint32_t)0x00000000U))
+        {
+           
+          *pRxData++ = (uint8_t)(husart->Instance->DR & (uint8_t)0x00FFU);
+        }
+        else
+        {
+           
+          *pRxData++ = (uint8_t)(husart->Instance->DR & (uint8_t)0x007FU);
+        }
+      }
+    }
+
+    husart->State = HAL_USART_STATE_READY;
+
+     
+    do{ (husart)->Lock = HAL_UNLOCKED; }while (0);
+
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_USART_Transmit_IT(USART_HandleTypeDef *husart, uint8_t *pTxData, uint16_t Size)
+{
+  if(husart->State == HAL_USART_STATE_READY)
+  {
+    if((pTxData == 0) || (Size == 0U))
+    {
+      return HAL_ERROR;
+    }
+
+     
+    do{ if((husart)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (husart)->Lock = HAL_LOCKED; } }while (0);
+
+    husart->pTxBuffPtr = pTxData;
+    husart->TxXferSize = Size;
+    husart->TxXferCount = Size;
+
+    husart->ErrorCode = ((uint32_t)0x00000000U);
+    husart->State = HAL_USART_STATE_BUSY_TX;
+
+    
+
+
+
+
+
+ 
+
+     
+    do{ (husart)->Lock = HAL_UNLOCKED; }while (0);
+
+     
+    ((husart->Instance ->CR1) |= (0x0080U));
+
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_USART_Receive_IT(USART_HandleTypeDef *husart, uint8_t *pRxData, uint16_t Size)
+{
+  if(husart->State == HAL_USART_STATE_READY)
+  {
+    if((pRxData == 0) || (Size == 0U))
+    {
+      return HAL_ERROR;
+    }
+     
+    do{ if((husart)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (husart)->Lock = HAL_LOCKED; } }while (0);
+
+    husart->pRxBuffPtr = pRxData;
+    husart->RxXferSize = Size;
+    husart->RxXferCount = Size;
+
+    husart->ErrorCode = ((uint32_t)0x00000000U);
+    husart->State = HAL_USART_STATE_BUSY_RX;
+
+     
+    do{ (husart)->Lock = HAL_UNLOCKED; }while (0);
+
+     
+    ((husart->Instance ->CR1) |= (0x0020U));
+
+     
+    ((husart->Instance ->CR1) |= (0x0100U));
+
+     
+    ((husart->Instance ->CR3) |= (0x0001U));
+
+     
+    husart->Instance->DR = (0xFFFFU & (uint16_t)0x01FFU);
+
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_USART_TransmitReceive_IT(USART_HandleTypeDef *husart, uint8_t *pTxData, uint8_t *pRxData,  uint16_t Size)
+{
+  if(husart->State == HAL_USART_STATE_READY)
+  {
+    if((pTxData == 0) || (pRxData == 0) || (Size == 0U))
+    {
+      return HAL_ERROR;
+    }
+     
+    do{ if((husart)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (husart)->Lock = HAL_LOCKED; } }while (0);
+
+    husart->pRxBuffPtr = pRxData;
+    husart->RxXferSize = Size;
+    husart->RxXferCount = Size;
+    husart->pTxBuffPtr = pTxData;
+    husart->TxXferSize = Size;
+    husart->TxXferCount = Size;
+
+    husart->ErrorCode = ((uint32_t)0x00000000U);
+    husart->State = HAL_USART_STATE_BUSY_TX_RX;
+
+     
+    do{ (husart)->Lock = HAL_UNLOCKED; }while (0);
+
+     
+    ((husart->Instance ->CR1) |= (0x0020U));
+
+     
+    ((husart->Instance ->CR1) |= (0x0100U));
+
+     
+    ((husart->Instance ->CR3) |= (0x0001U));
+
+     
+    ((husart->Instance ->CR1) |= (0x0080U));
+
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_USART_Transmit_DMA(USART_HandleTypeDef *husart, uint8_t *pTxData, uint16_t Size)
+{
+  uint32_t *tmp;
+
+  if(husart->State == HAL_USART_STATE_READY)
+  {
+    if((pTxData == 0) || (Size == 0U))
+    {
+      return HAL_ERROR;
+    }
+     
+    do{ if((husart)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (husart)->Lock = HAL_LOCKED; } }while (0);
+
+    husart->pTxBuffPtr = pTxData;
+    husart->TxXferSize = Size;
+    husart->TxXferCount = Size;
+
+    husart->ErrorCode = ((uint32_t)0x00000000U);
+    husart->State = HAL_USART_STATE_BUSY_TX;
+
+     
+    husart->hdmatx->XferCpltCallback = USART_DMATransmitCplt;
+
+     
+    husart->hdmatx->XferHalfCpltCallback = USART_DMATxHalfCplt;
+
+     
+    husart->hdmatx->XferErrorCallback = USART_DMAError;
+
+     
+    husart->hdmatx->XferAbortCallback = 0;
+
+     
+    tmp = (uint32_t*)&pTxData;
+    HAL_DMA_Start_IT(husart->hdmatx, *(uint32_t*)tmp, (uint32_t)&husart->Instance->DR, Size);
+
+     
+    ((husart)->Instance ->SR = ~(((uint32_t)0x00000040U)));
+
+     
+    do{ (husart)->Lock = HAL_UNLOCKED; }while (0);
+
+    
+ 
+    ((husart->Instance ->CR3) |= (0x0080U));
+
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_USART_Receive_DMA(USART_HandleTypeDef *husart, uint8_t *pRxData, uint16_t Size)
+{
+  uint32_t *tmp;
+
+  if(husart->State == HAL_USART_STATE_READY)
+  {
+    if((pRxData == 0) || (Size == 0U))
+    {
+      return HAL_ERROR;
+    }
+
+     
+    do{ if((husart)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (husart)->Lock = HAL_LOCKED; } }while (0);
+
+    husart->pRxBuffPtr = pRxData;
+    husart->RxXferSize = Size;
+    husart->pTxBuffPtr = pRxData;
+    husart->TxXferSize = Size;
+
+    husart->ErrorCode = ((uint32_t)0x00000000U);
+    husart->State = HAL_USART_STATE_BUSY_RX;
+
+     
+    husart->hdmarx->XferCpltCallback = USART_DMAReceiveCplt;
+
+     
+    husart->hdmarx->XferHalfCpltCallback = USART_DMARxHalfCplt;
+
+     
+    husart->hdmarx->XferErrorCallback = USART_DMAError;
+
+     
+    husart->hdmarx->XferAbortCallback = 0;
+
+    
+ 
+    husart->hdmatx->XferHalfCpltCallback = 0;
+    husart->hdmatx->XferCpltCallback = 0;
+
+     
+    husart->hdmatx->XferErrorCallback = USART_DMAError;
+
+     
+    husart->hdmatx->XferAbortCallback = 0;
+
+     
+    tmp = (uint32_t*)&pRxData;
+    HAL_DMA_Start_IT(husart->hdmarx, (uint32_t)&husart->Instance->DR, *(uint32_t*)tmp, Size);
+
+    
+
+ 
+    HAL_DMA_Start_IT(husart->hdmatx, *(uint32_t*)tmp, (uint32_t)&husart->Instance->DR, Size);
+
+    
+ 
+    do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (husart)->Instance ->SR; tmpreg = (husart)->Instance ->DR; ((void)(tmpreg)); } while(0);
+
+     
+    do{ (husart)->Lock = HAL_UNLOCKED; }while (0);
+
+     
+    ((husart->Instance ->CR1) |= (0x0100U));
+
+     
+    ((husart->Instance ->CR3) |= (0x0001U));
+
+    
+ 
+    ((husart->Instance ->CR3) |= (0x0040U));
+
+    
+ 
+    ((husart->Instance ->CR3) |= (0x0080U));
+
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_USART_TransmitReceive_DMA(USART_HandleTypeDef *husart, uint8_t *pTxData, uint8_t *pRxData, uint16_t Size)
+{
+  uint32_t *tmp;
+
+  if(husart->State == HAL_USART_STATE_READY)
+  {
+    if((pTxData == 0) || (pRxData == 0) || (Size == 0U))
+    {
+      return HAL_ERROR;
+    }
+     
+    do{ if((husart)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (husart)->Lock = HAL_LOCKED; } }while (0);
+
+    husart->pRxBuffPtr = pRxData;
+    husart->RxXferSize = Size;
+    husart->pTxBuffPtr = pTxData;
+    husart->TxXferSize = Size;
+
+    husart->ErrorCode = ((uint32_t)0x00000000U);
+    husart->State = HAL_USART_STATE_BUSY_TX_RX;
+
+     
+    husart->hdmarx->XferCpltCallback = USART_DMAReceiveCplt;
+
+     
+    husart->hdmarx->XferHalfCpltCallback = USART_DMARxHalfCplt;
+
+     
+    husart->hdmatx->XferCpltCallback = USART_DMATransmitCplt;
+
+     
+    husart->hdmatx->XferHalfCpltCallback = USART_DMATxHalfCplt;
+
+     
+    husart->hdmatx->XferErrorCallback = USART_DMAError;
+
+     
+    husart->hdmarx->XferErrorCallback = USART_DMAError;
+
+     
+    husart->hdmarx->XferAbortCallback = 0;
+
+     
+    tmp = (uint32_t*)&pRxData;
+    HAL_DMA_Start_IT(husart->hdmarx, (uint32_t)&husart->Instance->DR, *(uint32_t*)tmp, Size);
+
+     
+    tmp = (uint32_t*)&pTxData;
+    HAL_DMA_Start_IT(husart->hdmatx, *(uint32_t*)tmp, (uint32_t)&husart->Instance->DR, Size);
+
+     
+    ((husart)->Instance ->SR = ~(((uint32_t)0x00000040U)));
+
+     
+    do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (husart)->Instance ->SR; tmpreg = (husart)->Instance ->DR; ((void)(tmpreg)); } while(0);
+
+     
+    do{ (husart)->Lock = HAL_UNLOCKED; }while (0);
+
+     
+    ((husart->Instance ->CR1) |= (0x0100U));
+
+     
+    ((husart->Instance ->CR3) |= (0x0001U));
+
+    
+ 
+    ((husart->Instance ->CR3) |= (0x0040U));
+
+    
+ 
+    ((husart->Instance ->CR3) |= (0x0080U));
+
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_USART_DMAPause(USART_HandleTypeDef *husart)
+{
+   
+  do{ if((husart)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (husart)->Lock = HAL_LOCKED; } }while (0);
+
+   
+  ((husart->Instance ->CR3) &= ~(0x0080U));
+
+   
+  do{ (husart)->Lock = HAL_UNLOCKED; }while (0);
+
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_USART_DMAResume(USART_HandleTypeDef *husart)
+{
+   
+  do{ if((husart)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (husart)->Lock = HAL_LOCKED; } }while (0);
+
+   
+  ((husart->Instance ->CR3) |= (0x0080U));
+
+   
+  do{ (husart)->Lock = HAL_UNLOCKED; }while (0);
+
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_USART_DMAStop(USART_HandleTypeDef *husart)
+{
+  uint32_t dmarequest = 0x00U;
+  
+
+
+
+ 
+
+   
+  dmarequest = (((husart->Instance ->CR3) & (0x0080U)) != RESET);
+  if((husart->State == HAL_USART_STATE_BUSY_TX) && dmarequest)
+  {
+    USART_EndTxTransfer(husart);
+
+     
+    if(husart->hdmatx != 0)
+    {
+      HAL_DMA_Abort(husart->hdmatx);
+    }
+
+     
+    ((husart->Instance ->CR3) &= ~(0x0080U));
+  }
+
+   
+  dmarequest = (((husart->Instance ->CR3) & (0x0040U)) != RESET);
+  if((husart->State == HAL_USART_STATE_BUSY_RX) && dmarequest)
+  {
+    USART_EndRxTransfer(husart);
+
+     
+    if(husart->hdmarx != 0)
+    {
+      HAL_DMA_Abort(husart->hdmarx);
+    }
+
+     
+    ((husart->Instance ->CR3) &= ~(0x0040U));
+  }
+
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+void HAL_USART_IRQHandler(USART_HandleTypeDef *husart)
+{
+  uint32_t isrflags = ((husart->Instance ->SR));
+  uint32_t cr1its   = ((husart->Instance ->CR1));
+  uint32_t cr3its   = ((husart->Instance ->CR3));
+  uint32_t errorflags = 0x00U;
+  uint32_t dmarequest = 0x00U;
+
+   
+  errorflags = (isrflags & (uint32_t)(0x0001U | 0x0002U | 0x0008U | 0x0004U));
+  if(errorflags == RESET)
+  {
+     
+    if(((isrflags & 0x0020U) != RESET) && ((cr1its & 0x0020U) != RESET))
+    {
+      if(husart->State == HAL_USART_STATE_BUSY_RX)
+      {
+        USART_Receive_IT(husart);
+      }
+      else
+      {
+        USART_TransmitReceive_IT(husart);
+      }
+      return;
+    }
+  }
+   
+  if((errorflags != RESET) && ((cr3its & (0x0001U | 0x0100U)) != RESET))
+  {
+     
+    if(((isrflags & 0x0001U) != RESET) && ((cr1its & 0x0100U) != RESET))
+    {
+      husart->ErrorCode |= ((uint32_t)0x00000001U);
+    }
+
+     
+    if(((isrflags & 0x0004U) != RESET) && ((cr3its & 0x0001U) != RESET))
+    {
+      husart->ErrorCode |= ((uint32_t)0x00000002U);
+    }
+
+     
+    if(((isrflags & 0x0002U) != RESET) && ((cr3its & 0x0001U) != RESET))
+    {
+      husart->ErrorCode |= ((uint32_t)0x00000004U);
+    }
+
+     
+    if(((isrflags & 0x0008U) != RESET) && ((cr3its & 0x0001U) != RESET))
+    {
+      husart->ErrorCode |= ((uint32_t)0x00000008U);
+    }
+
+    if(husart->ErrorCode != ((uint32_t)0x00000000U))
+    {
+       
+      if(((isrflags & 0x0020U) != RESET) && ((cr1its & 0x0020U) != RESET))
+      {
+        if(husart->State == HAL_USART_STATE_BUSY_RX)
+        {
+          USART_Receive_IT(husart);
+        }
+        else
+        {
+          USART_TransmitReceive_IT(husart);
+        }
+      }
+      
+ 
+      dmarequest = (((husart->Instance ->CR3) & (0x0040U)) != RESET);
+      if(((husart->ErrorCode & ((uint32_t)0x00000008U)) != RESET) || dmarequest)
+      {
+        
+ 
+        USART_EndRxTransfer(husart);
+
+         
+        if ((((husart->Instance ->CR3) & (0x0040U)) != RESET))
+        {
+          ((husart->Instance ->CR3) &= ~(0x0040U));
+
+           
+          if(husart->hdmarx != 0)
+          {
+            
+ 
+            husart->hdmarx->XferAbortCallback = USART_DMAAbortOnError;
+
+            if(HAL_DMA_Abort_IT(husart->hdmarx) != HAL_OK)
+            {
+               
+              husart->hdmarx->XferAbortCallback(husart->hdmarx);
+            }
+          }
+          else
+          {
+             
+            HAL_USART_ErrorCallback(husart);
+          }
+        }
+        else
+        {
+           
+          HAL_USART_ErrorCallback(husart);
+        }
+      }
+      else
+      {
+         
+        HAL_USART_ErrorCallback(husart);
+        husart->ErrorCode = ((uint32_t)0x00000000U);
+      }
+    }
+    return;
+  }
+
+   
+  if(((isrflags & 0x0080U) != RESET) && ((cr1its & 0x0080U) != RESET))
+  {
+    if(husart->State == HAL_USART_STATE_BUSY_TX)
+    {
+      USART_Transmit_IT(husart);
+    }
+    else
+    {
+      USART_TransmitReceive_IT(husart);
+    }
+    return;
+  }
+
+   
+  if(((isrflags & 0x0040U) != RESET) && ((cr1its & 0x0040U) != RESET))
+  {
+    USART_EndTransmit_IT(husart);
+    return;
+  }
+}
+
+
+
+
+
+
+ 
+ __weak void HAL_USART_TxCpltCallback(USART_HandleTypeDef *husart)
+{
+   
+  ((void)(husart));
+  
+
+ 
+}
+
+
+
+
+
+
+ 
+ __weak void HAL_USART_TxHalfCpltCallback(USART_HandleTypeDef *husart)
+{
+   
+  ((void)(husart));
+  
+
+ 
+}
+
+
+
+
+
+
+ 
+__weak void HAL_USART_RxCpltCallback(USART_HandleTypeDef *husart)
+{
+   
+  ((void)(husart));
+  
+
+ 
+}
+
+
+
+
+
+
+ 
+__weak void HAL_USART_RxHalfCpltCallback(USART_HandleTypeDef *husart)
+{
+   
+  ((void)(husart));
+  
+
+ 
+}
+
+
+
+
+
+
+ 
+__weak void HAL_USART_TxRxCpltCallback(USART_HandleTypeDef *husart)
+{
+   
+  ((void)(husart));
+  
+
+ 
+}
+
+
+
+
+
+
+ 
+ __weak void HAL_USART_ErrorCallback(USART_HandleTypeDef *husart)
+{
+   
+  ((void)(husart));
+  
+
+ 
+}
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+HAL_USART_StateTypeDef HAL_USART_GetState(USART_HandleTypeDef *husart)
+{
+  return husart->State;
+}
+
+
+
+
+
+
+ 
+uint32_t HAL_USART_GetError(USART_HandleTypeDef *husart)
+{
+  return husart->ErrorCode;
+}
+
+
+
+ 
+
+
+
+
+
+ 
+static void USART_DMATransmitCplt(DMA_HandleTypeDef *hdma)
+{
+  USART_HandleTypeDef* husart = ( USART_HandleTypeDef* )((DMA_HandleTypeDef* )hdma)->Parent;
+   
+  if((hdma->Instance->CR & 0x00000100U) == 0U)
+  {
+    husart->TxXferCount = 0U;
+    if(husart->State == HAL_USART_STATE_BUSY_TX)
+    {
+      
+ 
+      ((husart->Instance ->CR3) &= ~(0x0080U));
+
+       
+      ((husart->Instance ->CR1) |= (0x0040U));
+    }
+  }
+   
+  else
+  {
+    if(husart->State == HAL_USART_STATE_BUSY_TX)
+    {
+      HAL_USART_TxCpltCallback(husart);
+    }
+  }
+}
+
+
+
+
+
+
+ 
+static void USART_DMATxHalfCplt(DMA_HandleTypeDef *hdma)
+{
+  USART_HandleTypeDef* husart = (USART_HandleTypeDef*)((DMA_HandleTypeDef*)hdma)->Parent;
+
+  HAL_USART_TxHalfCpltCallback(husart);
+}
+
+
+
+
+
+ 
+static void USART_DMAReceiveCplt(DMA_HandleTypeDef *hdma)
+{
+  USART_HandleTypeDef* husart = ( USART_HandleTypeDef* )((DMA_HandleTypeDef* )hdma)->Parent;
+   
+  if((hdma->Instance->CR & 0x00000100U) == 0U)
+  {
+    husart->RxXferCount = 0x00U;
+
+     
+    ((husart->Instance ->CR1) &= ~(0x0100U));
+    ((husart->Instance ->CR3) &= ~(0x0001U));
+
+    if(husart->State == HAL_USART_STATE_BUSY_RX)
+    {
+      
+ 
+      ((husart->Instance ->CR3) &= ~(0x0040U));
+
+      husart->State= HAL_USART_STATE_READY;
+      HAL_USART_RxCpltCallback(husart);
+    }
+     
+    else
+    {
+      
+ 
+      ((husart->Instance ->CR3) &= ~(0x0040U));
+      ((husart->Instance ->CR3) &= ~(0x0080U));
+
+      husart->State= HAL_USART_STATE_READY;
+      HAL_USART_TxRxCpltCallback(husart);
+    }
+  }
+   
+  else
+  {
+    if(husart->State == HAL_USART_STATE_BUSY_RX)
+    {
+      HAL_USART_RxCpltCallback(husart);
+    }
+     
+    else
+    {
+      HAL_USART_TxRxCpltCallback(husart);
+    }
+  }
+}
+
+
+
+
+
+
+ 
+static void USART_DMARxHalfCplt(DMA_HandleTypeDef *hdma)
+{
+  USART_HandleTypeDef* husart = (USART_HandleTypeDef*)((DMA_HandleTypeDef*)hdma)->Parent;
+
+  HAL_USART_RxHalfCpltCallback(husart);
+}
+
+
+
+
+
+ 
+static void USART_DMAError(DMA_HandleTypeDef *hdma)
+{
+  uint32_t dmarequest = 0x00U;
+  USART_HandleTypeDef* husart = ( USART_HandleTypeDef* )((DMA_HandleTypeDef* )hdma)->Parent;
+  husart->RxXferCount = 0x00U;
+  husart->TxXferCount = 0x00U;
+
+   
+  dmarequest = (((husart->Instance ->CR3) & (0x0080U)) != RESET);
+  if((husart->State == HAL_USART_STATE_BUSY_TX) && dmarequest)
+  {
+    USART_EndTxTransfer(husart);
+  }
+
+   
+  dmarequest = (((husart->Instance ->CR3) & (0x0040U)) != RESET);
+  if((husart->State == HAL_USART_STATE_BUSY_RX) && dmarequest)
+  {
+    USART_EndRxTransfer(husart);
+  }
+
+  husart->ErrorCode |= ((uint32_t)0x00000010U);
+  husart->State= HAL_USART_STATE_READY;
+
+  HAL_USART_ErrorCallback(husart);
+}
+
+
+
+
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef USART_WaitOnFlagUntilTimeout(USART_HandleTypeDef *husart, uint32_t Flag, FlagStatus Status, uint32_t Tickstart, uint32_t Timeout)
+{
+   
+  while(((((husart)->Instance ->SR & (Flag)) == (Flag)) ? SET : RESET) == Status)
+  {
+     
+    if(Timeout != 0xFFFFFFFFU)
+    {
+      if((Timeout == 0U)||((HAL_GetTick() - Tickstart ) > Timeout))
+      {
+         
+        ((husart->Instance ->CR1) &= ~(0x0080U));
+
+         
+        ((husart->Instance ->CR1) &= ~(0x0020U));
+
+         
+        ((husart->Instance ->CR1) &= ~(0x0100U));
+
+         
+        ((husart->Instance ->CR3) &= ~(0x0001U));
+
+        husart->State= HAL_USART_STATE_READY;
+
+         
+        do{ (husart)->Lock = HAL_UNLOCKED; }while (0);
+
+        return HAL_TIMEOUT;
+      }
+    }
+  }
+  return HAL_OK;
+}
+
+
+
+
+
+ 
+static void USART_EndTxTransfer(USART_HandleTypeDef *husart)
+{
+   
+  ((husart->Instance ->CR1) &= ~((0x0080U | 0x0040U)));
+
+   
+  husart->State = HAL_USART_STATE_READY;
+}
+
+
+
+
+
+ 
+static void USART_EndRxTransfer(USART_HandleTypeDef *husart)
+{
+   
+  ((husart->Instance ->CR1) &= ~((0x0020U | 0x0100U)));
+  ((husart->Instance ->CR3) &= ~(0x0001U));
+
+   
+  husart->State = HAL_USART_STATE_READY;
+}
+
+
+
+
+
+
+ 
+static void USART_DMAAbortOnError(DMA_HandleTypeDef *hdma)
+{
+  USART_HandleTypeDef* husart = ( USART_HandleTypeDef* )((DMA_HandleTypeDef* )hdma)->Parent;
+  husart->RxXferCount = 0x00U;
+  husart->TxXferCount = 0x00U;
+
+  HAL_USART_ErrorCallback(husart);
+}
+
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef USART_Transmit_IT(USART_HandleTypeDef *husart)
+{
+  uint16_t* tmp;
+
+  if(husart->State == HAL_USART_STATE_BUSY_TX)
+  {
+    if(husart->Init.WordLength == ((uint32_t)0x1000U))
+    {
+      tmp = (uint16_t*) husart->pTxBuffPtr;
+      husart->Instance->DR = (uint16_t)(*tmp & (uint16_t)0x01FFU);
+      if(husart->Init.Parity == ((uint32_t)0x00000000U))
+      {
+        husart->pTxBuffPtr += 2U;
+      }
+      else
+      {
+        husart->pTxBuffPtr += 1U;
+      }
+    }
+    else
+    {
+      husart->Instance->DR = (uint8_t)(*husart->pTxBuffPtr++ & (uint8_t)0x00FFU);
+    }
+
+    if(--husart->TxXferCount == 0U)
+    {
+       
+      ((husart->Instance ->CR1) &= ~(0x0080U));
+
+       
+      ((husart->Instance ->CR1) |= (0x0040U));
+    }
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef USART_EndTransmit_IT(USART_HandleTypeDef *husart)
+{
+   
+  ((husart->Instance ->CR1) &= ~(0x0040U));
+
+   
+  ((husart->Instance ->CR3) &= ~(0x0001U));
+
+  husart->State = HAL_USART_STATE_READY;
+
+  HAL_USART_TxCpltCallback(husart);
+
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef USART_Receive_IT(USART_HandleTypeDef *husart)
+{
+  uint16_t* tmp;
+  if(husart->State == HAL_USART_STATE_BUSY_RX)
+  {
+    if(husart->Init.WordLength == ((uint32_t)0x1000U))
+    {
+      tmp = (uint16_t*) husart->pRxBuffPtr;
+      if(husart->Init.Parity == ((uint32_t)0x00000000U))
+      {
+        *tmp = (uint16_t)(husart->Instance->DR & (uint16_t)0x01FFU);
+        husart->pRxBuffPtr += 2U;
+      }
+      else
+      {
+        *tmp = (uint16_t)(husart->Instance->DR & (uint16_t)0x00FFU);
+        husart->pRxBuffPtr += 1U;
+      }
+      if(--husart->RxXferCount != 0x00U)
+      {
+         
+        husart->Instance->DR = (0xFFFFU & (uint16_t)0x01FFU);
+      }
+    }
+    else
+    {
+      if(husart->Init.Parity == ((uint32_t)0x00000000U))
+      {
+        *husart->pRxBuffPtr++ = (uint8_t)(husart->Instance->DR & (uint8_t)0x00FFU);
+      }
+      else
+      {
+        *husart->pRxBuffPtr++ = (uint8_t)(husart->Instance->DR & (uint8_t)0x007FU);
+      }
+
+      if(--husart->RxXferCount != 0x00U)
+      {
+         
+        husart->Instance->DR = (0xFFFFU & (uint16_t)0x00FFU);
+      }
+    }
+
+    if(husart->RxXferCount == 0U)
+    {
+       
+      ((husart->Instance ->CR1) &= ~(0x0020U));
+
+       
+      ((husart->Instance ->CR1) &= ~(0x0100U));
+
+       
+      ((husart->Instance ->CR3) &= ~(0x0001U));
+
+      husart->State = HAL_USART_STATE_READY;
+      HAL_USART_RxCpltCallback(husart);
+
+      return HAL_OK;
+    }
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef USART_TransmitReceive_IT(USART_HandleTypeDef *husart)
+{
+  uint16_t* tmp;
+
+  if(husart->State == HAL_USART_STATE_BUSY_TX_RX)
+  {
+    if(husart->TxXferCount != 0x00U)
+    {
+      if((((husart)->Instance ->SR & (((uint32_t)0x00000080U))) == (((uint32_t)0x00000080U))) != RESET)
+      {
+        if(husart->Init.WordLength == ((uint32_t)0x1000U))
+        {
+          tmp = (uint16_t*) husart->pTxBuffPtr;
+          husart->Instance->DR = (uint16_t)(*tmp & (uint16_t)0x01FFU);
+          if(husart->Init.Parity == ((uint32_t)0x00000000U))
+          {
+            husart->pTxBuffPtr += 2U;
+          }
+          else
+          {
+            husart->pTxBuffPtr += 1U;
+          }
+        }
+        else
+        {
+          husart->Instance->DR = (uint8_t)(*husart->pTxBuffPtr++ & (uint8_t)0x00FFU);
+        }
+        husart->TxXferCount--;
+
+         
+        if(husart->TxXferCount == 0U)
+        {
+          ((husart->Instance ->CR1) &= ~(0x0080U));
+        }
+      }
+    }
+
+    if(husart->RxXferCount != 0x00U)
+    {
+      if((((husart)->Instance ->SR & (((uint32_t)0x00000020U))) == (((uint32_t)0x00000020U))) != RESET)
+      {
+        if(husart->Init.WordLength == ((uint32_t)0x1000U))
+        {
+          tmp = (uint16_t*) husart->pRxBuffPtr;
+          if(husart->Init.Parity == ((uint32_t)0x00000000U))
+          {
+            *tmp = (uint16_t)(husart->Instance->DR & (uint16_t)0x01FFU);
+            husart->pRxBuffPtr += 2U;
+          }
+          else
+          {
+            *tmp = (uint16_t)(husart->Instance->DR & (uint16_t)0x00FFU);
+            husart->pRxBuffPtr += 1U;
+          }
+        }
+        else
+        {
+          if(husart->Init.Parity == ((uint32_t)0x00000000U))
+          {
+            *husart->pRxBuffPtr++ = (uint8_t)(husart->Instance->DR & (uint8_t)0x00FFU);
+          }
+          else
+          {
+            *husart->pRxBuffPtr++ = (uint8_t)(husart->Instance->DR & (uint8_t)0x007FU);
+          }
+        }
+        husart->RxXferCount--;
+      }
+    }
+
+     
+    if(husart->RxXferCount == 0U)
+    {
+       
+      ((husart->Instance ->CR1) &= ~(0x0020U));
+
+       
+      ((husart->Instance ->CR1) &= ~(0x0100U));
+
+       
+      ((husart->Instance ->CR3) &= ~(0x0001U));
+
+      husart->State = HAL_USART_STATE_READY;
+
+      HAL_USART_TxRxCpltCallback(husart);
+
+      return HAL_OK;
+    }
+
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+ 
+static void USART_SetConfig(USART_HandleTypeDef *husart)
+{
+  uint32_t tmpreg = 0x00U;
+
+   
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+
+  
+ 
+  ((husart->Instance ->CR1) &= ~((0x0008U | 0x0004U)));
+
+   
+  tmpreg = husart->Instance->CR2;
+   
+  tmpreg &= (uint32_t)~((uint32_t)(0x0200U | 0x0400U | 0x0800U | 0x0100U | 0x3000U));
+   
+   
+   
+   
+   
+  tmpreg |= (uint32_t)(((uint32_t)0x0800U)| husart->Init.CLKPolarity |
+                       husart->Init.CLKPhase| husart->Init.CLKLastBit | husart->Init.StopBits);
+   
+  ((husart->Instance ->CR2) = ((uint32_t)tmpreg));
+
+   
+  tmpreg = husart->Instance->CR1;
+
+   
+  tmpreg &= (uint32_t)~((uint32_t)(0x1000U | 0x0400U | 0x0200U | 0x0008U |                                    0x0004U | 0x8000U));
+
+
+  
+
+
+
+ 
+  tmpreg |= (uint32_t)husart->Init.WordLength | husart->Init.Parity | husart->Init.Mode | 0x8000U;
+
+   
+  ((husart->Instance ->CR1) = ((uint32_t)tmpreg));
+
+   
+   
+  ((husart->Instance ->CR3) &= ~((0x0100U | 0x0200U)));
+
+   
+  if((husart->Instance == ((USART_TypeDef *) ((0x40000000U + 0x00010000U) + 0x1000U))) || (husart->Instance == ((USART_TypeDef *) ((0x40000000U + 0x00010000U) + 0x1400U))))
+  {
+    husart->Instance->BRR = ((((((((HAL_RCC_GetPCLK2Freq())))*25U)/(2U*(((husart->Init . BaudRate)))))/100U) << 4U)|(((((((((HAL_RCC_GetPCLK2Freq())))*25U)/(2U*(((husart->Init . BaudRate))))) - ((((((((HAL_RCC_GetPCLK2Freq()))))*25U)/(2U*((((husart->Init . BaudRate))))))/100U) * 100U)) * 16U + 50U) / 100U) & 0x0FU));
+  }
+  else
+  {
+    husart->Instance->BRR = ((((((((HAL_RCC_GetPCLK1Freq())))*25U)/(2U*(((husart->Init . BaudRate)))))/100U) << 4U)|(((((((((HAL_RCC_GetPCLK1Freq())))*25U)/(2U*(((husart->Init . BaudRate))))) - ((((((((HAL_RCC_GetPCLK1Freq()))))*25U)/(2U*((((husart->Init . BaudRate))))))/100U) * 100U)) * 16U + 50U) / 100U) & 0x0FU));
+  }
+}
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+ 
+
+ 

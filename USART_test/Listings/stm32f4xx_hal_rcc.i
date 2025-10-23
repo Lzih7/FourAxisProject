@@ -1,8 +1,90 @@
-#line 1 "MyLib\\Delay.c"
-#line 1 ".\\Inc\\main.h"
+#line 1 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_rcc.c"
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+ 
 #line 1 ".\\Drivers\\STM32F4xx_HAL_Driver\\Inc\\stm32f4xx_hal.h"
 
 
@@ -27756,36 +27838,1025 @@ void HAL_DisableCompensationCell(void);
 
 
  
-#line 5 ".\\Inc\\main.h"
+#line 88 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_rcc.c"
 
-void SystemClock_Config(void);
-void Error_Handler(void);
 
-#line 2 "MyLib\\Delay.c"
 
-static uint8_t timer_initialized = 0;
-static TIM_HandleTypeDef htim2;
+ 
 
-void Timer_Delay_us(uint8_t xus) {
-	if(!timer_initialized) {
-		do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x00000001U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x00000001U)); ((void)(tmpreg)); } while(0);
-		timer_initialized = 1;
 
-		htim2.Instance = ((TIM_TypeDef *) (0x40000000U + 0x0000U));
-		htim2.Init.Prescaler = 84 - 1;
-		htim2.Init.Period = 0xFFFFFFFF;
-		htim2.Init.CounterMode = ((uint32_t)0x00000000U);
-		htim2.Init.ClockDivision = ((uint32_t)0x00000000U);
-		if(HAL_TIM_Base_Init(&htim2) != HAL_OK) {
-			Error_Handler();
-		}
-	}
-	((&htim2)->Instance ->CNT = (0));
-	if(HAL_TIM_Base_Start(&htim2) != HAL_OK) {
-		Error_Handler();
-	}
-	while(((&htim2)->Instance ->CNT) < xus) {
-		
-	}
-	HAL_TIM_Base_Stop(&htim2);
+
+
+ 
+
+
+
+ 
+ 
+
+
+ 
+
+
+ 
+
+
+
+
+
+
+
+
+
+ 
+
+ 
+
+
+     
+const uint8_t APBAHBPrescTable[16] = {0U, 0U, 0U, 0U, 1U, 2U, 3U, 4U, 1U, 2U, 3U, 4U, 6U, 7U, 8U, 9U};
+
+
+ 
+
+ 
+ 
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+__weak void HAL_RCC_DeInit(void)
+{}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+__weak HAL_StatusTypeDef HAL_RCC_OscConfig(RCC_OscInitTypeDef  *RCC_OscInitStruct)
+{
+ uint32_t tickstart = 0U;  
+ 
+   
+  ((void)0);
+    
+  if(((RCC_OscInitStruct->OscillatorType) & ((uint32_t)0x00000001U)) == ((uint32_t)0x00000001U))
+  {
+     
+    ((void)0);
+     
+    if((((uint32_t)(((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR & 0x0000000CU)) == 0x00000004U) ||      ((((uint32_t)(((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR & 0x0000000CU)) == 0x00000008U) && ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->PLLCFGR & 0x00400000U) == 0x00400000U)))
+
+    {
+      if(((((((((((uint8_t)0x31U)) >> 5U) == 1U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR :((((((uint8_t)0x31U)) >> 5U) == 2U) ? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->BDCR :((((((uint8_t)0x31U)) >> 5U) == 3U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CSR :((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CIR))) & ((uint32_t)1U << ((((uint8_t)0x31U)) & ((uint8_t)0x1FU))))!= 0U)? 1U : 0U) != RESET) && (RCC_OscInitStruct->HSEState == ((uint8_t)0x00U)))
+      {
+        return HAL_ERROR;
+      }
+    }
+    else
+    {
+       
+      (*(volatile uint8_t *) ((uint32_t)0x40023802U) = (RCC_OscInitStruct->HSEState));
+      
+       
+      if((RCC_OscInitStruct->HSEState) != ((uint8_t)0x00U))
+      {
+         
+        tickstart = HAL_GetTick();
+      
+           
+        while((((((((((uint8_t)0x31U)) >> 5U) == 1U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR :((((((uint8_t)0x31U)) >> 5U) == 2U) ? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->BDCR :((((((uint8_t)0x31U)) >> 5U) == 3U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CSR :((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CIR))) & ((uint32_t)1U << ((((uint8_t)0x31U)) & ((uint8_t)0x1FU))))!= 0U)? 1U : 0U) == RESET)
+        {
+          if((HAL_GetTick() - tickstart ) > ((uint32_t)100U))
+          {
+            return HAL_TIMEOUT;
+          } 
+        }
+      }
+      else
+      {
+         
+        tickstart = HAL_GetTick();
+
+         
+        while((((((((((uint8_t)0x31U)) >> 5U) == 1U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR :((((((uint8_t)0x31U)) >> 5U) == 2U) ? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->BDCR :((((((uint8_t)0x31U)) >> 5U) == 3U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CSR :((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CIR))) & ((uint32_t)1U << ((((uint8_t)0x31U)) & ((uint8_t)0x1FU))))!= 0U)? 1U : 0U) != RESET)
+        {
+          if((HAL_GetTick() - tickstart ) > ((uint32_t)100U))
+          {
+            return HAL_TIMEOUT;
+          } 
+        }
+      }
+    }
+  }
+   
+  if(((RCC_OscInitStruct->OscillatorType) & ((uint32_t)0x00000002U)) == ((uint32_t)0x00000002U))
+  {
+     
+    ((void)0);
+    ((void)0);
+    
+     
+    if((((uint32_t)(((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR & 0x0000000CU)) == 0x00000000U) ||      ((((uint32_t)(((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR & 0x0000000CU)) == 0x00000008U) && ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->PLLCFGR & 0x00400000U) == 0x00000000U)))
+
+    {
+       
+      if(((((((((((uint8_t)0x21U)) >> 5U) == 1U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR :((((((uint8_t)0x21U)) >> 5U) == 2U) ? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->BDCR :((((((uint8_t)0x21U)) >> 5U) == 3U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CSR :((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CIR))) & ((uint32_t)1U << ((((uint8_t)0x21U)) & ((uint8_t)0x1FU))))!= 0U)? 1U : 0U) != RESET) && (RCC_OscInitStruct->HSIState != ((uint8_t)0x01U)))
+      {
+        return HAL_ERROR;
+      }
+       
+      else
+      {
+         
+        ((((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR)) = ((((((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR))) & (~(0x000000F8U))) | ((uint32_t)(RCC_OscInitStruct->HSICalibrationValue) << (__clz(__rbit(0x000000F8U))))))));
+      }
+    }
+    else
+    {
+       
+      if((RCC_OscInitStruct->HSIState)!= ((uint8_t)0x00U))
+      {
+         
+        (*(volatile uint32_t *) (0x42000000U + (((((0x40000000U + 0x00020000U) + 0x3800U) - 0x40000000U) + 0x00U) * 32U) + (0x00U * 4U)) = ENABLE);
+
+         
+        tickstart = HAL_GetTick();
+
+           
+        while((((((((((uint8_t)0x21U)) >> 5U) == 1U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR :((((((uint8_t)0x21U)) >> 5U) == 2U) ? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->BDCR :((((((uint8_t)0x21U)) >> 5U) == 3U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CSR :((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CIR))) & ((uint32_t)1U << ((((uint8_t)0x21U)) & ((uint8_t)0x1FU))))!= 0U)? 1U : 0U) == RESET)
+        {
+          if((HAL_GetTick() - tickstart ) > ((uint32_t)2U))
+          {
+            return HAL_TIMEOUT;
+          }       
+        } 
+                
+         
+        ((((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR)) = ((((((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR))) & (~(0x000000F8U))) | ((uint32_t)(RCC_OscInitStruct->HSICalibrationValue) << (__clz(__rbit(0x000000F8U))))))));
+      }
+      else
+      {
+         
+        (*(volatile uint32_t *) (0x42000000U + (((((0x40000000U + 0x00020000U) + 0x3800U) - 0x40000000U) + 0x00U) * 32U) + (0x00U * 4U)) = DISABLE);
+
+         
+        tickstart = HAL_GetTick();
+      
+           
+        while((((((((((uint8_t)0x21U)) >> 5U) == 1U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR :((((((uint8_t)0x21U)) >> 5U) == 2U) ? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->BDCR :((((((uint8_t)0x21U)) >> 5U) == 3U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CSR :((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CIR))) & ((uint32_t)1U << ((((uint8_t)0x21U)) & ((uint8_t)0x1FU))))!= 0U)? 1U : 0U) != RESET)
+        {
+          if((HAL_GetTick() - tickstart ) > ((uint32_t)2U))
+          {
+            return HAL_TIMEOUT;
+          } 
+        } 
+      }
+    }
+  }
+   
+  if(((RCC_OscInitStruct->OscillatorType) & ((uint32_t)0x00000008U)) == ((uint32_t)0x00000008U))
+  {
+     
+    ((void)0);
+
+     
+    if((RCC_OscInitStruct->LSIState)!= ((uint8_t)0x00U))
+    {
+       
+      (*(volatile uint32_t *) (0x42000000U + (((((0x40000000U + 0x00020000U) + 0x3800U) - 0x40000000U) + 0x74U) * 32U) + (0x00U * 4U)) = ENABLE);
+      
+       
+      tickstart = HAL_GetTick();
+      
+       
+      while((((((((((uint8_t)0x61U)) >> 5U) == 1U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR :((((((uint8_t)0x61U)) >> 5U) == 2U) ? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->BDCR :((((((uint8_t)0x61U)) >> 5U) == 3U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CSR :((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CIR))) & ((uint32_t)1U << ((((uint8_t)0x61U)) & ((uint8_t)0x1FU))))!= 0U)? 1U : 0U) == RESET)
+      {
+        if((HAL_GetTick() - tickstart ) > ((uint32_t)2U))
+        {
+          return HAL_TIMEOUT;
+        } 
+      }
+    }
+    else
+    {
+       
+      (*(volatile uint32_t *) (0x42000000U + (((((0x40000000U + 0x00020000U) + 0x3800U) - 0x40000000U) + 0x74U) * 32U) + (0x00U * 4U)) = DISABLE);
+      
+       
+      tickstart = HAL_GetTick();
+      
+         
+      while((((((((((uint8_t)0x61U)) >> 5U) == 1U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR :((((((uint8_t)0x61U)) >> 5U) == 2U) ? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->BDCR :((((((uint8_t)0x61U)) >> 5U) == 3U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CSR :((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CIR))) & ((uint32_t)1U << ((((uint8_t)0x61U)) & ((uint8_t)0x1FU))))!= 0U)? 1U : 0U) != RESET)
+      {
+        if((HAL_GetTick() - tickstart ) > ((uint32_t)2U))
+        {
+          return HAL_TIMEOUT;
+        }       
+      } 
+    }
+  }
+    
+  if(((RCC_OscInitStruct->OscillatorType) & ((uint32_t)0x00000004U)) == ((uint32_t)0x00000004U))
+  {
+     
+    ((void)0);
+    
+     
+    do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x10000000U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x10000000U)); ((void)(tmpreg)); } while(0);
+    
+     
+    ((PWR_TypeDef *) (0x40000000U + 0x7000U))->CR |= 0x00000100U;
+    
+     
+    tickstart = HAL_GetTick();
+    
+    while((((PWR_TypeDef *) (0x40000000U + 0x7000U))->CR & 0x00000100U) == RESET)
+    {
+      if((HAL_GetTick() - tickstart ) > ((uint32_t)2U))
+      {
+        return HAL_TIMEOUT;
+      }      
+    }
+
+     
+    (*(volatile uint8_t *) (0x40000000U + ((((0x40000000U + 0x00020000U) + 0x3800U) - 0x40000000U) + 0x70U)) = (RCC_OscInitStruct->LSEState));
+     
+    if((RCC_OscInitStruct->LSEState) != ((uint8_t)0x00U))
+    {
+       
+      tickstart = HAL_GetTick();
+      
+         
+      while((((((((((uint8_t)0x41U)) >> 5U) == 1U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR :((((((uint8_t)0x41U)) >> 5U) == 2U) ? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->BDCR :((((((uint8_t)0x41U)) >> 5U) == 3U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CSR :((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CIR))) & ((uint32_t)1U << ((((uint8_t)0x41U)) & ((uint8_t)0x1FU))))!= 0U)? 1U : 0U) == RESET)
+      {
+        if((HAL_GetTick() - tickstart ) > ((uint32_t)5000U))
+        {
+          return HAL_TIMEOUT;
+        }       
+      }
+    }
+    else
+    {
+       
+      tickstart = HAL_GetTick();
+      
+         
+      while((((((((((uint8_t)0x41U)) >> 5U) == 1U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR :((((((uint8_t)0x41U)) >> 5U) == 2U) ? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->BDCR :((((((uint8_t)0x41U)) >> 5U) == 3U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CSR :((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CIR))) & ((uint32_t)1U << ((((uint8_t)0x41U)) & ((uint8_t)0x1FU))))!= 0U)? 1U : 0U) != RESET)
+      {
+        if((HAL_GetTick() - tickstart ) > ((uint32_t)5000U))
+        {
+          return HAL_TIMEOUT;
+        }       
+      }
+    }
+  }
+   
+   
+  ((void)0);
+  if ((RCC_OscInitStruct->PLL.PLLState) != ((uint8_t)0x00U))
+  {
+     
+    if(((uint32_t)(((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR & 0x0000000CU)) != 0x00000008U)
+    { 
+      if((RCC_OscInitStruct->PLL.PLLState) == ((uint8_t)0x02U))
+      {
+         
+        ((void)0);
+        ((void)0);
+        ((void)0);
+        ((void)0);
+        ((void)0);
+      
+         
+        (*(volatile uint32_t *) (0x42000000U + (((((0x40000000U + 0x00020000U) + 0x3800U) - 0x40000000U) + 0x00U) * 32U) + (0x18U * 4U)) = DISABLE);
+        
+         
+        tickstart = HAL_GetTick();
+        
+           
+        while((((((((((uint8_t)0x39U)) >> 5U) == 1U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR :((((((uint8_t)0x39U)) >> 5U) == 2U) ? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->BDCR :((((((uint8_t)0x39U)) >> 5U) == 3U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CSR :((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CIR))) & ((uint32_t)1U << ((((uint8_t)0x39U)) & ((uint8_t)0x1FU))))!= 0U)? 1U : 0U) != RESET)
+        {
+          if((HAL_GetTick() - tickstart ) > ((uint32_t)2))
+          {
+            return HAL_TIMEOUT;
+          }
+        }        
+
+         
+        ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->PLLCFGR) = ((RCC_OscInitStruct->PLL . PLLSource | RCC_OscInitStruct->PLL . PLLM | (RCC_OscInitStruct->PLL . PLLN << (__clz(__rbit(0x00007FC0U)))) | (((RCC_OscInitStruct->PLL . PLLP >> 1U) - 1U) << (__clz(__rbit(0x00030000U)))) | (RCC_OscInitStruct->PLL . PLLQ << (__clz(__rbit(0x0F000000U)))))));
+
+
+
+
+         
+        (*(volatile uint32_t *) (0x42000000U + (((((0x40000000U + 0x00020000U) + 0x3800U) - 0x40000000U) + 0x00U) * 32U) + (0x18U * 4U)) = ENABLE);
+
+         
+        tickstart = HAL_GetTick();
+        
+           
+        while((((((((((uint8_t)0x39U)) >> 5U) == 1U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR :((((((uint8_t)0x39U)) >> 5U) == 2U) ? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->BDCR :((((((uint8_t)0x39U)) >> 5U) == 3U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CSR :((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CIR))) & ((uint32_t)1U << ((((uint8_t)0x39U)) & ((uint8_t)0x1FU))))!= 0U)? 1U : 0U) == RESET)
+        {
+          if((HAL_GetTick() - tickstart ) > ((uint32_t)2))
+          {
+            return HAL_TIMEOUT;
+          } 
+        }
+      }
+      else
+      {
+         
+        (*(volatile uint32_t *) (0x42000000U + (((((0x40000000U + 0x00020000U) + 0x3800U) - 0x40000000U) + 0x00U) * 32U) + (0x18U * 4U)) = DISABLE);
+ 
+         
+        tickstart = HAL_GetTick();
+        
+           
+        while((((((((((uint8_t)0x39U)) >> 5U) == 1U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR :((((((uint8_t)0x39U)) >> 5U) == 2U) ? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->BDCR :((((((uint8_t)0x39U)) >> 5U) == 3U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CSR :((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CIR))) & ((uint32_t)1U << ((((uint8_t)0x39U)) & ((uint8_t)0x1FU))))!= 0U)? 1U : 0U) != RESET)
+        {
+          if((HAL_GetTick() - tickstart ) > ((uint32_t)2))
+          {
+            return HAL_TIMEOUT;
+          }
+        }
+      }
+    }
+    else
+    {
+      return HAL_ERROR;
+    }
+  }
+  return HAL_OK;
 }
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_RCC_ClockConfig(RCC_ClkInitTypeDef  *RCC_ClkInitStruct, uint32_t FLatency)
+{
+  uint32_t tickstart = 0U;   
+ 
+   
+  ((void)0);
+  ((void)0);
+ 
+  
+
+ 
+  
+   
+  if(FLatency > (((FLASH_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3C00U))->ACR & 0x0000000FU))
+  {    
+     
+    (*(volatile uint8_t *)((uint32_t)0x40023C00U) = (uint8_t)(FLatency));
+    
+    
+ 
+    if((((FLASH_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3C00U))->ACR & 0x0000000FU) != FLatency)
+    {
+      return HAL_ERROR;
+    }
+  }
+ 
+   
+  if(((RCC_ClkInitStruct->ClockType) & ((uint32_t)0x00000002U)) == ((uint32_t)0x00000002U))
+  {
+    ((void)0);
+    (((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR)) = ((((((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR))) & (~(0x000000F0U))) | (RCC_ClkInitStruct->AHBCLKDivider))));
+  }
+  
+    
+  if(((RCC_ClkInitStruct->ClockType) & ((uint32_t)0x00000001U)) == ((uint32_t)0x00000001U))
+  {    
+    ((void)0);
+    
+     
+    if(RCC_ClkInitStruct->SYSCLKSource == 0x00000001U)
+    {
+         
+      if((((((((((uint8_t)0x31U)) >> 5U) == 1U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR :((((((uint8_t)0x31U)) >> 5U) == 2U) ? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->BDCR :((((((uint8_t)0x31U)) >> 5U) == 3U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CSR :((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CIR))) & ((uint32_t)1U << ((((uint8_t)0x31U)) & ((uint8_t)0x1FU))))!= 0U)? 1U : 0U) == RESET)
+      {
+        return HAL_ERROR;
+      }
+    }
+     
+    else if((RCC_ClkInitStruct->SYSCLKSource == 0x00000002U)   || 
+            (RCC_ClkInitStruct->SYSCLKSource == ((uint32_t)(0x00000001U | 0x00000002U))))
+    {
+         
+      if((((((((((uint8_t)0x39U)) >> 5U) == 1U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR :((((((uint8_t)0x39U)) >> 5U) == 2U) ? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->BDCR :((((((uint8_t)0x39U)) >> 5U) == 3U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CSR :((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CIR))) & ((uint32_t)1U << ((((uint8_t)0x39U)) & ((uint8_t)0x1FU))))!= 0U)? 1U : 0U) == RESET)
+      {
+        return HAL_ERROR;
+      }
+    }
+     
+    else
+    {
+         
+      if((((((((((uint8_t)0x21U)) >> 5U) == 1U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR :((((((uint8_t)0x21U)) >> 5U) == 2U) ? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->BDCR :((((((uint8_t)0x21U)) >> 5U) == 3U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CSR :((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CIR))) & ((uint32_t)1U << ((((uint8_t)0x21U)) & ((uint8_t)0x1FU))))!= 0U)? 1U : 0U) == RESET)
+      {
+        return HAL_ERROR;
+      }
+    }
+    
+    (((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR)) = ((((((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR))) & (~(0x00000003U))) | ((RCC_ClkInitStruct->SYSCLKSource)))));
+     
+    tickstart = HAL_GetTick();
+    
+    if(RCC_ClkInitStruct->SYSCLKSource == 0x00000001U)
+    {
+      while (((uint32_t)(((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR & 0x0000000CU)) != 0x00000004U)
+      {
+        if((HAL_GetTick() - tickstart ) > ((uint32_t)5000U))
+        {
+          return HAL_TIMEOUT;
+        }
+      }
+    }
+    else if(RCC_ClkInitStruct->SYSCLKSource == 0x00000002U)
+    {
+      while (((uint32_t)(((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR & 0x0000000CU)) != 0x00000008U)
+      {
+        if((HAL_GetTick() - tickstart ) > ((uint32_t)5000U))
+        {
+          return HAL_TIMEOUT;
+        }
+      }
+    }
+    else if(RCC_ClkInitStruct->SYSCLKSource == ((uint32_t)(0x00000001U | 0x00000002U)))
+    {
+      while (((uint32_t)(((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR & 0x0000000CU)) != ((uint32_t)(0x00000004U | 0x00000008U)))
+      {
+        if((HAL_GetTick() - tickstart ) > ((uint32_t)5000U))
+        {
+          return HAL_TIMEOUT;
+        }
+      }
+    }
+    else
+    {
+      while(((uint32_t)(((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR & 0x0000000CU)) != 0x00000000U)
+      {
+        if((HAL_GetTick() - tickstart ) > ((uint32_t)5000U))
+        {
+          return HAL_TIMEOUT;
+        }
+      }
+    }
+  }    
+  
+   
+  if(FLatency < (((FLASH_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3C00U))->ACR & 0x0000000FU))
+  { 
+      
+    (*(volatile uint8_t *)((uint32_t)0x40023C00U) = (uint8_t)(FLatency));
+    
+    
+ 
+    if((((FLASH_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3C00U))->ACR & 0x0000000FU) != FLatency)
+    {
+      return HAL_ERROR;
+    }
+ }
+
+    
+  if(((RCC_ClkInitStruct->ClockType) & ((uint32_t)0x00000004U)) == ((uint32_t)0x00000004U))
+  {
+    ((void)0);
+    (((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR)) = ((((((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR))) & (~(0x00001C00U))) | (RCC_ClkInitStruct->APB1CLKDivider))));
+  }
+  
+    
+  if(((RCC_ClkInitStruct->ClockType) & ((uint32_t)0x00000008U)) == ((uint32_t)0x00000008U))
+  {
+    ((void)0);
+    (((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR)) = ((((((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR))) & (~(0x0000E000U))) | (((RCC_ClkInitStruct->APB2CLKDivider) << 3U)))));
+  }
+
+   
+  SystemCoreClock = HAL_RCC_GetSysClockFreq() >> APBAHBPrescTable[(((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR & 0x000000F0U)>> (__clz(__rbit(0x000000F0U)))];
+
+   
+  HAL_InitTick (((uint32_t)0x0FU));
+  
+  return HAL_OK;
+}
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+void HAL_RCC_MCOConfig(uint32_t RCC_MCOx, uint32_t RCC_MCOSource, uint32_t RCC_MCODiv)
+{
+  GPIO_InitTypeDef GPIO_InitStruct;
+   
+  ((void)0);
+  ((void)0);
+   
+  if(RCC_MCOx == ((uint32_t)0x00000000U))
+  {
+    ((void)0);
+    
+     
+    do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1ENR) |= (0x00000001U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1ENR) & (0x00000001U)); ((void)(tmpreg)); } while(0);
+    
+         
+    GPIO_InitStruct.Pin = ((uint16_t)0x0100U);
+    GPIO_InitStruct.Mode = ((uint32_t)0x00000002U);
+    GPIO_InitStruct.Speed = ((uint32_t)0x00000003U);
+    GPIO_InitStruct.Pull = ((uint32_t)0x00000000U);
+    GPIO_InitStruct.Alternate = ((uint8_t)0x00U);
+    HAL_GPIO_Init(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0000U)), &GPIO_InitStruct);
+    
+     
+    (((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR)) = ((((((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR))) & (~((0x00600000U | 0x07000000U)))) | ((RCC_MCOSource | RCC_MCODiv)))));
+    
+    
+
+
+
+  }
+
+  else
+  {
+    ((void)0);
+    
+     
+    do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1ENR) |= (0x00000004U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1ENR) & (0x00000004U)); ((void)(tmpreg)); } while(0);
+    
+     
+    GPIO_InitStruct.Pin = ((uint16_t)0x0200U);
+    GPIO_InitStruct.Mode = ((uint32_t)0x00000002U);
+    GPIO_InitStruct.Speed = ((uint32_t)0x00000003U);
+    GPIO_InitStruct.Pull = ((uint32_t)0x00000000U);
+    GPIO_InitStruct.Alternate = ((uint8_t)0x00U);
+    HAL_GPIO_Init(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0800U)), &GPIO_InitStruct);
+    
+     
+    (((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR)) = ((((((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR))) & (~((0xC0000000U | 0x38000000U)))) | ((RCC_MCOSource | (RCC_MCODiv << 3U))))));
+
+    
+
+
+
+  }
+
+}
+
+
+
+
+
+
+
+
+
+ 
+void HAL_RCC_EnableCSS(void)
+{
+  *(volatile uint32_t *) (0x42000000U + (((((0x40000000U + 0x00020000U) + 0x3800U) - 0x40000000U) + 0x00U) * 32U) + (0x13U * 4U)) = (uint32_t)ENABLE;
+}
+
+
+
+
+ 
+void HAL_RCC_DisableCSS(void)
+{
+  *(volatile uint32_t *) (0x42000000U + (((((0x40000000U + 0x00020000U) + 0x3800U) - 0x40000000U) + 0x00U) * 32U) + (0x13U * 4U)) = (uint32_t)DISABLE;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+__weak uint32_t HAL_RCC_GetSysClockFreq(void)
+{
+  uint32_t pllm = 0U, pllvco = 0U, pllp = 0U;
+  uint32_t sysclockfreq = 0U;
+
+   
+  switch (((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR & 0x0000000CU)
+  {
+    case 0x00000000U:   
+    {
+      sysclockfreq = ((uint32_t)16000000U);
+       break;
+    }
+    case 0x00000004U:   
+    {
+      sysclockfreq = ((uint32_t)25000000U);
+      break;
+    }
+    case 0x00000008U:   
+    {
+      
+ 
+      pllm = ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->PLLCFGR & 0x0000003FU;
+      if(((uint32_t)(((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->PLLCFGR & 0x00400000U)) != 0x00000000U)
+      {
+         
+        pllvco = ((((uint32_t)25000000U) / pllm) * ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->PLLCFGR & 0x00007FC0U) >> (__clz(__rbit(0x00007FC0U)))));
+      }
+      else
+      {
+         
+        pllvco = ((((uint32_t)16000000U) / pllm) * ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->PLLCFGR & 0x00007FC0U) >> (__clz(__rbit(0x00007FC0U)))));    
+      }
+      pllp = ((((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->PLLCFGR & 0x00030000U) >> (__clz(__rbit(0x00030000U)))) + 1U) *2U);
+      
+      sysclockfreq = pllvco/pllp;
+      break;
+    }
+    default:
+    {
+      sysclockfreq = ((uint32_t)16000000U);
+      break;
+    }
+  }
+  return sysclockfreq;
+}
+
+
+
+
+
+
+
+
+
+ 
+uint32_t HAL_RCC_GetHCLKFreq(void)
+{
+  return SystemCoreClock;
+}
+
+
+
+
+
+
+ 
+uint32_t HAL_RCC_GetPCLK1Freq(void)
+{  
+   
+  return (HAL_RCC_GetHCLKFreq() >> APBAHBPrescTable[(((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR & 0x00001C00U)>> (__clz(__rbit(0x00001C00U)))]);
+}
+
+
+
+
+
+
+ 
+uint32_t HAL_RCC_GetPCLK2Freq(void)
+{
+   
+  return (HAL_RCC_GetHCLKFreq()>> APBAHBPrescTable[(((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR & 0x0000E000U)>> (__clz(__rbit(0x0000E000U)))]);
+} 
+
+
+
+
+
+
+
+ 
+__weak void HAL_RCC_GetOscConfig(RCC_OscInitTypeDef  *RCC_OscInitStruct)
+{
+   
+  RCC_OscInitStruct->OscillatorType = ((uint32_t)0x00000001U) | ((uint32_t)0x00000002U) | ((uint32_t)0x00000004U) | ((uint32_t)0x00000008U);
+  
+   
+  if((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR &0x00040000U) == 0x00040000U)
+  {
+    RCC_OscInitStruct->HSEState = ((uint8_t)0x05U);
+  }
+  else if((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR &0x00010000U) == 0x00010000U)
+  {
+    RCC_OscInitStruct->HSEState = ((uint8_t)0x01U);
+  }
+  else
+  {
+    RCC_OscInitStruct->HSEState = ((uint8_t)0x00U);
+  }
+  
+   
+  if((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR &0x00000001U) == 0x00000001U)
+  {
+    RCC_OscInitStruct->HSIState = ((uint8_t)0x01U);
+  }
+  else
+  {
+    RCC_OscInitStruct->HSIState = ((uint8_t)0x00U);
+  }
+  
+  RCC_OscInitStruct->HSICalibrationValue = (uint32_t)((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR &0x000000F8U) >> (__clz(__rbit(0x000000F8U))));
+  
+   
+  if((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->BDCR &0x00000004U) == 0x00000004U)
+  {
+    RCC_OscInitStruct->LSEState = ((uint8_t)0x05U);
+  }
+  else if((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->BDCR &0x00000001U) == 0x00000001U)
+  {
+    RCC_OscInitStruct->LSEState = ((uint8_t)0x01U);
+  }
+  else
+  {
+    RCC_OscInitStruct->LSEState = ((uint8_t)0x00U);
+  }
+  
+   
+  if((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CSR &0x00000001U) == 0x00000001U)
+  {
+    RCC_OscInitStruct->LSIState = ((uint8_t)0x01U);
+  }
+  else
+  {
+    RCC_OscInitStruct->LSIState = ((uint8_t)0x00U);
+  }
+  
+   
+  if((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR &0x01000000U) == 0x01000000U)
+  {
+    RCC_OscInitStruct->PLL.PLLState = ((uint8_t)0x02U);
+  }
+  else
+  {
+    RCC_OscInitStruct->PLL.PLLState = ((uint8_t)0x01U);
+  }
+  RCC_OscInitStruct->PLL.PLLSource = (uint32_t)(((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->PLLCFGR & 0x00400000U);
+  RCC_OscInitStruct->PLL.PLLM = (uint32_t)(((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->PLLCFGR & 0x0000003FU);
+  RCC_OscInitStruct->PLL.PLLN = (uint32_t)((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->PLLCFGR & 0x00007FC0U) >> (__clz(__rbit(0x00007FC0U))));
+  RCC_OscInitStruct->PLL.PLLP = (uint32_t)((((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->PLLCFGR & 0x00030000U) + 0x00010000U) << 1U) >> (__clz(__rbit(0x00030000U))));
+  RCC_OscInitStruct->PLL.PLLQ = (uint32_t)((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->PLLCFGR & 0x0F000000U) >> (__clz(__rbit(0x0F000000U))));
+}
+
+
+
+
+
+
+
+
+ 
+void HAL_RCC_GetClockConfig(RCC_ClkInitTypeDef  *RCC_ClkInitStruct, uint32_t *pFLatency)
+{
+   
+  RCC_ClkInitStruct->ClockType = ((uint32_t)0x00000001U) | ((uint32_t)0x00000002U) | ((uint32_t)0x00000004U) | ((uint32_t)0x00000008U);
+   
+    
+  RCC_ClkInitStruct->SYSCLKSource = (uint32_t)(((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR & 0x00000003U);
+  
+    
+  RCC_ClkInitStruct->AHBCLKDivider = (uint32_t)(((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR & 0x000000F0U); 
+  
+    
+  RCC_ClkInitStruct->APB1CLKDivider = (uint32_t)(((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR & 0x00001C00U);   
+  
+    
+  RCC_ClkInitStruct->APB2CLKDivider = (uint32_t)((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR & 0x0000E000U) >> 3U);
+  
+      
+  *pFLatency = (uint32_t)(((FLASH_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3C00U))->ACR & 0x0000000FU); 
+}
+
+
+
+
+
+ 
+void HAL_RCC_NMI_IRQHandler(void)
+{
+   
+  if(((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CIR & (((uint8_t)0x80U))) == (((uint8_t)0x80U))))
+  {
+     
+    HAL_RCC_CSSCallback();
+
+     
+    (*(volatile uint8_t *) ((uint32_t)(((0x40000000U + 0x00020000U) + 0x3800U) + 0x0CU + 0x02U)) = (((uint8_t)0x80U)));
+  }
+}
+
+
+
+
+ 
+__weak void HAL_RCC_CSSCallback(void)
+{
+  
+
+  
+}
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+ 
+
+ 

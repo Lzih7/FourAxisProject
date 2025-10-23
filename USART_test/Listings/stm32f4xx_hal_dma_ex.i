@@ -1,8 +1,61 @@
-#line 1 "MyLib\\Delay.c"
-#line 1 ".\\Inc\\main.h"
+#line 1 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_dma_ex.c"
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+ 
 #line 1 ".\\Drivers\\STM32F4xx_HAL_Driver\\Inc\\stm32f4xx_hal.h"
 
 
@@ -27756,36 +27809,279 @@ void HAL_DisableCompensationCell(void);
 
 
  
-#line 5 ".\\Inc\\main.h"
+#line 59 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_dma_ex.c"
 
-void SystemClock_Config(void);
-void Error_Handler(void);
 
-#line 2 "MyLib\\Delay.c"
 
-static uint8_t timer_initialized = 0;
-static TIM_HandleTypeDef htim2;
+ 
 
-void Timer_Delay_us(uint8_t xus) {
-	if(!timer_initialized) {
-		do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x00000001U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x00000001U)); ((void)(tmpreg)); } while(0);
-		timer_initialized = 1;
 
-		htim2.Instance = ((TIM_TypeDef *) (0x40000000U + 0x0000U));
-		htim2.Init.Prescaler = 84 - 1;
-		htim2.Init.Period = 0xFFFFFFFF;
-		htim2.Init.CounterMode = ((uint32_t)0x00000000U);
-		htim2.Init.ClockDivision = ((uint32_t)0x00000000U);
-		if(HAL_TIM_Base_Init(&htim2) != HAL_OK) {
-			Error_Handler();
-		}
-	}
-	((&htim2)->Instance ->CNT = (0));
-	if(HAL_TIM_Base_Start(&htim2) != HAL_OK) {
-		Error_Handler();
-	}
-	while(((&htim2)->Instance ->CNT) < xus) {
-		
-	}
-	HAL_TIM_Base_Stop(&htim2);
+
+
+ 
+
+
+
+ 
+ 
+ 
+ 
+ 
+
+
+ 
+static void DMA_MultiBufferSetConfig(DMA_HandleTypeDef *hdma, uint32_t SrcAddress, uint32_t DstAddress, uint32_t DataLength);
+
+
+ 
+
+ 
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_DMAEx_MultiBufferStart(DMA_HandleTypeDef *hdma, uint32_t SrcAddress, uint32_t DstAddress, uint32_t SecondMemAddress, uint32_t DataLength)
+{
+  HAL_StatusTypeDef status = HAL_OK;
+  
+   
+  ((void)0);
+  
+   
+  if (hdma->Init.Direction == ((uint32_t)0x00000080U))
+  {
+    hdma->ErrorCode = ((uint32_t)0x00000100U);
+    status = HAL_ERROR;
+  }
+  else
+  {
+     
+    do{ if((hdma)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hdma)->Lock = HAL_LOCKED; } }while (0);
+    
+    if(HAL_DMA_STATE_READY == hdma->State)
+    {
+       
+      hdma->State = HAL_DMA_STATE_BUSY; 
+      
+       
+      hdma->Instance->CR |= (uint32_t)0x00040000U;
+      
+       
+      hdma->Instance->M1AR = SecondMemAddress;
+      
+       
+      DMA_MultiBufferSetConfig(hdma, SrcAddress, DstAddress, DataLength);
+      
+       
+      ((hdma)->Instance ->CR |= 0x00000001U);
+    }
+    else
+    {
+       
+      status = HAL_BUSY;
+    }
+  }
+  return status;
 }
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_DMAEx_MultiBufferStart_IT(DMA_HandleTypeDef *hdma, uint32_t SrcAddress, uint32_t DstAddress, uint32_t SecondMemAddress, uint32_t DataLength)
+{
+  HAL_StatusTypeDef status = HAL_OK;
+  
+   
+  ((void)0);
+  
+   
+  if (hdma->Init.Direction == ((uint32_t)0x00000080U))
+  {
+    hdma->ErrorCode = ((uint32_t)0x00000100U);
+    return HAL_ERROR;
+  }
+  
+   
+  if ((0 == hdma->XferCpltCallback) || (0 == hdma->XferM1CpltCallback) || (0 == hdma->XferErrorCallback))
+  {
+    hdma->ErrorCode = ((uint32_t)0x00000040U);
+    return HAL_ERROR;
+  }
+  
+   
+  do{ if((hdma)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hdma)->Lock = HAL_LOCKED; } }while (0);
+  
+  if(HAL_DMA_STATE_READY == hdma->State)
+  {
+     
+    hdma->State = HAL_DMA_STATE_BUSY;
+    
+     
+    hdma->ErrorCode = ((uint32_t)0x00000000U);
+    
+     
+    hdma->Instance->CR |= (uint32_t)0x00040000U;
+    
+     
+    hdma->Instance->M1AR = SecondMemAddress;
+    
+     
+    DMA_MultiBufferSetConfig(hdma, SrcAddress, DstAddress, DataLength); 
+    
+     
+    (((uint32_t)((hdma)->Instance) > (uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x058U)))? (((DMA_TypeDef *) ((0x40000000U + 0x00020000U) + 0x6400U))->HIFCR = ((((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x010U))))? ((uint32_t)0x00000020U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x010U))))? ((uint32_t)0x00000020U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x070U))))? ((uint32_t)0x00000020U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x070U))))? ((uint32_t)0x00000020U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x028U))))? ((uint32_t)0x00000800U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x028U))))? ((uint32_t)0x00000800U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x088U))))? ((uint32_t)0x00000800U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x088U))))? ((uint32_t)0x00000800U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x040U))))? ((uint32_t)0x00200000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x040U))))? ((uint32_t)0x00200000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x0A0U))))? ((uint32_t)0x00200000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x0A0U))))? ((uint32_t)0x00200000U) : ((uint32_t)0x08000000U)))) : ((uint32_t)((hdma)->Instance) > (uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x0B8U)))? (((DMA_TypeDef *) ((0x40000000U + 0x00020000U) + 0x6400U))->LIFCR = ((((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x010U))))? ((uint32_t)0x00000020U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x010U))))? ((uint32_t)0x00000020U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x070U))))? ((uint32_t)0x00000020U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x070U))))? ((uint32_t)0x00000020U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x028U))))? ((uint32_t)0x00000800U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x028U))))? ((uint32_t)0x00000800U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x088U))))? ((uint32_t)0x00000800U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x088U))))? ((uint32_t)0x00000800U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x040U))))? ((uint32_t)0x00200000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x040U))))? ((uint32_t)0x00200000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x0A0U))))? ((uint32_t)0x00200000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x0A0U))))? ((uint32_t)0x00200000U) : ((uint32_t)0x08000000U)))) : ((uint32_t)((hdma)->Instance) > (uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x058U)))? (((DMA_TypeDef *) ((0x40000000U + 0x00020000U) + 0x6000U))->HIFCR = ((((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x010U))))? ((uint32_t)0x00000020U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x010U))))? ((uint32_t)0x00000020U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x070U))))? ((uint32_t)0x00000020U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x070U))))? ((uint32_t)0x00000020U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x028U))))? ((uint32_t)0x00000800U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x028U))))? ((uint32_t)0x00000800U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x088U))))? ((uint32_t)0x00000800U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x088U))))? ((uint32_t)0x00000800U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x040U))))? ((uint32_t)0x00200000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x040U))))? ((uint32_t)0x00200000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x0A0U))))? ((uint32_t)0x00200000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x0A0U))))? ((uint32_t)0x00200000U) : ((uint32_t)0x08000000U)))) : (((DMA_TypeDef *) ((0x40000000U + 0x00020000U) + 0x6000U))->LIFCR = ((((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x010U))))? ((uint32_t)0x00000020U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x010U))))? ((uint32_t)0x00000020U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x070U))))? ((uint32_t)0x00000020U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x070U))))? ((uint32_t)0x00000020U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x028U))))? ((uint32_t)0x00000800U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x028U))))? ((uint32_t)0x00000800U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x088U))))? ((uint32_t)0x00000800U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x088U))))? ((uint32_t)0x00000800U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x040U))))? ((uint32_t)0x00200000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x040U))))? ((uint32_t)0x00200000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x0A0U))))? ((uint32_t)0x00200000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x0A0U))))? ((uint32_t)0x00200000U) : ((uint32_t)0x08000000U)))));
+    (((uint32_t)((hdma)->Instance) > (uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x058U)))? (((DMA_TypeDef *) ((0x40000000U + 0x00020000U) + 0x6400U))->HIFCR = ((((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x010U))))? ((uint32_t)0x00000010U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x010U))))? ((uint32_t)0x00000010U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x070U))))? ((uint32_t)0x00000010U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x070U))))? ((uint32_t)0x00000010U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x028U))))? ((uint32_t)0x00000400U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x028U))))? ((uint32_t)0x00000400U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x088U))))? ((uint32_t)0x00000400U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x088U))))? ((uint32_t)0x00000400U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x040U))))? ((uint32_t)0x00100000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x040U))))? ((uint32_t)0x00100000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x0A0U))))? ((uint32_t)0x00100000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x0A0U))))? ((uint32_t)0x00100000U) : ((uint32_t)0x04000000U)))) : ((uint32_t)((hdma)->Instance) > (uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x0B8U)))? (((DMA_TypeDef *) ((0x40000000U + 0x00020000U) + 0x6400U))->LIFCR = ((((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x010U))))? ((uint32_t)0x00000010U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x010U))))? ((uint32_t)0x00000010U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x070U))))? ((uint32_t)0x00000010U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x070U))))? ((uint32_t)0x00000010U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x028U))))? ((uint32_t)0x00000400U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x028U))))? ((uint32_t)0x00000400U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x088U))))? ((uint32_t)0x00000400U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x088U))))? ((uint32_t)0x00000400U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x040U))))? ((uint32_t)0x00100000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x040U))))? ((uint32_t)0x00100000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x0A0U))))? ((uint32_t)0x00100000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x0A0U))))? ((uint32_t)0x00100000U) : ((uint32_t)0x04000000U)))) : ((uint32_t)((hdma)->Instance) > (uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x058U)))? (((DMA_TypeDef *) ((0x40000000U + 0x00020000U) + 0x6000U))->HIFCR = ((((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x010U))))? ((uint32_t)0x00000010U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x010U))))? ((uint32_t)0x00000010U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x070U))))? ((uint32_t)0x00000010U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x070U))))? ((uint32_t)0x00000010U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x028U))))? ((uint32_t)0x00000400U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x028U))))? ((uint32_t)0x00000400U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x088U))))? ((uint32_t)0x00000400U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x088U))))? ((uint32_t)0x00000400U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x040U))))? ((uint32_t)0x00100000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x040U))))? ((uint32_t)0x00100000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x0A0U))))? ((uint32_t)0x00100000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x0A0U))))? ((uint32_t)0x00100000U) : ((uint32_t)0x04000000U)))) : (((DMA_TypeDef *) ((0x40000000U + 0x00020000U) + 0x6000U))->LIFCR = ((((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x010U))))? ((uint32_t)0x00000010U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x010U))))? ((uint32_t)0x00000010U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x070U))))? ((uint32_t)0x00000010U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x070U))))? ((uint32_t)0x00000010U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x028U))))? ((uint32_t)0x00000400U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x028U))))? ((uint32_t)0x00000400U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x088U))))? ((uint32_t)0x00000400U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x088U))))? ((uint32_t)0x00000400U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x040U))))? ((uint32_t)0x00100000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x040U))))? ((uint32_t)0x00100000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x0A0U))))? ((uint32_t)0x00100000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x0A0U))))? ((uint32_t)0x00100000U) : ((uint32_t)0x04000000U)))));
+    (((uint32_t)((hdma)->Instance) > (uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x058U)))? (((DMA_TypeDef *) ((0x40000000U + 0x00020000U) + 0x6400U))->HIFCR = ((((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x010U))))? ((uint32_t)0x00000008U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x010U))))? ((uint32_t)0x00000008U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x070U))))? ((uint32_t)0x00000008U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x070U))))? ((uint32_t)0x00000008U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x028U))))? ((uint32_t)0x00000200U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x028U))))? ((uint32_t)0x00000200U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x088U))))? ((uint32_t)0x00000200U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x088U))))? ((uint32_t)0x00000200U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x040U))))? ((uint32_t)0x00080000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x040U))))? ((uint32_t)0x00080000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x0A0U))))? ((uint32_t)0x00080000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x0A0U))))? ((uint32_t)0x00080000U) : ((uint32_t)0x02000000U)))) : ((uint32_t)((hdma)->Instance) > (uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x0B8U)))? (((DMA_TypeDef *) ((0x40000000U + 0x00020000U) + 0x6400U))->LIFCR = ((((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x010U))))? ((uint32_t)0x00000008U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x010U))))? ((uint32_t)0x00000008U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x070U))))? ((uint32_t)0x00000008U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x070U))))? ((uint32_t)0x00000008U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x028U))))? ((uint32_t)0x00000200U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x028U))))? ((uint32_t)0x00000200U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x088U))))? ((uint32_t)0x00000200U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x088U))))? ((uint32_t)0x00000200U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x040U))))? ((uint32_t)0x00080000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x040U))))? ((uint32_t)0x00080000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x0A0U))))? ((uint32_t)0x00080000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x0A0U))))? ((uint32_t)0x00080000U) : ((uint32_t)0x02000000U)))) : ((uint32_t)((hdma)->Instance) > (uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x058U)))? (((DMA_TypeDef *) ((0x40000000U + 0x00020000U) + 0x6000U))->HIFCR = ((((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x010U))))? ((uint32_t)0x00000008U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x010U))))? ((uint32_t)0x00000008U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x070U))))? ((uint32_t)0x00000008U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x070U))))? ((uint32_t)0x00000008U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x028U))))? ((uint32_t)0x00000200U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x028U))))? ((uint32_t)0x00000200U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x088U))))? ((uint32_t)0x00000200U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x088U))))? ((uint32_t)0x00000200U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x040U))))? ((uint32_t)0x00080000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x040U))))? ((uint32_t)0x00080000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x0A0U))))? ((uint32_t)0x00080000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x0A0U))))? ((uint32_t)0x00080000U) : ((uint32_t)0x02000000U)))) : (((DMA_TypeDef *) ((0x40000000U + 0x00020000U) + 0x6000U))->LIFCR = ((((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x010U))))? ((uint32_t)0x00000008U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x010U))))? ((uint32_t)0x00000008U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x070U))))? ((uint32_t)0x00000008U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x070U))))? ((uint32_t)0x00000008U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x028U))))? ((uint32_t)0x00000200U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x028U))))? ((uint32_t)0x00000200U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x088U))))? ((uint32_t)0x00000200U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x088U))))? ((uint32_t)0x00000200U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x040U))))? ((uint32_t)0x00080000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x040U))))? ((uint32_t)0x00080000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x0A0U))))? ((uint32_t)0x00080000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x0A0U))))? ((uint32_t)0x00080000U) : ((uint32_t)0x02000000U)))));
+    (((uint32_t)((hdma)->Instance) > (uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x058U)))? (((DMA_TypeDef *) ((0x40000000U + 0x00020000U) + 0x6400U))->HIFCR = ((((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x010U))))? ((uint32_t)0x00800004U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x010U))))? ((uint32_t)0x00800004U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x070U))))? ((uint32_t)0x00800004U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x070U))))? ((uint32_t)0x00800004U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x028U))))? ((uint32_t)0x00000100U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x028U))))? ((uint32_t)0x00000100U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x088U))))? ((uint32_t)0x00000100U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x088U))))? ((uint32_t)0x00000100U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x040U))))? ((uint32_t)0x00040000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x040U))))? ((uint32_t)0x00040000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x0A0U))))? ((uint32_t)0x00040000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x0A0U))))? ((uint32_t)0x00040000U) : ((uint32_t)0x01000000U)))) : ((uint32_t)((hdma)->Instance) > (uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x0B8U)))? (((DMA_TypeDef *) ((0x40000000U + 0x00020000U) + 0x6400U))->LIFCR = ((((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x010U))))? ((uint32_t)0x00800004U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x010U))))? ((uint32_t)0x00800004U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x070U))))? ((uint32_t)0x00800004U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x070U))))? ((uint32_t)0x00800004U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x028U))))? ((uint32_t)0x00000100U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x028U))))? ((uint32_t)0x00000100U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x088U))))? ((uint32_t)0x00000100U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x088U))))? ((uint32_t)0x00000100U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x040U))))? ((uint32_t)0x00040000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x040U))))? ((uint32_t)0x00040000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x0A0U))))? ((uint32_t)0x00040000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x0A0U))))? ((uint32_t)0x00040000U) : ((uint32_t)0x01000000U)))) : ((uint32_t)((hdma)->Instance) > (uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x058U)))? (((DMA_TypeDef *) ((0x40000000U + 0x00020000U) + 0x6000U))->HIFCR = ((((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x010U))))? ((uint32_t)0x00800004U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x010U))))? ((uint32_t)0x00800004U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x070U))))? ((uint32_t)0x00800004U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x070U))))? ((uint32_t)0x00800004U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x028U))))? ((uint32_t)0x00000100U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x028U))))? ((uint32_t)0x00000100U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x088U))))? ((uint32_t)0x00000100U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x088U))))? ((uint32_t)0x00000100U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x040U))))? ((uint32_t)0x00040000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x040U))))? ((uint32_t)0x00040000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x0A0U))))? ((uint32_t)0x00040000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x0A0U))))? ((uint32_t)0x00040000U) : ((uint32_t)0x01000000U)))) : (((DMA_TypeDef *) ((0x40000000U + 0x00020000U) + 0x6000U))->LIFCR = ((((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x010U))))? ((uint32_t)0x00800004U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x010U))))? ((uint32_t)0x00800004U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x070U))))? ((uint32_t)0x00800004U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x070U))))? ((uint32_t)0x00800004U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x028U))))? ((uint32_t)0x00000100U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x028U))))? ((uint32_t)0x00000100U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x088U))))? ((uint32_t)0x00000100U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x088U))))? ((uint32_t)0x00000100U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x040U))))? ((uint32_t)0x00040000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x040U))))? ((uint32_t)0x00040000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x0A0U))))? ((uint32_t)0x00040000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x0A0U))))? ((uint32_t)0x00040000U) : ((uint32_t)0x01000000U)))));
+    (((uint32_t)((hdma)->Instance) > (uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x058U)))? (((DMA_TypeDef *) ((0x40000000U + 0x00020000U) + 0x6400U))->HIFCR = ((((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x010U))))? ((uint32_t)0x00800001U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x010U))))? ((uint32_t)0x00800001U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x070U))))? ((uint32_t)0x00800001U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x070U))))? ((uint32_t)0x00800001U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x028U))))? ((uint32_t)0x00000040U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x028U))))? ((uint32_t)0x00000040U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x088U))))? ((uint32_t)0x00000040U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x088U))))? ((uint32_t)0x00000040U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x040U))))? ((uint32_t)0x00010000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x040U))))? ((uint32_t)0x00010000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x0A0U))))? ((uint32_t)0x00010000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x0A0U))))? ((uint32_t)0x00010000U) : ((uint32_t)0x00400000U)))) : ((uint32_t)((hdma)->Instance) > (uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x0B8U)))? (((DMA_TypeDef *) ((0x40000000U + 0x00020000U) + 0x6400U))->LIFCR = ((((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x010U))))? ((uint32_t)0x00800001U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x010U))))? ((uint32_t)0x00800001U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x070U))))? ((uint32_t)0x00800001U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x070U))))? ((uint32_t)0x00800001U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x028U))))? ((uint32_t)0x00000040U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x028U))))? ((uint32_t)0x00000040U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x088U))))? ((uint32_t)0x00000040U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x088U))))? ((uint32_t)0x00000040U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x040U))))? ((uint32_t)0x00010000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x040U))))? ((uint32_t)0x00010000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x0A0U))))? ((uint32_t)0x00010000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x0A0U))))? ((uint32_t)0x00010000U) : ((uint32_t)0x00400000U)))) : ((uint32_t)((hdma)->Instance) > (uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x058U)))? (((DMA_TypeDef *) ((0x40000000U + 0x00020000U) + 0x6000U))->HIFCR = ((((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x010U))))? ((uint32_t)0x00800001U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x010U))))? ((uint32_t)0x00800001U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x070U))))? ((uint32_t)0x00800001U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x070U))))? ((uint32_t)0x00800001U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x028U))))? ((uint32_t)0x00000040U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x028U))))? ((uint32_t)0x00000040U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x088U))))? ((uint32_t)0x00000040U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x088U))))? ((uint32_t)0x00000040U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x040U))))? ((uint32_t)0x00010000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x040U))))? ((uint32_t)0x00010000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x0A0U))))? ((uint32_t)0x00010000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x0A0U))))? ((uint32_t)0x00010000U) : ((uint32_t)0x00400000U)))) : (((DMA_TypeDef *) ((0x40000000U + 0x00020000U) + 0x6000U))->LIFCR = ((((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x010U))))? ((uint32_t)0x00800001U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x010U))))? ((uint32_t)0x00800001U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x070U))))? ((uint32_t)0x00800001U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x070U))))? ((uint32_t)0x00800001U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x028U))))? ((uint32_t)0x00000040U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x028U))))? ((uint32_t)0x00000040U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x088U))))? ((uint32_t)0x00000040U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x088U))))? ((uint32_t)0x00000040U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x040U))))? ((uint32_t)0x00010000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x040U))))? ((uint32_t)0x00010000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6000U) + 0x0A0U))))? ((uint32_t)0x00010000U) : ((uint32_t)((hdma)->Instance) == ((uint32_t)((DMA_Stream_TypeDef *) (((0x40000000U + 0x00020000U) + 0x6400U) + 0x0A0U))))? ((uint32_t)0x00010000U) : ((uint32_t)0x00400000U)))));
+
+     
+    hdma->Instance->CR  |= ((uint32_t)0x00000010U) | ((uint32_t)0x00000004U) | ((uint32_t)0x00000002U);
+    hdma->Instance->FCR |= ((uint32_t)0x00000080U);
+    
+    if((hdma->XferHalfCpltCallback != 0) || (hdma->XferM1HalfCpltCallback != 0))
+    {
+      hdma->Instance->CR  |= ((uint32_t)0x00000008U);
+    }
+    
+     
+    ((hdma)->Instance ->CR |= 0x00000001U); 
+  }
+  else
+  {     
+     
+    do{ (hdma)->Lock = HAL_UNLOCKED; }while (0);	  
+    
+     
+    status = HAL_BUSY;
+  }  
+  return status; 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_DMAEx_ChangeMemory(DMA_HandleTypeDef *hdma, uint32_t Address, HAL_DMA_MemoryTypeDef memory)
+{
+  if(memory == MEMORY0)
+  {
+     
+    hdma->Instance->M0AR = Address;
+  }
+  else
+  {
+     
+    hdma->Instance->M1AR = Address;
+  }
+
+  return HAL_OK;
+}
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+ 
+static void DMA_MultiBufferSetConfig(DMA_HandleTypeDef *hdma, uint32_t SrcAddress, uint32_t DstAddress, uint32_t DataLength)
+{  
+   
+  hdma->Instance->NDTR = DataLength;
+  
+   
+  if((hdma->Init.Direction) == ((uint32_t)0x00000040U))
+  {   
+     
+    hdma->Instance->PAR = DstAddress;
+    
+     
+    hdma->Instance->M0AR = SrcAddress;
+  }
+   
+  else
+  {
+     
+    hdma->Instance->PAR = SrcAddress;
+    
+     
+    hdma->Instance->M0AR = DstAddress;
+  }
+}
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+ 
+
+ 

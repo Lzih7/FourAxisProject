@@ -1,8 +1,104 @@
-#line 1 "MyLib\\Delay.c"
-#line 1 ".\\Inc\\main.h"
+#line 1 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_cortex.c"
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+ 
 #line 1 ".\\Drivers\\STM32F4xx_HAL_Driver\\Inc\\stm32f4xx_hal.h"
 
 
@@ -27756,36 +27852,386 @@ void HAL_DisableCompensationCell(void);
 
 
  
-#line 5 ".\\Inc\\main.h"
+#line 102 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_cortex.c"
 
-void SystemClock_Config(void);
-void Error_Handler(void);
 
-#line 2 "MyLib\\Delay.c"
 
-static uint8_t timer_initialized = 0;
-static TIM_HandleTypeDef htim2;
+ 
 
-void Timer_Delay_us(uint8_t xus) {
-	if(!timer_initialized) {
-		do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x00000001U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x00000001U)); ((void)(tmpreg)); } while(0);
-		timer_initialized = 1;
 
-		htim2.Instance = ((TIM_TypeDef *) (0x40000000U + 0x0000U));
-		htim2.Init.Prescaler = 84 - 1;
-		htim2.Init.Period = 0xFFFFFFFF;
-		htim2.Init.CounterMode = ((uint32_t)0x00000000U);
-		htim2.Init.ClockDivision = ((uint32_t)0x00000000U);
-		if(HAL_TIM_Base_Init(&htim2) != HAL_OK) {
-			Error_Handler();
-		}
-	}
-	((&htim2)->Instance ->CNT = (0));
-	if(HAL_TIM_Base_Start(&htim2) != HAL_OK) {
-		Error_Handler();
-	}
-	while(((&htim2)->Instance ->CNT) < xus) {
-		
-	}
-	HAL_TIM_Base_Stop(&htim2);
+
+
+ 
+
+
+
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+void HAL_NVIC_SetPriorityGrouping(uint32_t PriorityGroup)
+{
+   
+  ((void)0);
+  
+   
+  NVIC_SetPriorityGrouping(PriorityGroup);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+void HAL_NVIC_SetPriority(IRQn_Type IRQn, uint32_t PreemptPriority, uint32_t SubPriority)
+{ 
+  uint32_t prioritygroup = 0x00U;
+  
+   
+  ((void)0);
+  ((void)0);
+  
+  prioritygroup = NVIC_GetPriorityGrouping();
+  
+  NVIC_SetPriority(IRQn, NVIC_EncodePriority(prioritygroup, PreemptPriority, SubPriority));
+}
+
+
+
+
+
+
+
+
+
+ 
+void HAL_NVIC_EnableIRQ(IRQn_Type IRQn)
+{
+   
+  ((void)0);
+  
+   
+  NVIC_EnableIRQ(IRQn);
+}
+
+
+
+
+
+
+
+ 
+void HAL_NVIC_DisableIRQ(IRQn_Type IRQn)
+{
+   
+  ((void)0);
+  
+   
+  NVIC_DisableIRQ(IRQn);
+}
+
+
+
+
+ 
+void HAL_NVIC_SystemReset(void)
+{
+   
+  NVIC_SystemReset();
+}
+
+
+
+
+
+
+
+ 
+uint32_t HAL_SYSTICK_Config(uint32_t TicksNumb)
+{
+   return SysTick_Config(TicksNumb);
+}
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+void HAL_MPU_ConfigRegion(MPU_Region_InitTypeDef *MPU_Init)
+{
+   
+  ((void)0);
+  ((void)0);
+
+   
+  ((MPU_Type *) ((0xE000E000UL) + 0x0D90UL) )->RNR = MPU_Init->Number;
+
+  if ((MPU_Init->Enable) != RESET)
+  {
+     
+    ((void)0);
+    ((void)0);
+    ((void)0);
+    ((void)0);
+    ((void)0);
+    ((void)0);
+    ((void)0);
+    ((void)0);
+    
+    ((MPU_Type *) ((0xE000E000UL) + 0x0D90UL) )->RBAR = MPU_Init->BaseAddress;
+    ((MPU_Type *) ((0xE000E000UL) + 0x0D90UL) )->RASR = ((uint32_t)MPU_Init->DisableExec             << 28U)   |
+                ((uint32_t)MPU_Init->AccessPermission        << 24U)   |
+                ((uint32_t)MPU_Init->TypeExtField            << 19U)  |
+                ((uint32_t)MPU_Init->IsShareable             << 18U)    |
+                ((uint32_t)MPU_Init->IsCacheable             << 17U)    |
+                ((uint32_t)MPU_Init->IsBufferable            << 16U)    |
+                ((uint32_t)MPU_Init->SubRegionDisable        << 8U)  |
+                ((uint32_t)MPU_Init->Size                    << 1U) |
+                ((uint32_t)MPU_Init->Enable                  << 0U);
+  }
+  else
+  {
+    ((MPU_Type *) ((0xE000E000UL) + 0x0D90UL) )->RBAR = 0x00U;
+    ((MPU_Type *) ((0xE000E000UL) + 0x0D90UL) )->RASR = 0x00U;
+  }
+}
+
+
+
+
+
+ 
+uint32_t HAL_NVIC_GetPriorityGrouping(void)
+{
+   
+  return NVIC_GetPriorityGrouping();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+void HAL_NVIC_GetPriority(IRQn_Type IRQn, uint32_t PriorityGroup, uint32_t *pPreemptPriority, uint32_t *pSubPriority)
+{
+   
+  ((void)0);
+  
+  NVIC_DecodePriority(NVIC_GetPriority(IRQn), PriorityGroup, pPreemptPriority, pSubPriority);
+}
+
+
+
+
+
+
+
+ 
+void HAL_NVIC_SetPendingIRQ(IRQn_Type IRQn)
+{
+   
+  ((void)0);
+  
+   
+  NVIC_SetPendingIRQ(IRQn);
+}
+
+
+
+
+
+
+
+
+
+ 
+uint32_t HAL_NVIC_GetPendingIRQ(IRQn_Type IRQn)
+{
+   
+  ((void)0);
+  
+   
+  return NVIC_GetPendingIRQ(IRQn);
+}
+
+
+
+
+
+
+
+ 
+void HAL_NVIC_ClearPendingIRQ(IRQn_Type IRQn)
+{
+   
+  ((void)0);
+  
+   
+  NVIC_ClearPendingIRQ(IRQn);
+}
+
+
+
+
+
+
+
+
+ 
+uint32_t HAL_NVIC_GetActive(IRQn_Type IRQn)
+{
+   
+  ((void)0);
+  
+   
+  return NVIC_GetActive(IRQn);
+}
+
+
+
+
+
+
+
+
+ 
+void HAL_SYSTICK_CLKSourceConfig(uint32_t CLKSource)
+{
+   
+  ((void)0);
+  if (CLKSource == ((uint32_t)0x00000004U))
+  {
+    ((SysTick_Type *) ((0xE000E000UL) + 0x0010UL) )->CTRL |= ((uint32_t)0x00000004U);
+  }
+  else
+  {
+    ((SysTick_Type *) ((0xE000E000UL) + 0x0010UL) )->CTRL &= ~((uint32_t)0x00000004U);
+  }
+}
+
+
+
+
+ 
+void HAL_SYSTICK_IRQHandler(void)
+{
+  HAL_SYSTICK_Callback();
+}
+
+
+
+
+ 
+__weak void HAL_SYSTICK_Callback(void)
+{
+  
+
+ 
+}
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+ 
+
+ 

@@ -1,8 +1,129 @@
-#line 1 "MyLib\\Delay.c"
-#line 1 ".\\Inc\\main.h"
+#line 1 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_gpio.c"
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+ 
 #line 1 ".\\Drivers\\STM32F4xx_HAL_Driver\\Inc\\stm32f4xx_hal.h"
 
 
@@ -27756,36 +27877,419 @@ void HAL_DisableCompensationCell(void);
 
 
  
-#line 5 ".\\Inc\\main.h"
+#line 127 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_gpio.c"
 
-void SystemClock_Config(void);
-void Error_Handler(void);
 
-#line 2 "MyLib\\Delay.c"
 
-static uint8_t timer_initialized = 0;
-static TIM_HandleTypeDef htim2;
+ 
 
-void Timer_Delay_us(uint8_t xus) {
-	if(!timer_initialized) {
-		do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x00000001U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x00000001U)); ((void)(tmpreg)); } while(0);
-		timer_initialized = 1;
 
-		htim2.Instance = ((TIM_TypeDef *) (0x40000000U + 0x0000U));
-		htim2.Init.Prescaler = 84 - 1;
-		htim2.Init.Period = 0xFFFFFFFF;
-		htim2.Init.CounterMode = ((uint32_t)0x00000000U);
-		htim2.Init.ClockDivision = ((uint32_t)0x00000000U);
-		if(HAL_TIM_Base_Init(&htim2) != HAL_OK) {
-			Error_Handler();
-		}
-	}
-	((&htim2)->Instance ->CNT = (0));
-	if(HAL_TIM_Base_Start(&htim2) != HAL_OK) {
-		Error_Handler();
-	}
-	while(((&htim2)->Instance ->CNT) < xus) {
-		
-	}
-	HAL_TIM_Base_Stop(&htim2);
+
+
+ 
+
+
+
+ 
+ 
+
+
+ 
+#line 151 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_gpio.c"
+
+
+
+
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+ 
+void HAL_GPIO_Init(GPIO_TypeDef  *GPIOx, GPIO_InitTypeDef *GPIO_Init)
+{
+  uint32_t position;
+  uint32_t ioposition = 0x00U;
+  uint32_t iocurrent = 0x00U;
+  uint32_t temp = 0x00U;
+
+   
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+
+   
+  for(position = 0U; position < ((uint32_t)16U); position++)
+  {
+     
+    ioposition = ((uint32_t)0x01U) << position;
+     
+    iocurrent = (uint32_t)(GPIO_Init->Pin) & ioposition;
+
+    if(iocurrent == ioposition)
+    {
+       
+       
+      if((GPIO_Init->Mode == ((uint32_t)0x00000002U)) || (GPIO_Init->Mode == ((uint32_t)0x00000012U)))
+      {
+         
+        ((void)0);
+         
+        temp = GPIOx->AFR[position >> 3U];
+        temp &= ~((uint32_t)0xFU << ((uint32_t)(position & (uint32_t)0x07U) * 4U)) ;
+        temp |= ((uint32_t)(GPIO_Init->Alternate) << (((uint32_t)position & (uint32_t)0x07U) * 4U));
+        GPIOx->AFR[position >> 3U] = temp;
+      }
+
+       
+      temp = GPIOx->MODER;
+      temp &= ~(0x00000003U << (position * 2U));
+      temp |= ((GPIO_Init->Mode & ((uint32_t)0x00000003U)) << (position * 2U));
+      GPIOx->MODER = temp;
+
+       
+      if((GPIO_Init->Mode == ((uint32_t)0x00000001U)) || (GPIO_Init->Mode == ((uint32_t)0x00000002U)) ||
+         (GPIO_Init->Mode == ((uint32_t)0x00000011U)) || (GPIO_Init->Mode == ((uint32_t)0x00000012U)))
+      {
+         
+        ((void)0);
+         
+        temp = GPIOx->OSPEEDR; 
+        temp &= ~(0x00000003U << (position * 2U));
+        temp |= (GPIO_Init->Speed << (position * 2U));
+        GPIOx->OSPEEDR = temp;
+
+         
+        temp = GPIOx->OTYPER;
+        temp &= ~(0x00000001U << position) ;
+        temp |= (((GPIO_Init->Mode & ((uint32_t)0x00000010U)) >> 4U) << position);
+        GPIOx->OTYPER = temp;
+      }
+
+       
+      temp = GPIOx->PUPDR;
+      temp &= ~(0x00000003U << (position * 2U));
+      temp |= ((GPIO_Init->Pull) << (position * 2U));
+      GPIOx->PUPDR = temp;
+
+       
+       
+      if((GPIO_Init->Mode & ((uint32_t)0x10000000U)) == ((uint32_t)0x10000000U))
+      {
+         
+        do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB2ENR) |= (0x00004000U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB2ENR) & (0x00004000U)); ((void)(tmpreg)); } while(0);
+
+        temp = ((SYSCFG_TypeDef *) ((0x40000000U + 0x00010000U) + 0x3800U))->EXTICR[position >> 2U];
+        temp &= ~(((uint32_t)0x0FU) << (4U * (position & 0x03U)));
+        temp |= ((uint32_t)((uint8_t)(((GPIOx) == (((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0000U))))? 0U : ((GPIOx) == (((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0400U))))? 1U : ((GPIOx) == (((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0800U))))? 2U : ((GPIOx) == (((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0C00U))))? 3U : ((GPIOx) == (((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x1000U))))? 4U : 5U)) << (4U * (position & 0x03U)));
+        ((SYSCFG_TypeDef *) ((0x40000000U + 0x00010000U) + 0x3800U))->EXTICR[position >> 2U] = temp;
+
+         
+        temp = ((EXTI_TypeDef *) ((0x40000000U + 0x00010000U) + 0x3C00U))->IMR;
+        temp &= ~((uint32_t)iocurrent);
+        if((GPIO_Init->Mode & ((uint32_t)0x00010000U)) == ((uint32_t)0x00010000U))
+        {
+          temp |= iocurrent;
+        }
+        ((EXTI_TypeDef *) ((0x40000000U + 0x00010000U) + 0x3C00U))->IMR = temp;
+
+        temp = ((EXTI_TypeDef *) ((0x40000000U + 0x00010000U) + 0x3C00U))->EMR;
+        temp &= ~((uint32_t)iocurrent);
+        if((GPIO_Init->Mode & ((uint32_t)0x00020000U)) == ((uint32_t)0x00020000U))
+        {
+          temp |= iocurrent;
+        }
+        ((EXTI_TypeDef *) ((0x40000000U + 0x00010000U) + 0x3C00U))->EMR = temp;
+
+         
+        temp = ((EXTI_TypeDef *) ((0x40000000U + 0x00010000U) + 0x3C00U))->RTSR;
+        temp &= ~((uint32_t)iocurrent);
+        if((GPIO_Init->Mode & ((uint32_t)0x00100000U)) == ((uint32_t)0x00100000U))
+        {
+          temp |= iocurrent;
+        }
+        ((EXTI_TypeDef *) ((0x40000000U + 0x00010000U) + 0x3C00U))->RTSR = temp;
+
+        temp = ((EXTI_TypeDef *) ((0x40000000U + 0x00010000U) + 0x3C00U))->FTSR;
+        temp &= ~((uint32_t)iocurrent);
+        if((GPIO_Init->Mode & ((uint32_t)0x00200000U)) == ((uint32_t)0x00200000U))
+        {
+          temp |= iocurrent;
+        }
+        ((EXTI_TypeDef *) ((0x40000000U + 0x00010000U) + 0x3C00U))->FTSR = temp;
+      }
+    }
+  }
 }
+
+
+
+
+
+
+
+
+ 
+void HAL_GPIO_DeInit(GPIO_TypeDef  *GPIOx, uint32_t GPIO_Pin)
+{
+  uint32_t position;
+  uint32_t ioposition = 0x00U;
+  uint32_t iocurrent = 0x00U;
+  uint32_t tmp = 0x00U;
+
+   
+  ((void)0);
+  
+   
+  for(position = 0U; position < ((uint32_t)16U); position++)
+  {
+     
+    ioposition = ((uint32_t)0x01U) << position;
+     
+    iocurrent = (GPIO_Pin) & ioposition;
+
+    if(iocurrent == ioposition)
+    {
+       
+       
+      GPIOx->MODER &= ~(0x00000003U << (position * 2U));
+
+       
+      GPIOx->AFR[position >> 3U] &= ~((uint32_t)0xFU << ((uint32_t)(position & (uint32_t)0x07U) * 4U)) ;
+
+       
+      GPIOx->OSPEEDR &= ~(0x00000003U << (position * 2U));
+
+       
+      GPIOx->OTYPER  &= ~(0x00000001U << position) ;
+
+       
+      GPIOx->PUPDR &= ~(0x00000003U << (position * 2U));
+
+       
+      tmp = ((SYSCFG_TypeDef *) ((0x40000000U + 0x00010000U) + 0x3800U))->EXTICR[position >> 2U];
+      tmp &= (((uint32_t)0x0FU) << (4U * (position & 0x03U)));
+      if(tmp == ((uint32_t)((uint8_t)(((GPIOx) == (((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0000U))))? 0U : ((GPIOx) == (((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0400U))))? 1U : ((GPIOx) == (((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0800U))))? 2U : ((GPIOx) == (((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0C00U))))? 3U : ((GPIOx) == (((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x1000U))))? 4U : 5U)) << (4U * (position & 0x03U))))
+      {
+         
+        tmp = ((uint32_t)0x0FU) << (4U * (position & 0x03U));
+        ((SYSCFG_TypeDef *) ((0x40000000U + 0x00010000U) + 0x3800U))->EXTICR[position >> 2U] &= ~tmp;
+
+         
+        ((EXTI_TypeDef *) ((0x40000000U + 0x00010000U) + 0x3C00U))->IMR &= ~((uint32_t)iocurrent);
+        ((EXTI_TypeDef *) ((0x40000000U + 0x00010000U) + 0x3C00U))->EMR &= ~((uint32_t)iocurrent);
+        
+         
+        ((EXTI_TypeDef *) ((0x40000000U + 0x00010000U) + 0x3C00U))->RTSR &= ~((uint32_t)iocurrent);
+        ((EXTI_TypeDef *) ((0x40000000U + 0x00010000U) + 0x3C00U))->FTSR &= ~((uint32_t)iocurrent);
+      }
+    }
+  }
+}
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+ 
+GPIO_PinState HAL_GPIO_ReadPin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
+{
+  GPIO_PinState bitstatus;
+
+   
+  ((void)0);
+
+  if((GPIOx->IDR & GPIO_Pin) != (uint32_t)GPIO_PIN_RESET)
+  {
+    bitstatus = GPIO_PIN_SET;
+  }
+  else
+  {
+    bitstatus = GPIO_PIN_RESET;
+  }
+  return bitstatus;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+void HAL_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIO_PinState PinState)
+{
+   
+  ((void)0);
+  ((void)0);
+
+  if(PinState != GPIO_PIN_RESET)
+  {
+    GPIOx->BSRR = GPIO_Pin;
+  }
+  else
+  {
+    GPIOx->BSRR = (uint32_t)GPIO_Pin << 16U;
+  }
+}
+
+
+
+
+
+
+
+ 
+void HAL_GPIO_TogglePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
+{
+   
+  ((void)0);
+
+  GPIOx->ODR ^= GPIO_Pin;
+}
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_GPIO_LockPin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
+{
+  volatile uint32_t tmp = 0x00010000U;
+
+   
+  ((void)0);
+
+   
+  tmp |= GPIO_Pin;
+   
+  GPIOx->LCKR = tmp;
+   
+  GPIOx->LCKR = GPIO_Pin;
+   
+  GPIOx->LCKR = tmp;
+   
+  tmp = GPIOx->LCKR;
+
+ if((GPIOx->LCKR & 0x00010000U) != RESET)
+  {
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_ERROR;
+  }
+}
+
+
+
+
+
+ 
+void HAL_GPIO_EXTI_IRQHandler(uint16_t GPIO_Pin)
+{
+   
+  if((((EXTI_TypeDef *) ((0x40000000U + 0x00010000U) + 0x3C00U))->PR & (GPIO_Pin)) != RESET)
+  {
+    (((EXTI_TypeDef *) ((0x40000000U + 0x00010000U) + 0x3C00U))->PR = (GPIO_Pin));
+    HAL_GPIO_EXTI_Callback(GPIO_Pin);
+  }
+}
+
+
+
+
+
+ 
+__weak void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+   
+  ((void)(GPIO_Pin));
+  
+
+ 
+}
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+ 
+
+ 

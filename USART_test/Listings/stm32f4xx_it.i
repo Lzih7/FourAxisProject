@@ -1,4 +1,4 @@
-#line 1 "MyLib\\Delay.c"
+#line 1 "Src\\stm32f4xx_it.c"
 #line 1 ".\\Inc\\main.h"
 
 
@@ -27761,31 +27761,29 @@ void HAL_DisableCompensationCell(void);
 void SystemClock_Config(void);
 void Error_Handler(void);
 
-#line 2 "MyLib\\Delay.c"
+#line 2 "Src\\stm32f4xx_it.c"
+#line 1 ".\\Inc\\stm32f4xx_it.h"
 
-static uint8_t timer_initialized = 0;
-static TIM_HandleTypeDef htim2;
 
-void Timer_Delay_us(uint8_t xus) {
-	if(!timer_initialized) {
-		do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x00000001U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x00000001U)); ((void)(tmpreg)); } while(0);
-		timer_initialized = 1;
 
-		htim2.Instance = ((TIM_TypeDef *) (0x40000000U + 0x0000U));
-		htim2.Init.Prescaler = 84 - 1;
-		htim2.Init.Period = 0xFFFFFFFF;
-		htim2.Init.CounterMode = ((uint32_t)0x00000000U);
-		htim2.Init.ClockDivision = ((uint32_t)0x00000000U);
-		if(HAL_TIM_Base_Init(&htim2) != HAL_OK) {
-			Error_Handler();
-		}
-	}
-	((&htim2)->Instance ->CNT = (0));
-	if(HAL_TIM_Base_Start(&htim2) != HAL_OK) {
-		Error_Handler();
-	}
-	while(((&htim2)->Instance ->CNT) < xus) {
-		
-	}
-	HAL_TIM_Base_Stop(&htim2);
-}
+void NMI_Handler(void);
+void HardFault_Handler(void);
+void MemManage_Handler(void);
+void BusFault_Handler(void);
+void UsageFault_Handler(void);
+void SVC_Handler(void);
+void DebugMon_Handler(void);
+void PendSV_Handler(void);
+void SysTick_Handler(void);
+
+#line 3 "Src\\stm32f4xx_it.c"
+
+void NMI_Handler(void) {}
+void HardFault_Handler(void) { while(1) {} }
+void MemManage_Handler(void) { while(1) {} }
+void BusFault_Handler(void) { while(1) {} }
+void UsageFault_Handler(void) { while(1) {} }
+void SVC_Handler(void) {}
+void DebugMon_Handler(void) {}
+void PendSV_Handler(void) {}
+void SysTick_Handler(void) { HAL_IncTick(); }

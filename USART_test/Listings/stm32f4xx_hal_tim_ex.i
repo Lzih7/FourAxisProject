@@ -1,8 +1,103 @@
-#line 1 "MyLib\\Delay.c"
-#line 1 ".\\Inc\\main.h"
+#line 1 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_tim_ex.c"
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+ 
 #line 1 ".\\Drivers\\STM32F4xx_HAL_Driver\\Inc\\stm32f4xx_hal.h"
 
 
@@ -27756,36 +27851,1777 @@ void HAL_DisableCompensationCell(void);
 
 
  
-#line 5 ".\\Inc\\main.h"
+#line 101 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_tim_ex.c"
 
-void SystemClock_Config(void);
-void Error_Handler(void);
 
-#line 2 "MyLib\\Delay.c"
 
-static uint8_t timer_initialized = 0;
-static TIM_HandleTypeDef htim2;
+ 
 
-void Timer_Delay_us(uint8_t xus) {
-	if(!timer_initialized) {
-		do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x00000001U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x00000001U)); ((void)(tmpreg)); } while(0);
-		timer_initialized = 1;
 
-		htim2.Instance = ((TIM_TypeDef *) (0x40000000U + 0x0000U));
-		htim2.Init.Prescaler = 84 - 1;
-		htim2.Init.Period = 0xFFFFFFFF;
-		htim2.Init.CounterMode = ((uint32_t)0x00000000U);
-		htim2.Init.ClockDivision = ((uint32_t)0x00000000U);
-		if(HAL_TIM_Base_Init(&htim2) != HAL_OK) {
-			Error_Handler();
-		}
-	}
-	((&htim2)->Instance ->CNT = (0));
-	if(HAL_TIM_Base_Start(&htim2) != HAL_OK) {
-		Error_Handler();
-	}
-	while(((&htim2)->Instance ->CNT) < xus) {
-		
-	}
-	HAL_TIM_Base_Stop(&htim2);
+
+
+ 
+
+
+
+ 
+ 
+ 
+ 
+
+
+ 
+ 
+static void TIM_CCxNChannelCmd(TIM_TypeDef* TIMx, uint32_t Channel, uint32_t ChannelNState);
+
+
+ 
+      
+ 
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_TIMEx_HallSensor_Init(TIM_HandleTypeDef *htim, TIM_HallSensor_InitTypeDef* sConfig)
+{
+  TIM_OC_InitTypeDef OC_Config;
+    
+   
+  if(htim == 0)
+  {
+    return HAL_ERROR;
+  }
+  
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+
+   
+  htim->State= HAL_TIM_STATE_BUSY;
+  
+   
+  HAL_TIMEx_HallSensor_MspInit(htim);
+  
+   
+  TIM_Base_SetConfig(htim->Instance, &htim->Init);
+  
+   
+  TIM_TI1_SetConfig(htim->Instance, sConfig->IC1Polarity, (0x0003U), sConfig->IC1Filter);
+  
+   
+  htim->Instance->CCMR1 &= ~0x000CU;
+   
+  htim->Instance->CCMR1 |= sConfig->IC1Prescaler;
+  
+   
+  htim->Instance->CR2 |= 0x0080U;
+  
+   
+  htim->Instance->SMCR &= ~0x0070U;
+  htim->Instance->SMCR |= ((uint32_t)0x00000040U);
+  
+     
+  htim->Instance->SMCR &= ~0x0007U;
+  htim->Instance->SMCR |= ((uint32_t)0x00000004U);
+  
+   
+  OC_Config.OCFastMode = ((uint32_t)0x00000000U);
+  OC_Config.OCIdleState = ((uint32_t)0x00000000U);
+  OC_Config.OCMode = (0x0070U);
+  OC_Config.OCNIdleState = ((uint32_t)0x00000000U);
+  OC_Config.OCNPolarity = ((uint32_t)0x00000000U);
+  OC_Config.OCPolarity = ((uint32_t)0x00000000U);
+  OC_Config.Pulse = sConfig->Commutation_Delay; 
+    
+  TIM_OC2_SetConfig(htim->Instance, &OC_Config);
+  
+  
+ 
+  htim->Instance->CR2 &= ~0x0070U;
+  htim->Instance->CR2 |= ((0x0040U | 0x0010U)); 
+  
+   
+  htim->State= HAL_TIM_STATE_READY;
+
+  return HAL_OK;
 }
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_TIMEx_HallSensor_DeInit(TIM_HandleTypeDef *htim)
+{
+   
+  ((void)0);
+
+  htim->State = HAL_TIM_STATE_BUSY;
+  
+   
+  do { if (((htim)->Instance ->CCER & ((uint32_t)(0x0001U | 0x0010U | 0x0100U | 0x1000U))) == 0U) { if(((htim)->Instance ->CCER & ((uint32_t)(0x0004U | 0x0040U | 0x0400U))) == 0U) { (htim)->Instance ->CR1 &= ~(0x0001U); } } } while(0);
+    
+   
+  HAL_TIMEx_HallSensor_MspDeInit(htim);
+    
+     
+  htim->State = HAL_TIM_STATE_RESET; 
+
+   
+  do{ (htim)->Lock = HAL_UNLOCKED; }while (0);
+
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+__weak void HAL_TIMEx_HallSensor_MspInit(TIM_HandleTypeDef *htim)
+{
+   
+  ((void)(htim));
+  
+
+ 
+}
+
+
+
+
+
+
+ 
+__weak void HAL_TIMEx_HallSensor_MspDeInit(TIM_HandleTypeDef *htim)
+{
+   
+  ((void)(htim));
+  
+
+ 
+}
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_TIMEx_HallSensor_Start(TIM_HandleTypeDef *htim)
+{
+   
+  ((void)0);
+  
+  
+   
+  TIM_CCxChannelCmd(htim->Instance, ((uint32_t)0x00000000U), ((uint32_t)0x00000001U)); 
+  
+   
+  ((htim)->Instance ->CR1|=(0x0001U));
+  
+   
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_TIMEx_HallSensor_Stop(TIM_HandleTypeDef *htim)
+{
+   
+  ((void)0);
+  
+  
+   
+  TIM_CCxChannelCmd(htim->Instance, ((uint32_t)0x00000000U), ((uint32_t)0x00000000U)); 
+
+   
+  do { if (((htim)->Instance ->CCER & ((uint32_t)(0x0001U | 0x0010U | 0x0100U | 0x1000U))) == 0U) { if(((htim)->Instance ->CCER & ((uint32_t)(0x0004U | 0x0040U | 0x0400U))) == 0U) { (htim)->Instance ->CR1 &= ~(0x0001U); } } } while(0);
+  
+   
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_TIMEx_HallSensor_Start_IT(TIM_HandleTypeDef *htim)
+{ 
+   
+  ((void)0);
+  
+   
+  ((htim)->Instance ->DIER |= ((0x0002U)));
+  
+  
+   
+  TIM_CCxChannelCmd(htim->Instance, ((uint32_t)0x00000000U), ((uint32_t)0x00000001U));  
+  
+   
+  ((htim)->Instance ->CR1|=(0x0001U));
+  
+   
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_TIMEx_HallSensor_Stop_IT(TIM_HandleTypeDef *htim)
+{
+   
+  ((void)0);
+  
+  
+   
+  TIM_CCxChannelCmd(htim->Instance, ((uint32_t)0x00000000U), ((uint32_t)0x00000000U)); 
+  
+   
+  ((htim)->Instance ->DIER &= ~((0x0002U)));
+  
+   
+  do { if (((htim)->Instance ->CCER & ((uint32_t)(0x0001U | 0x0010U | 0x0100U | 0x1000U))) == 0U) { if(((htim)->Instance ->CCER & ((uint32_t)(0x0004U | 0x0040U | 0x0400U))) == 0U) { (htim)->Instance ->CR1 &= ~(0x0001U); } } } while(0);
+  
+   
+  return HAL_OK;
+}
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_TIMEx_HallSensor_Start_DMA(TIM_HandleTypeDef *htim, uint32_t *pData, uint16_t Length)
+{
+   
+  ((void)0);
+  
+   if((htim->State == HAL_TIM_STATE_BUSY))
+  {
+     return HAL_BUSY;
+  }
+  else if((htim->State == HAL_TIM_STATE_READY))
+  {
+    if(((uint32_t)pData == 0U) && (Length > 0U)) 
+    {
+      return HAL_ERROR;                                    
+    }
+    else
+    {
+      htim->State = HAL_TIM_STATE_BUSY;
+    }
+  }
+  
+   
+  TIM_CCxChannelCmd(htim->Instance, ((uint32_t)0x00000000U), ((uint32_t)0x00000001U)); 
+  
+   
+  htim->hdma[((uint16_t) 0x0001U)]->XferCpltCallback = TIM_DMACaptureCplt;     
+   
+  htim->hdma[((uint16_t) 0x0001U)]->XferErrorCallback = TIM_DMAError ;
+  
+   
+  HAL_DMA_Start_IT(htim->hdma[((uint16_t) 0x0001U)], (uint32_t)&htim->Instance->CCR1, (uint32_t)pData, Length);    
+  
+   
+  ((htim)->Instance ->DIER |= ((0x0200U)));
+ 
+   
+  ((htim)->Instance ->CR1|=(0x0001U));
+  
+   
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_TIMEx_HallSensor_Stop_DMA(TIM_HandleTypeDef *htim)
+{
+   
+  ((void)0);
+  
+  
+   
+  TIM_CCxChannelCmd(htim->Instance, ((uint32_t)0x00000000U), ((uint32_t)0x00000000U)); 
+ 
+  
+   
+  ((htim)->Instance ->DIER &= ~((0x0200U)));
+ 
+   
+  do { if (((htim)->Instance ->CCER & ((uint32_t)(0x0001U | 0x0010U | 0x0100U | 0x1000U))) == 0U) { if(((htim)->Instance ->CCER & ((uint32_t)(0x0004U | 0x0040U | 0x0400U))) == 0U) { (htim)->Instance ->CR1 &= ~(0x0001U); } } } while(0);
+  
+   
+  return HAL_OK;
+}
+
+
+ 
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+  
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_TIMEx_OCN_Start(TIM_HandleTypeDef *htim, uint32_t Channel)
+{
+   
+  ((void)0); 
+  
+      
+     TIM_CCxNChannelCmd(htim->Instance, Channel, ((uint32_t)0x00000004U));
+    
+   
+    ((htim)->Instance ->BDTR|=(0x8000U));
+
+   
+  ((htim)->Instance ->CR1|=(0x0001U));
+  
+   
+  return HAL_OK;
+} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_TIMEx_OCN_Stop(TIM_HandleTypeDef *htim, uint32_t Channel)
+{ 
+   
+  ((void)0); 
+  
+     
+  TIM_CCxNChannelCmd(htim->Instance, Channel, ((uint32_t)0x00000000U));
+    
+   
+    do { if (((htim)->Instance ->CCER & ((uint32_t)(0x0001U | 0x0010U | 0x0100U | 0x1000U))) == 0U) { if(((htim)->Instance ->CCER & ((uint32_t)(0x0004U | 0x0040U | 0x0400U))) == 0U) { (htim)->Instance ->BDTR &= ~(0x8000U); } } } while(0);
+
+   
+  do { if (((htim)->Instance ->CCER & ((uint32_t)(0x0001U | 0x0010U | 0x0100U | 0x1000U))) == 0U) { if(((htim)->Instance ->CCER & ((uint32_t)(0x0004U | 0x0040U | 0x0400U))) == 0U) { (htim)->Instance ->CR1 &= ~(0x0001U); } } } while(0);
+  
+   
+  return HAL_OK;
+} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_TIMEx_OCN_Start_IT(TIM_HandleTypeDef *htim, uint32_t Channel)
+{
+   
+  ((void)0); 
+  
+  switch (Channel)
+  {
+    case ((uint32_t)0x00000000U):
+    {       
+       
+      ((htim)->Instance ->DIER |= ((0x0002U)));
+    }
+    break;
+    
+    case ((uint32_t)0x00000004U):
+    {
+       
+      ((htim)->Instance ->DIER |= ((0x0004U)));
+    }
+    break;
+    
+    case ((uint32_t)0x00000008U):
+    {
+       
+      ((htim)->Instance ->DIER |= ((0x0008U)));
+    }
+    break;
+    
+    case ((uint32_t)0x0000000CU):
+    {
+       
+      ((htim)->Instance ->DIER |= ((0x0010U)));
+    }
+    break;
+    
+    default:
+    break;
+  } 
+  
+   
+  ((htim)->Instance ->DIER |= ((0x0080U)));
+  
+   
+  TIM_CCxNChannelCmd(htim->Instance, Channel, ((uint32_t)0x00000004U));
+  
+   
+  ((htim)->Instance ->BDTR|=(0x8000U));
+  
+   
+  ((htim)->Instance ->CR1|=(0x0001U));
+  
+   
+  return HAL_OK;
+} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_TIMEx_OCN_Stop_IT(TIM_HandleTypeDef *htim, uint32_t Channel)
+{
+   
+  ((void)0); 
+  
+  switch (Channel)
+  {
+    case ((uint32_t)0x00000000U):
+    {       
+       
+      ((htim)->Instance ->DIER &= ~((0x0002U)));
+    }
+    break;
+    
+    case ((uint32_t)0x00000004U):
+    {
+       
+      ((htim)->Instance ->DIER &= ~((0x0004U)));
+    }
+    break;
+    
+    case ((uint32_t)0x00000008U):
+    {
+       
+      ((htim)->Instance ->DIER &= ~((0x0008U)));
+    }
+    break;
+    
+    case ((uint32_t)0x0000000CU):
+    {
+       
+      ((htim)->Instance ->DIER &= ~((0x0010U)));
+    }
+    break;
+    
+    default:
+    break; 
+  }
+  
+   
+  TIM_CCxNChannelCmd(htim->Instance, Channel, ((uint32_t)0x00000000U));
+
+   
+  if((((htim->Instance ->CCER)) & (0x0004U | 0x0040U | 0x0400U)) == RESET)
+  {
+    ((htim)->Instance ->DIER &= ~((0x0080U)));
+  }
+  
+   
+  do { if (((htim)->Instance ->CCER & ((uint32_t)(0x0001U | 0x0010U | 0x0100U | 0x1000U))) == 0U) { if(((htim)->Instance ->CCER & ((uint32_t)(0x0004U | 0x0040U | 0x0400U))) == 0U) { (htim)->Instance ->BDTR &= ~(0x8000U); } } } while(0);
+  
+   
+  do { if (((htim)->Instance ->CCER & ((uint32_t)(0x0001U | 0x0010U | 0x0100U | 0x1000U))) == 0U) { if(((htim)->Instance ->CCER & ((uint32_t)(0x0004U | 0x0040U | 0x0400U))) == 0U) { (htim)->Instance ->CR1 &= ~(0x0001U); } } } while(0);
+  
+   
+  return HAL_OK;
+} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_TIMEx_OCN_Start_DMA(TIM_HandleTypeDef *htim, uint32_t Channel, uint32_t *pData, uint16_t Length)
+{
+   
+  ((void)0); 
+  
+  if((htim->State == HAL_TIM_STATE_BUSY))
+  {
+     return HAL_BUSY;
+  }
+  else if((htim->State == HAL_TIM_STATE_READY))
+  {
+    if(((uint32_t)pData == 0U) && (Length > 0U)) 
+    {
+      return HAL_ERROR;                                    
+    }
+    else
+    {
+      htim->State = HAL_TIM_STATE_BUSY;
+    }
+  }    
+  switch (Channel)
+  {
+    case ((uint32_t)0x00000000U):
+    {      
+       
+      htim->hdma[((uint16_t) 0x0001U)]->XferCpltCallback = TIM_DMADelayPulseCplt;
+     
+       
+      htim->hdma[((uint16_t) 0x0001U)]->XferErrorCallback = TIM_DMAError ;
+      
+       
+      HAL_DMA_Start_IT(htim->hdma[((uint16_t) 0x0001U)], (uint32_t)pData, (uint32_t)&htim->Instance->CCR1, Length);
+      
+       
+      ((htim)->Instance ->DIER |= ((0x0200U)));
+    }
+    break;
+    
+    case ((uint32_t)0x00000004U):
+    {
+       
+      htim->hdma[((uint16_t) 0x0002U)]->XferCpltCallback = TIM_DMADelayPulseCplt;
+     
+       
+      htim->hdma[((uint16_t) 0x0002U)]->XferErrorCallback = TIM_DMAError ;
+      
+       
+      HAL_DMA_Start_IT(htim->hdma[((uint16_t) 0x0002U)], (uint32_t)pData, (uint32_t)&htim->Instance->CCR2, Length);
+      
+       
+      ((htim)->Instance ->DIER |= ((0x0400U)));
+    }
+    break;
+    
+    case ((uint32_t)0x00000008U):
+{
+       
+      htim->hdma[((uint16_t) 0x0003U)]->XferCpltCallback = TIM_DMADelayPulseCplt;
+     
+       
+      htim->hdma[((uint16_t) 0x0003U)]->XferErrorCallback = TIM_DMAError ;
+      
+       
+      HAL_DMA_Start_IT(htim->hdma[((uint16_t) 0x0003U)], (uint32_t)pData, (uint32_t)&htim->Instance->CCR3,Length);
+      
+       
+      ((htim)->Instance ->DIER |= ((0x0800U)));
+    }
+    break;
+    
+    case ((uint32_t)0x0000000CU):
+    {
+      
+      htim->hdma[((uint16_t) 0x0004U)]->XferCpltCallback = TIM_DMADelayPulseCplt;
+     
+       
+      htim->hdma[((uint16_t) 0x0004U)]->XferErrorCallback = TIM_DMAError ;
+      
+       
+      HAL_DMA_Start_IT(htim->hdma[((uint16_t) 0x0004U)], (uint32_t)pData, (uint32_t)&htim->Instance->CCR4, Length);
+      
+       
+      ((htim)->Instance ->DIER |= ((0x1000U)));
+    }
+    break;
+    
+    default:
+    break;
+  }
+
+   
+  TIM_CCxNChannelCmd(htim->Instance, Channel, ((uint32_t)0x00000004U));
+  
+   
+  ((htim)->Instance ->BDTR|=(0x8000U));
+  
+   
+  ((htim)->Instance ->CR1|=(0x0001U)); 
+  
+   
+  return HAL_OK;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_TIMEx_OCN_Stop_DMA(TIM_HandleTypeDef *htim, uint32_t Channel)
+{
+   
+  ((void)0); 
+  
+  switch (Channel)
+  {
+    case ((uint32_t)0x00000000U):
+    {       
+       
+      ((htim)->Instance ->DIER &= ~((0x0200U)));
+    }
+    break;
+    
+    case ((uint32_t)0x00000004U):
+    {
+       
+      ((htim)->Instance ->DIER &= ~((0x0400U)));
+    }
+    break;
+    
+    case ((uint32_t)0x00000008U):
+    {
+       
+      ((htim)->Instance ->DIER &= ~((0x0800U)));
+    }
+    break;
+    
+    case ((uint32_t)0x0000000CU):
+    {
+       
+      ((htim)->Instance ->DIER &= ~((0x1000U)));
+    }
+    break;
+    
+    default:
+    break;
+  } 
+  
+   
+  TIM_CCxNChannelCmd(htim->Instance, Channel, ((uint32_t)0x00000000U));
+  
+   
+  do { if (((htim)->Instance ->CCER & ((uint32_t)(0x0001U | 0x0010U | 0x0100U | 0x1000U))) == 0U) { if(((htim)->Instance ->CCER & ((uint32_t)(0x0004U | 0x0040U | 0x0400U))) == 0U) { (htim)->Instance ->BDTR &= ~(0x8000U); } } } while(0);
+  
+   
+  do { if (((htim)->Instance ->CCER & ((uint32_t)(0x0001U | 0x0010U | 0x0100U | 0x1000U))) == 0U) { if(((htim)->Instance ->CCER & ((uint32_t)(0x0004U | 0x0040U | 0x0400U))) == 0U) { (htim)->Instance ->CR1 &= ~(0x0001U); } } } while(0);
+  
+   
+  htim->State = HAL_TIM_STATE_READY;
+  
+   
+  return HAL_OK;
+}
+
+
+ 
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_TIMEx_PWMN_Start(TIM_HandleTypeDef *htim, uint32_t Channel)
+{
+   
+  ((void)0); 
+  
+   
+  TIM_CCxNChannelCmd(htim->Instance, Channel, ((uint32_t)0x00000004U));
+  
+   
+  ((htim)->Instance ->BDTR|=(0x8000U));
+  
+   
+  ((htim)->Instance ->CR1|=(0x0001U));
+  
+   
+  return HAL_OK;
+} 
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_TIMEx_PWMN_Stop(TIM_HandleTypeDef *htim, uint32_t Channel)
+{ 
+   
+  ((void)0); 
+  
+   
+  TIM_CCxNChannelCmd(htim->Instance, Channel, ((uint32_t)0x00000000U));  
+  
+   
+  do { if (((htim)->Instance ->CCER & ((uint32_t)(0x0001U | 0x0010U | 0x0100U | 0x1000U))) == 0U) { if(((htim)->Instance ->CCER & ((uint32_t)(0x0004U | 0x0040U | 0x0400U))) == 0U) { (htim)->Instance ->BDTR &= ~(0x8000U); } } } while(0);
+  
+   
+  do { if (((htim)->Instance ->CCER & ((uint32_t)(0x0001U | 0x0010U | 0x0100U | 0x1000U))) == 0U) { if(((htim)->Instance ->CCER & ((uint32_t)(0x0004U | 0x0040U | 0x0400U))) == 0U) { (htim)->Instance ->CR1 &= ~(0x0001U); } } } while(0);
+  
+   
+  return HAL_OK;
+} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_TIMEx_PWMN_Start_IT(TIM_HandleTypeDef *htim, uint32_t Channel)
+{
+   
+  ((void)0); 
+  
+  switch (Channel)
+  {
+    case ((uint32_t)0x00000000U):
+    {       
+       
+      ((htim)->Instance ->DIER |= ((0x0002U)));
+    }
+    break;
+    
+    case ((uint32_t)0x00000004U):
+    {
+       
+      ((htim)->Instance ->DIER |= ((0x0004U)));
+    }
+    break;
+    
+    case ((uint32_t)0x00000008U):
+    {
+       
+      ((htim)->Instance ->DIER |= ((0x0008U)));
+    }
+    break;
+    
+    case ((uint32_t)0x0000000CU):
+    {
+       
+      ((htim)->Instance ->DIER |= ((0x0010U)));
+    }
+    break;
+    
+    default:
+    break;
+  } 
+  
+   
+  ((htim)->Instance ->DIER |= ((0x0080U)));
+  
+   
+  TIM_CCxNChannelCmd(htim->Instance, Channel, ((uint32_t)0x00000004U));
+  
+   
+  ((htim)->Instance ->BDTR|=(0x8000U));
+  
+   
+  ((htim)->Instance ->CR1|=(0x0001U));
+  
+   
+  return HAL_OK;
+} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_TIMEx_PWMN_Stop_IT (TIM_HandleTypeDef *htim, uint32_t Channel)
+{
+   
+  ((void)0); 
+
+  switch (Channel)
+  {
+    case ((uint32_t)0x00000000U):
+    {       
+       
+      ((htim)->Instance ->DIER &= ~((0x0002U)));
+    }
+    break;
+    
+    case ((uint32_t)0x00000004U):
+    {
+       
+      ((htim)->Instance ->DIER &= ~((0x0004U)));
+    }
+    break;
+    
+    case ((uint32_t)0x00000008U):
+    {
+       
+      ((htim)->Instance ->DIER &= ~((0x0008U)));
+    }
+    break;
+    
+    case ((uint32_t)0x0000000CU):
+    {
+       
+      ((htim)->Instance ->DIER &= ~((0x0010U)));
+    }
+    break;
+    
+    default:
+    break; 
+  }
+  
+   
+  TIM_CCxNChannelCmd(htim->Instance, Channel, ((uint32_t)0x00000000U));
+  
+   
+  if((((htim->Instance ->CCER)) & (0x0004U | 0x0040U | 0x0400U)) == RESET)
+  {
+    ((htim)->Instance ->DIER &= ~((0x0080U)));
+  }
+  
+   
+  do { if (((htim)->Instance ->CCER & ((uint32_t)(0x0001U | 0x0010U | 0x0100U | 0x1000U))) == 0U) { if(((htim)->Instance ->CCER & ((uint32_t)(0x0004U | 0x0040U | 0x0400U))) == 0U) { (htim)->Instance ->BDTR &= ~(0x8000U); } } } while(0);
+  
+   
+  do { if (((htim)->Instance ->CCER & ((uint32_t)(0x0001U | 0x0010U | 0x0100U | 0x1000U))) == 0U) { if(((htim)->Instance ->CCER & ((uint32_t)(0x0004U | 0x0040U | 0x0400U))) == 0U) { (htim)->Instance ->CR1 &= ~(0x0001U); } } } while(0);
+  
+   
+  return HAL_OK;
+} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_TIMEx_PWMN_Start_DMA(TIM_HandleTypeDef *htim, uint32_t Channel, uint32_t *pData, uint16_t Length)
+{
+   
+  ((void)0); 
+  
+  if((htim->State == HAL_TIM_STATE_BUSY))
+  {
+     return HAL_BUSY;
+  }
+  else if((htim->State == HAL_TIM_STATE_READY))
+  {
+    if(((uint32_t)pData == 0U) && (Length > 0U)) 
+    {
+      return HAL_ERROR;                                    
+    }
+    else
+    {
+      htim->State = HAL_TIM_STATE_BUSY;
+    }
+  }    
+  switch (Channel)
+  {
+    case ((uint32_t)0x00000000U):
+    {      
+       
+      htim->hdma[((uint16_t) 0x0001U)]->XferCpltCallback = TIM_DMADelayPulseCplt;
+     
+       
+      htim->hdma[((uint16_t) 0x0001U)]->XferErrorCallback = TIM_DMAError ;
+      
+       
+      HAL_DMA_Start_IT(htim->hdma[((uint16_t) 0x0001U)], (uint32_t)pData, (uint32_t)&htim->Instance->CCR1, Length);
+      
+       
+      ((htim)->Instance ->DIER |= ((0x0200U)));
+    }
+    break;
+    
+    case ((uint32_t)0x00000004U):
+    {
+       
+      htim->hdma[((uint16_t) 0x0002U)]->XferCpltCallback = TIM_DMADelayPulseCplt;
+     
+       
+      htim->hdma[((uint16_t) 0x0002U)]->XferErrorCallback = TIM_DMAError ;
+      
+       
+      HAL_DMA_Start_IT(htim->hdma[((uint16_t) 0x0002U)], (uint32_t)pData, (uint32_t)&htim->Instance->CCR2, Length);
+      
+       
+      ((htim)->Instance ->DIER |= ((0x0400U)));
+    }
+    break;
+    
+    case ((uint32_t)0x00000008U):
+    {
+       
+      htim->hdma[((uint16_t) 0x0003U)]->XferCpltCallback = TIM_DMADelayPulseCplt;
+     
+       
+      htim->hdma[((uint16_t) 0x0003U)]->XferErrorCallback = TIM_DMAError ;
+      
+       
+      HAL_DMA_Start_IT(htim->hdma[((uint16_t) 0x0003U)], (uint32_t)pData, (uint32_t)&htim->Instance->CCR3,Length);
+      
+       
+      ((htim)->Instance ->DIER |= ((0x0800U)));
+    }
+    break;
+    
+    case ((uint32_t)0x0000000CU):
+    {
+      
+      htim->hdma[((uint16_t) 0x0004U)]->XferCpltCallback = TIM_DMADelayPulseCplt;
+     
+       
+      htim->hdma[((uint16_t) 0x0004U)]->XferErrorCallback = TIM_DMAError ;
+      
+       
+      HAL_DMA_Start_IT(htim->hdma[((uint16_t) 0x0004U)], (uint32_t)pData, (uint32_t)&htim->Instance->CCR4, Length);
+      
+       
+      ((htim)->Instance ->DIER |= ((0x1000U)));
+    }
+    break;
+    
+    default:
+    break;
+  }
+
+   
+     TIM_CCxNChannelCmd(htim->Instance, Channel, ((uint32_t)0x00000004U));
+    
+   
+    ((htim)->Instance ->BDTR|=(0x8000U));
+  
+   
+  ((htim)->Instance ->CR1|=(0x0001U)); 
+  
+   
+  return HAL_OK;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_TIMEx_PWMN_Stop_DMA(TIM_HandleTypeDef *htim, uint32_t Channel)
+{
+   
+  ((void)0); 
+  
+  switch (Channel)
+  {
+    case ((uint32_t)0x00000000U):
+    {       
+       
+      ((htim)->Instance ->DIER &= ~((0x0200U)));
+    }
+    break;
+    
+    case ((uint32_t)0x00000004U):
+    {
+       
+      ((htim)->Instance ->DIER &= ~((0x0400U)));
+    }
+    break;
+    
+    case ((uint32_t)0x00000008U):
+    {
+       
+      ((htim)->Instance ->DIER &= ~((0x0800U)));
+    }
+    break;
+    
+    case ((uint32_t)0x0000000CU):
+    {
+       
+      ((htim)->Instance ->DIER &= ~((0x1000U)));
+    }
+    break;
+    
+    default:
+    break;
+  } 
+  
+   
+    TIM_CCxNChannelCmd(htim->Instance, Channel, ((uint32_t)0x00000000U));
+     
+   
+    do { if (((htim)->Instance ->CCER & ((uint32_t)(0x0001U | 0x0010U | 0x0100U | 0x1000U))) == 0U) { if(((htim)->Instance ->CCER & ((uint32_t)(0x0004U | 0x0040U | 0x0400U))) == 0U) { (htim)->Instance ->BDTR &= ~(0x8000U); } } } while(0);
+
+   
+  do { if (((htim)->Instance ->CCER & ((uint32_t)(0x0001U | 0x0010U | 0x0100U | 0x1000U))) == 0U) { if(((htim)->Instance ->CCER & ((uint32_t)(0x0004U | 0x0040U | 0x0400U))) == 0U) { (htim)->Instance ->CR1 &= ~(0x0001U); } } } while(0);
+  
+   
+  htim->State = HAL_TIM_STATE_READY;
+  
+   
+  return HAL_OK;
+}
+
+
+
+ 
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_TIMEx_OnePulseN_Start(TIM_HandleTypeDef *htim, uint32_t OutputChannel)
+  {
+   
+  ((void)0); 
+  
+   
+  TIM_CCxNChannelCmd(htim->Instance, OutputChannel, ((uint32_t)0x00000004U)); 
+  
+   
+  ((htim)->Instance ->BDTR|=(0x8000U));
+  
+   
+  return HAL_OK;
+}
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_TIMEx_OnePulseN_Stop(TIM_HandleTypeDef *htim, uint32_t OutputChannel)
+{
+
+   
+  ((void)0); 
+
+   
+    TIM_CCxNChannelCmd(htim->Instance, OutputChannel, ((uint32_t)0x00000000U));
+  
+   
+    do { if (((htim)->Instance ->CCER & ((uint32_t)(0x0001U | 0x0010U | 0x0100U | 0x1000U))) == 0U) { if(((htim)->Instance ->CCER & ((uint32_t)(0x0004U | 0x0040U | 0x0400U))) == 0U) { (htim)->Instance ->BDTR &= ~(0x8000U); } } } while(0);
+  
+   
+  do { if (((htim)->Instance ->CCER & ((uint32_t)(0x0001U | 0x0010U | 0x0100U | 0x1000U))) == 0U) { if(((htim)->Instance ->CCER & ((uint32_t)(0x0004U | 0x0040U | 0x0400U))) == 0U) { (htim)->Instance ->CR1 &= ~(0x0001U); } } } while(0); 
+   
+   
+  return HAL_OK;
+}
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_TIMEx_OnePulseN_Start_IT(TIM_HandleTypeDef *htim, uint32_t OutputChannel)
+{
+   
+  ((void)0); 
+
+   
+  ((htim)->Instance ->DIER |= ((0x0002U)));
+  
+   
+  ((htim)->Instance ->DIER |= ((0x0004U)));
+  
+   
+  TIM_CCxNChannelCmd(htim->Instance, OutputChannel, ((uint32_t)0x00000004U)); 
+  
+   
+  ((htim)->Instance ->BDTR|=(0x8000U));
+  
+   
+  return HAL_OK;
+  } 
+  
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_TIMEx_OnePulseN_Stop_IT(TIM_HandleTypeDef *htim, uint32_t OutputChannel)
+{
+   
+  ((void)0); 
+
+   
+  ((htim)->Instance ->DIER &= ~((0x0002U)));
+  
+   
+  ((htim)->Instance ->DIER &= ~((0x0004U)));
+  
+   
+  TIM_CCxNChannelCmd(htim->Instance, OutputChannel, ((uint32_t)0x00000000U));
+  
+   
+  do { if (((htim)->Instance ->CCER & ((uint32_t)(0x0001U | 0x0010U | 0x0100U | 0x1000U))) == 0U) { if(((htim)->Instance ->CCER & ((uint32_t)(0x0004U | 0x0040U | 0x0400U))) == 0U) { (htim)->Instance ->BDTR &= ~(0x8000U); } } } while(0);
+  
+   
+   do { if (((htim)->Instance ->CCER & ((uint32_t)(0x0001U | 0x0010U | 0x0100U | 0x1000U))) == 0U) { if(((htim)->Instance ->CCER & ((uint32_t)(0x0004U | 0x0040U | 0x0400U))) == 0U) { (htim)->Instance ->CR1 &= ~(0x0001U); } } } while(0);  
+  
+   
+  return HAL_OK;
+}
+
+
+ 
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_TIMEx_ConfigCommutationEvent(TIM_HandleTypeDef *htim, uint32_t  InputTrigger, uint32_t  CommutationSource)
+{
+   
+  ((void)0);
+  ((void)0);
+  
+  do{ if((htim)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (htim)->Lock = HAL_LOCKED; } }while (0);
+  
+  if ((InputTrigger == ((uint32_t)0x00000000U)) || (InputTrigger == ((uint32_t)0x00000010U)) ||
+      (InputTrigger == ((uint32_t)0x00000020U)) || (InputTrigger == ((uint32_t)0x00000030U)))
+  {    
+     
+    htim->Instance->SMCR &= ~0x0070U;
+    htim->Instance->SMCR |= InputTrigger;
+  }
+    
+   
+  htim->Instance->CR2 |= 0x0001U;
+   
+  htim->Instance->CR2 &= ~0x0004U;
+  htim->Instance->CR2 |= CommutationSource;
+    
+  do{ (htim)->Lock = HAL_UNLOCKED; }while (0);
+  
+  return HAL_OK;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_TIMEx_ConfigCommutationEvent_IT(TIM_HandleTypeDef *htim, uint32_t  InputTrigger, uint32_t  CommutationSource)
+{
+   
+  ((void)0);
+  ((void)0);
+  
+  do{ if((htim)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (htim)->Lock = HAL_LOCKED; } }while (0);
+  
+  if ((InputTrigger == ((uint32_t)0x00000000U)) || (InputTrigger == ((uint32_t)0x00000010U)) ||
+      (InputTrigger == ((uint32_t)0x00000020U)) || (InputTrigger == ((uint32_t)0x00000030U)))
+  {    
+     
+    htim->Instance->SMCR &= ~0x0070U;
+    htim->Instance->SMCR |= InputTrigger;
+  }
+  
+   
+  htim->Instance->CR2 |= 0x0001U;
+   
+  htim->Instance->CR2 &= ~0x0004U;
+  htim->Instance->CR2 |= CommutationSource;
+    
+   
+  ((htim)->Instance ->DIER |= ((0x0020U)));
+
+  do{ (htim)->Lock = HAL_UNLOCKED; }while (0);
+  
+  return HAL_OK;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_TIMEx_ConfigCommutationEvent_DMA(TIM_HandleTypeDef *htim, uint32_t  InputTrigger, uint32_t  CommutationSource)
+{
+   
+  ((void)0);
+  ((void)0);
+  
+  do{ if((htim)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (htim)->Lock = HAL_LOCKED; } }while (0);
+  
+  if ((InputTrigger == ((uint32_t)0x00000000U)) || (InputTrigger == ((uint32_t)0x00000010U)) ||
+      (InputTrigger == ((uint32_t)0x00000020U)) || (InputTrigger == ((uint32_t)0x00000030U)))
+  {    
+     
+    htim->Instance->SMCR &= ~0x0070U;
+    htim->Instance->SMCR |= InputTrigger;
+  }
+  
+   
+  htim->Instance->CR2 |= 0x0001U;
+   
+  htim->Instance->CR2 &= ~0x0004U;
+  htim->Instance->CR2 |= CommutationSource;
+  
+   
+   
+  htim->hdma[((uint16_t) 0x0005U)]->XferCpltCallback = TIMEx_DMACommutationCplt;     
+   
+  htim->hdma[((uint16_t) 0x0005U)]->XferErrorCallback = TIM_DMAError;
+  
+   
+  ((htim)->Instance ->DIER |= ((0x2000U)));
+
+  do{ (htim)->Lock = HAL_UNLOCKED; }while (0);
+  
+  return HAL_OK;
+}
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_TIMEx_MasterConfigSynchronization(TIM_HandleTypeDef *htim, TIM_MasterConfigTypeDef * sMasterConfig)
+{
+   
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  
+  do{ if((htim)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (htim)->Lock = HAL_LOCKED; } }while (0);
+  
+  htim->State = HAL_TIM_STATE_BUSY;
+
+   
+  htim->Instance->CR2 &= ~0x0070U;
+   
+  htim->Instance->CR2 |= sMasterConfig->MasterOutputTrigger;
+
+   
+  htim->Instance->SMCR &= ~0x0080U;
+   
+  htim->Instance->SMCR |= sMasterConfig->MasterSlaveMode;
+  
+  htim->State = HAL_TIM_STATE_READY;
+  
+  do{ (htim)->Lock = HAL_UNLOCKED; }while (0);
+  
+  return HAL_OK;
+} 
+                                                     
+
+
+
+
+
+
+
+
+     
+HAL_StatusTypeDef HAL_TIMEx_ConfigBreakDeadTime(TIM_HandleTypeDef *htim, 
+                                              TIM_BreakDeadTimeConfigTypeDef * sBreakDeadTimeConfig)
+{
+   
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  
+   
+  do{ if((htim)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (htim)->Lock = HAL_LOCKED; } }while (0);
+  
+  htim->State = HAL_TIM_STATE_BUSY;
+
+  
+ 
+  htim->Instance->BDTR = (uint32_t)sBreakDeadTimeConfig->OffStateRunMode  | 
+                                   sBreakDeadTimeConfig->OffStateIDLEMode |
+                                   sBreakDeadTimeConfig->LockLevel        |
+                                   sBreakDeadTimeConfig->DeadTime         |
+                                   sBreakDeadTimeConfig->BreakState       |
+                                   sBreakDeadTimeConfig->BreakPolarity    |
+                                   sBreakDeadTimeConfig->AutomaticOutput;
+  
+                                   
+  htim->State = HAL_TIM_STATE_READY;                                 
+  
+  do{ (htim)->Lock = HAL_UNLOCKED; }while (0);
+  
+  return HAL_OK;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_TIMEx_RemapConfig(TIM_HandleTypeDef *htim, uint32_t Remap)
+{
+  do{ if((htim)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (htim)->Lock = HAL_LOCKED; } }while (0);
+    
+   
+  ((void)0);
+  ((void)0);
+  
+   
+  htim->Instance->OR = Remap;
+  
+  htim->State = HAL_TIM_STATE_READY;
+  
+  do{ (htim)->Lock = HAL_UNLOCKED; }while (0);  
+  
+  return HAL_OK;
+}
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+__weak void HAL_TIMEx_CommutationCallback(TIM_HandleTypeDef *htim)
+{
+   
+  ((void)(htim));
+  
+
+ 
+}
+
+
+
+
+
+
+ 
+__weak void HAL_TIMEx_BreakCallback(TIM_HandleTypeDef *htim)
+{
+   
+  ((void)(htim));
+  
+
+ 
+}
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+HAL_TIM_StateTypeDef HAL_TIMEx_HallSensor_GetState(TIM_HandleTypeDef *htim)
+{
+  return htim->State;
+}
+
+
+
+ 
+
+
+
+
+
+
+ 
+void TIMEx_DMACommutationCplt(DMA_HandleTypeDef *hdma)
+{
+  TIM_HandleTypeDef* htim = ( TIM_HandleTypeDef* )((DMA_HandleTypeDef* )hdma)->Parent;
+  
+  htim->State= HAL_TIM_STATE_READY;
+    
+  HAL_TIMEx_CommutationCallback(htim); 
+}
+
+
+ 
+  
+
+
+
+
+
+
+
+
+
+
+
+ 
+static void TIM_CCxNChannelCmd(TIM_TypeDef* TIMx, uint32_t Channel, uint32_t ChannelNState)
+{
+  uint32_t tmp = 0U;
+
+   
+  ((void)0);
+  ((void)0);
+
+  tmp = 0x0004U << Channel;
+
+   
+  TIMx->CCER &= ~tmp;
+
+    
+  TIMx->CCER |= (uint32_t)(ChannelNState << Channel);
+}
+
+
+
+ 
+
+
+
+
+  
+
+
+
+  
+ 

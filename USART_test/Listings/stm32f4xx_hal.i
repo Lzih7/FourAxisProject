@@ -1,8 +1,57 @@
-#line 1 "MyLib\\Delay.c"
-#line 1 ".\\Inc\\main.h"
+#line 1 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal.c"
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+ 
 #line 1 ".\\Drivers\\STM32F4xx_HAL_Driver\\Inc\\stm32f4xx_hal.h"
 
 
@@ -27756,36 +27805,443 @@ void HAL_DisableCompensationCell(void);
 
 
  
-#line 5 ".\\Inc\\main.h"
+#line 55 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal.c"
 
-void SystemClock_Config(void);
-void Error_Handler(void);
 
-#line 2 "MyLib\\Delay.c"
 
-static uint8_t timer_initialized = 0;
-static TIM_HandleTypeDef htim2;
+ 
 
-void Timer_Delay_us(uint8_t xus) {
-	if(!timer_initialized) {
-		do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x00000001U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x00000001U)); ((void)(tmpreg)); } while(0);
-		timer_initialized = 1;
 
-		htim2.Instance = ((TIM_TypeDef *) (0x40000000U + 0x0000U));
-		htim2.Init.Prescaler = 84 - 1;
-		htim2.Init.Period = 0xFFFFFFFF;
-		htim2.Init.CounterMode = ((uint32_t)0x00000000U);
-		htim2.Init.ClockDivision = ((uint32_t)0x00000000U);
-		if(HAL_TIM_Base_Init(&htim2) != HAL_OK) {
-			Error_Handler();
-		}
-	}
-	((&htim2)->Instance ->CNT = (0));
-	if(HAL_TIM_Base_Start(&htim2) != HAL_OK) {
-		Error_Handler();
-	}
-	while(((&htim2)->Instance ->CNT) < xus) {
-		
-	}
-	HAL_TIM_Base_Stop(&htim2);
+
+
+ 
+
+ 
+ 
+
+
+ 
+
+
+ 
+#line 81 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal.c"
+                                        
+
+
+ 
+
+  
+  
+
+
+
+
+  
+  
+
+
+
+
+
+ 
+
+ 
+ 
+
+
+ 
+volatile uint32_t uwTick;
+
+
+ 
+ 
+ 
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_Init(void)
+{
+    
+
+   (((FLASH_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3C00U))->ACR |= 0x00000200U);
+
+
+
+   (((FLASH_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3C00U))->ACR |= 0x00000400U);
+
+
+
+  (((FLASH_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3C00U))->ACR |= 0x00000100U);
+
+
+   
+  HAL_NVIC_SetPriorityGrouping(((uint32_t)0x00000003U));
+
+   
+  HAL_InitTick(((uint32_t)0x0FU));
+  
+   
+  HAL_MspInit();
+  
+   
+  return HAL_OK;
 }
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_DeInit(void)
+{
+   
+  (((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1RSTR = 0xFFFFFFFFU);
+  (((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1RSTR = 0x00U);
+
+  (((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB2RSTR = 0xFFFFFFFFU);
+  (((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB2RSTR = 0x00U);
+
+  (((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1RSTR = 0xFFFFFFFFU);
+  (((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1RSTR = 0x00U);
+
+  (((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB2RSTR = 0xFFFFFFFFU);
+  (((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB2RSTR = 0x00U);
+
+  (((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB3RSTR = 0xFFFFFFFFU);
+  (((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB3RSTR = 0x00U);
+
+   
+  HAL_MspDeInit();
+    
+   
+  return HAL_OK;
+}
+
+
+
+
+ 
+__weak void HAL_MspInit(void)
+{
+  
+
+ 
+}
+
+
+
+
+ 
+__weak void HAL_MspDeInit(void)
+{
+  
+
+  
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+__weak HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
+{
+   
+  HAL_SYSTICK_Config(SystemCoreClock/1000U);
+
+   
+  HAL_NVIC_SetPriority(SysTick_IRQn, TickPriority ,0U);
+
+   
+  return HAL_OK;
+}
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+ 
+__weak void HAL_IncTick(void)
+{
+  uwTick++;
+}
+
+
+
+
+
+
+ 
+__weak uint32_t HAL_GetTick(void)
+{
+  return uwTick;
+}
+
+
+
+
+
+
+
+
+
+
+
+ 
+__weak void HAL_Delay(volatile uint32_t Delay)
+{
+  uint32_t tickstart = 0U;
+  tickstart = HAL_GetTick();
+  while((HAL_GetTick() - tickstart) < Delay)
+  {
+  }
+}
+
+
+
+
+
+
+
+
+
+
+ 
+__weak void HAL_SuspendTick(void)
+{
+   
+  ((SysTick_Type *) ((0xE000E000UL) + 0x0010UL) )->CTRL &= ~(1UL << 1U);
+}
+
+
+
+
+
+
+
+
+
+
+ 
+__weak void HAL_ResumeTick(void)
+{
+   
+  ((SysTick_Type *) ((0xE000E000UL) + 0x0010UL) )->CTRL  |= (1UL << 1U);
+}
+
+
+
+
+ 
+uint32_t HAL_GetHalVersion(void)
+{
+ return (((0x01) << 24U) |((0x05) << 16U) |((0x00) << 8U ) |((0x00)));
+}
+
+
+
+
+ 
+uint32_t HAL_GetREVID(void)
+{
+   return((((DBGMCU_TypeDef *) 0xE0042000U)->IDCODE) >> 16U);
+}
+
+
+
+
+ 
+uint32_t HAL_GetDEVID(void)
+{
+   return((((DBGMCU_TypeDef *) 0xE0042000U)->IDCODE) & ((uint32_t)0x00000FFFU));
+}
+
+
+
+
+ 
+void HAL_DBGMCU_EnableDBGSleepMode(void)
+{
+  ((((DBGMCU_TypeDef *) 0xE0042000U)->CR) |= (0x00000001U));
+}
+
+
+
+
+ 
+void HAL_DBGMCU_DisableDBGSleepMode(void)
+{
+  ((((DBGMCU_TypeDef *) 0xE0042000U)->CR) &= ~(0x00000001U));
+}
+
+
+
+
+ 
+void HAL_DBGMCU_EnableDBGStopMode(void)
+{
+  ((((DBGMCU_TypeDef *) 0xE0042000U)->CR) |= (0x00000002U));
+}
+
+
+
+
+ 
+void HAL_DBGMCU_DisableDBGStopMode(void)
+{
+  ((((DBGMCU_TypeDef *) 0xE0042000U)->CR) &= ~(0x00000002U));
+}
+
+
+
+
+ 
+void HAL_DBGMCU_EnableDBGStandbyMode(void)
+{
+  ((((DBGMCU_TypeDef *) 0xE0042000U)->CR) |= (0x00000004U));
+}
+
+
+
+
+ 
+void HAL_DBGMCU_DisableDBGStandbyMode(void)
+{
+  ((((DBGMCU_TypeDef *) 0xE0042000U)->CR) &= ~(0x00000004U));
+}
+
+
+
+
+
+
+ 
+void HAL_EnableCompensationCell(void)
+{
+  *(volatile uint32_t *)(uint32_t)(0x42000000U + (((((0x40000000U + 0x00010000U) + 0x3800U) - 0x40000000U) + 0x20U) * 32U) + ((__clz(__rbit(0x00000001U))) * 4U)) = (uint32_t)ENABLE;
+}
+
+
+
+
+
+
+ 
+void HAL_DisableCompensationCell(void)
+{
+  *(volatile uint32_t *)(uint32_t)(0x42000000U + (((((0x40000000U + 0x00010000U) + 0x3800U) - 0x40000000U) + 0x20U) * 32U) + ((__clz(__rbit(0x00000001U))) * 4U)) = (uint32_t)DISABLE;
+}
+
+#line 515 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal.c"
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+ 

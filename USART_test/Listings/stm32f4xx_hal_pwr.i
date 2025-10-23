@@ -1,8 +1,47 @@
-#line 1 "MyLib\\Delay.c"
-#line 1 ".\\Inc\\main.h"
+#line 1 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_pwr.c"
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+ 
 #line 1 ".\\Drivers\\STM32F4xx_HAL_Driver\\Inc\\stm32f4xx_hal.h"
 
 
@@ -27756,36 +27795,537 @@ void HAL_DisableCompensationCell(void);
 
 
  
-#line 5 ".\\Inc\\main.h"
+#line 45 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_pwr.c"
 
-void SystemClock_Config(void);
-void Error_Handler(void);
 
-#line 2 "MyLib\\Delay.c"
 
-static uint8_t timer_initialized = 0;
-static TIM_HandleTypeDef htim2;
+ 
 
-void Timer_Delay_us(uint8_t xus) {
-	if(!timer_initialized) {
-		do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x00000001U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x00000001U)); ((void)(tmpreg)); } while(0);
-		timer_initialized = 1;
 
-		htim2.Instance = ((TIM_TypeDef *) (0x40000000U + 0x0000U));
-		htim2.Init.Prescaler = 84 - 1;
-		htim2.Init.Period = 0xFFFFFFFF;
-		htim2.Init.CounterMode = ((uint32_t)0x00000000U);
-		htim2.Init.ClockDivision = ((uint32_t)0x00000000U);
-		if(HAL_TIM_Base_Init(&htim2) != HAL_OK) {
-			Error_Handler();
-		}
-	}
-	((&htim2)->Instance ->CNT = (0));
-	if(HAL_TIM_Base_Start(&htim2) != HAL_OK) {
-		Error_Handler();
-	}
-	while(((&htim2)->Instance ->CNT) < xus) {
-		
-	}
-	HAL_TIM_Base_Stop(&htim2);
+
+
+ 
+
+
+
+ 
+ 
+
+
+ 
+  
+
+
+      
+
+
+
+
+
+
+ 
+
+
+
+     
+ 
+ 
+ 
+ 
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+void HAL_PWR_DeInit(void)
+{
+  (((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1RSTR |= (0x10000000U));
+  (((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1RSTR &= ~(0x10000000U));
 }
+
+
+
+
+
+
+
+ 
+void HAL_PWR_EnableBkUpAccess(void)
+{
+  *(volatile uint32_t *) (uint32_t)(0x42000000U + ((((0x40000000U + 0x7000U) - 0x40000000U) + 0x00U) * 32U) + ((__clz(__rbit(0x00000100U))) * 4U)) = (uint32_t)ENABLE;
+}
+
+
+
+
+
+
+
+ 
+void HAL_PWR_DisableBkUpAccess(void)
+{
+  *(volatile uint32_t *) (uint32_t)(0x42000000U + ((((0x40000000U + 0x7000U) - 0x40000000U) + 0x00U) * 32U) + ((__clz(__rbit(0x00000100U))) * 4U)) = (uint32_t)DISABLE;
+}
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+ 
+void HAL_PWR_ConfigPVD(PWR_PVDTypeDef *sConfigPVD)
+{
+   
+  ((void)0);
+  ((void)0);
+  
+   
+  (((((PWR_TypeDef *) (0x40000000U + 0x7000U))->CR)) = ((((((((PWR_TypeDef *) (0x40000000U + 0x7000U))->CR))) & (~(0x000000E0U))) | (sConfigPVD->PVDLevel))));
+  
+   
+  (((EXTI_TypeDef *) ((0x40000000U + 0x00010000U) + 0x3C00U))->EMR &= ~(((uint32_t)0x00010000U)));
+  (((EXTI_TypeDef *) ((0x40000000U + 0x00010000U) + 0x3C00U))->IMR &= ~(((uint32_t)0x00010000U)));
+  ((((EXTI_TypeDef *) ((0x40000000U + 0x00010000U) + 0x3C00U))->RTSR) &= ~(((uint32_t)0x00010000U)));
+  ((((EXTI_TypeDef *) ((0x40000000U + 0x00010000U) + 0x3C00U))->FTSR) &= ~(((uint32_t)0x00010000U))); 
+
+   
+  if((sConfigPVD->Mode & ((uint32_t)0x00010000U)) == ((uint32_t)0x00010000U))
+  {
+    (((EXTI_TypeDef *) ((0x40000000U + 0x00010000U) + 0x3C00U))->IMR |= (((uint32_t)0x00010000U)));
+  }
+  
+   
+  if((sConfigPVD->Mode & ((uint32_t)0x00020000U)) == ((uint32_t)0x00020000U))
+  {
+    (((EXTI_TypeDef *) ((0x40000000U + 0x00010000U) + 0x3C00U))->EMR |= (((uint32_t)0x00010000U)));
+  }
+  
+   
+  if((sConfigPVD->Mode & ((uint32_t)0x00000001U)) == ((uint32_t)0x00000001U))
+  {
+    ((((EXTI_TypeDef *) ((0x40000000U + 0x00010000U) + 0x3C00U))->RTSR) |= (((uint32_t)0x00010000U)));
+  }
+  
+  if((sConfigPVD->Mode & ((uint32_t)0x00000002U)) == ((uint32_t)0x00000002U))
+  {
+    ((((EXTI_TypeDef *) ((0x40000000U + 0x00010000U) + 0x3C00U))->FTSR) |= (((uint32_t)0x00010000U)));
+  }
+}
+
+
+
+
+ 
+void HAL_PWR_EnablePVD(void)
+{
+  *(volatile uint32_t *) (uint32_t)(0x42000000U + ((((0x40000000U + 0x7000U) - 0x40000000U) + 0x00U) * 32U) + ((__clz(__rbit(0x00000010U))) * 4U)) = (uint32_t)ENABLE;
+}
+
+
+
+
+ 
+void HAL_PWR_DisablePVD(void)
+{
+  *(volatile uint32_t *) (uint32_t)(0x42000000U + ((((0x40000000U + 0x7000U) - 0x40000000U) + 0x00U) * 32U) + ((__clz(__rbit(0x00000010U))) * 4U)) = (uint32_t)DISABLE;
+}
+
+
+
+
+
+
+
+
+
+ 
+void HAL_PWR_EnableWakeUpPin(uint32_t WakeUpPinx)
+{
+   
+  ((void)0);
+
+   
+  ((((PWR_TypeDef *) (0x40000000U + 0x7000U))->CSR) |= (WakeUpPinx));
+}
+
+
+
+
+
+
+
+
+
+ 
+void HAL_PWR_DisableWakeUpPin(uint32_t WakeUpPinx)
+{
+   
+  ((void)0);  
+
+   
+  ((((PWR_TypeDef *) (0x40000000U + 0x7000U))->CSR) &= ~(WakeUpPinx));
+}
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+void HAL_PWR_EnterSLEEPMode(uint32_t Regulator, uint8_t SLEEPEntry)
+{
+   
+  ((void)0);
+  ((void)0);
+
+   
+  ((((SCB_Type *) ((0xE000E000UL) + 0x0D00UL) )->SCR) &= ~(((uint32_t)(1UL << 2U))));
+
+   
+  if(SLEEPEntry == ((uint8_t)0x01U))
+  {   
+     
+    __wfi();
+  }
+  else
+  {
+     
+    __sev();
+    __wfe();
+    __wfe();
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+void HAL_PWR_EnterSTOPMode(uint32_t Regulator, uint8_t STOPEntry)
+{
+   
+  ((void)0);
+  ((void)0);
+  
+   
+  (((((PWR_TypeDef *) (0x40000000U + 0x7000U))->CR)) = ((((((((PWR_TypeDef *) (0x40000000U + 0x7000U))->CR))) & (~((0x00000002U | 0x00000001U)))) | (Regulator))));
+  
+   
+  ((((SCB_Type *) ((0xE000E000UL) + 0x0D00UL) )->SCR) |= (((uint32_t)(1UL << 2U))));
+  
+   
+  if(STOPEntry == ((uint8_t)0x01U))
+  {   
+     
+    __wfi();
+  }
+  else
+  {
+     
+    __sev();
+    __wfe();
+    __wfe();
+  }
+   
+  ((((SCB_Type *) ((0xE000E000UL) + 0x0D00UL) )->SCR) &= ~(((uint32_t)(1UL << 2U))));  
+}
+
+
+
+
+
+
+
+
+
+
+ 
+void HAL_PWR_EnterSTANDBYMode(void)
+{
+   
+  ((((PWR_TypeDef *) (0x40000000U + 0x7000U))->CR) |= (0x00000002U));
+
+   
+  ((((SCB_Type *) ((0xE000E000UL) + 0x0D00UL) )->SCR) |= (((uint32_t)(1UL << 2U))));
+  
+   
+
+  __force_stores();
+
+   
+  __wfi();
+}
+
+
+
+
+
+ 
+void HAL_PWR_PVD_IRQHandler(void)
+{
+   
+  if((((EXTI_TypeDef *) ((0x40000000U + 0x00010000U) + 0x3C00U))->PR & (((uint32_t)0x00010000U))) != RESET)
+  {
+     
+    HAL_PWR_PVDCallback();
+    
+     
+    (((EXTI_TypeDef *) ((0x40000000U + 0x00010000U) + 0x3C00U))->PR = (((uint32_t)0x00010000U)));
+  }
+}
+
+
+
+
+ 
+__weak void HAL_PWR_PVDCallback(void)
+{
+  
+
+  
+}
+
+
+
+
+
+
+
+
+ 
+void HAL_PWR_EnableSleepOnExit(void)
+{
+   
+  ((((SCB_Type *) ((0xE000E000UL) + 0x0D00UL) )->SCR) |= (((uint32_t)(1UL << 1U))));
+}
+
+
+
+
+
+
+ 
+void HAL_PWR_DisableSleepOnExit(void)
+{
+   
+  ((((SCB_Type *) ((0xE000E000UL) + 0x0D00UL) )->SCR) &= ~(((uint32_t)(1UL << 1U))));
+}
+
+
+
+
+
+
+ 
+void HAL_PWR_EnableSEVOnPend(void)
+{
+   
+  ((((SCB_Type *) ((0xE000E000UL) + 0x0D00UL) )->SCR) |= (((uint32_t)(1UL << 4U))));
+}
+
+
+
+
+
+
+ 
+void HAL_PWR_DisableSEVOnPend(void)
+{
+   
+  ((((SCB_Type *) ((0xE000E000UL) + 0x0D00UL) )->SCR) &= ~(((uint32_t)(1UL << 4U))));
+}
+
+
+
+ 
+  
+
+
+ 
+
+
+
+
+ 
+
+
+
+ 
+
+ 

@@ -1,8 +1,158 @@
-#line 1 "MyLib\\Delay.c"
-#line 1 ".\\Inc\\main.h"
+#line 1 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_spi.c"
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+ 
 #line 1 ".\\Drivers\\STM32F4xx_HAL_Driver\\Inc\\stm32f4xx_hal.h"
 
 
@@ -27756,36 +27906,2587 @@ void HAL_DisableCompensationCell(void);
 
 
  
-#line 5 ".\\Inc\\main.h"
+#line 156 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_spi.c"
 
-void SystemClock_Config(void);
-void Error_Handler(void);
 
-#line 2 "MyLib\\Delay.c"
 
-static uint8_t timer_initialized = 0;
-static TIM_HandleTypeDef htim2;
+ 
 
-void Timer_Delay_us(uint8_t xus) {
-	if(!timer_initialized) {
-		do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x00000001U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x00000001U)); ((void)(tmpreg)); } while(0);
-		timer_initialized = 1;
 
-		htim2.Instance = ((TIM_TypeDef *) (0x40000000U + 0x0000U));
-		htim2.Init.Prescaler = 84 - 1;
-		htim2.Init.Period = 0xFFFFFFFF;
-		htim2.Init.CounterMode = ((uint32_t)0x00000000U);
-		htim2.Init.ClockDivision = ((uint32_t)0x00000000U);
-		if(HAL_TIM_Base_Init(&htim2) != HAL_OK) {
-			Error_Handler();
-		}
-	}
-	((&htim2)->Instance ->CNT = (0));
-	if(HAL_TIM_Base_Start(&htim2) != HAL_OK) {
-		Error_Handler();
-	}
-	while(((&htim2)->Instance ->CNT) < xus) {
-		
-	}
-	HAL_TIM_Base_Stop(&htim2);
+
+ 
+
+
+ 
+ 
+
+
+ 
+
+
+
+ 
+
+ 
+ 
+ 
+
+
+ 
+static void SPI_DMATransmitCplt(DMA_HandleTypeDef *hdma);
+static void SPI_DMAReceiveCplt(DMA_HandleTypeDef *hdma);
+static void SPI_DMATransmitReceiveCplt(DMA_HandleTypeDef *hdma);
+static void SPI_DMAHalfTransmitCplt(DMA_HandleTypeDef *hdma);
+static void SPI_DMAHalfReceiveCplt(DMA_HandleTypeDef *hdma);
+static void SPI_DMAHalfTransmitReceiveCplt(DMA_HandleTypeDef *hdma);
+static void SPI_DMAError(DMA_HandleTypeDef *hdma);
+static void SPI_DMAAbortOnError(DMA_HandleTypeDef *hdma);
+static HAL_StatusTypeDef SPI_WaitFlagStateUntilTimeout(SPI_HandleTypeDef *hspi, uint32_t Flag, uint32_t State, uint32_t Timeout, uint32_t Tickstart);
+static void SPI_TxISR_8BIT(struct __SPI_HandleTypeDef *hspi);
+static void SPI_TxISR_16BIT(struct __SPI_HandleTypeDef *hspi);
+static void SPI_RxISR_8BIT(struct __SPI_HandleTypeDef *hspi);
+static void SPI_RxISR_16BIT(struct __SPI_HandleTypeDef *hspi);
+static void SPI_2linesRxISR_8BIT(struct __SPI_HandleTypeDef *hspi);
+static void SPI_2linesTxISR_8BIT(struct __SPI_HandleTypeDef *hspi);
+static void SPI_2linesTxISR_16BIT(struct __SPI_HandleTypeDef *hspi);
+static void SPI_2linesRxISR_16BIT(struct __SPI_HandleTypeDef *hspi);
+
+static void SPI_RxISR_8BITCRC(struct __SPI_HandleTypeDef *hspi);
+static void SPI_RxISR_16BITCRC(struct __SPI_HandleTypeDef *hspi);
+static void SPI_2linesRxISR_8BITCRC(struct __SPI_HandleTypeDef *hspi);
+static void SPI_2linesRxISR_16BITCRC(struct __SPI_HandleTypeDef *hspi);
+
+static void SPI_CloseRxTx_ISR(SPI_HandleTypeDef *hspi);
+static void SPI_CloseRx_ISR(SPI_HandleTypeDef *hspi);
+static void SPI_CloseTx_ISR(SPI_HandleTypeDef *hspi);
+static HAL_StatusTypeDef SPI_CheckFlag_BSY(SPI_HandleTypeDef *hspi, uint32_t Timeout, uint32_t Tickstart);
+
+
+ 
+
+ 
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_SPI_Init(SPI_HandleTypeDef *hspi)
+{
+   
+  if(hspi == 0)
+  {
+    return HAL_ERROR;
+  }
+
+   
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  if(hspi->Init.TIMode == ((uint32_t)0x00000000U))
+  {
+    ((void)0);
+    ((void)0);
+  }
+
+  ((void)0);
+  if(hspi->Init.CRCCalculation == 0x00002000U)
+  {
+    ((void)0);
+  }
+
+
+
+
+  if(hspi->State == HAL_SPI_STATE_RESET)
+  {
+     
+    hspi->Lock = HAL_UNLOCKED;
+
+     
+    HAL_SPI_MspInit(hspi);
+  }
+
+  hspi->State = HAL_SPI_STATE_BUSY;
+
+   
+  ((hspi)->Instance ->CR1 &= (~0x00000040U));
+
+   
+  
+ 
+  ((hspi->Instance ->CR1) = ((hspi->Init . Mode | hspi->Init . Direction | hspi->Init . DataSize | hspi->Init . CLKPolarity | hspi->Init . CLKPhase | (hspi->Init . NSS & 0x00000200U) | hspi->Init . BaudRatePrescaler | hspi->Init . FirstBit | hspi->Init . CRCCalculation)));
+
+
+
+   
+  ((hspi->Instance ->CR2) = ((((hspi->Init . NSS >> 16U) & 0x00000004U) | hspi->Init . TIMode)));
+
+
+   
+   
+  if(hspi->Init.CRCCalculation == 0x00002000U)
+  {
+    ((hspi->Instance ->CRCPR) = (hspi->Init . CRCPolynomial));
+  }
+
+
+
+   
+  ((hspi->Instance ->I2SCFGR) &= ~(0x00000800U));
+
+
+  hspi->ErrorCode = ((uint32_t)0x00000000U);
+  hspi->State     = HAL_SPI_STATE_READY;
+
+  return HAL_OK;
 }
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_SPI_DeInit(SPI_HandleTypeDef *hspi)
+{
+   
+  if(hspi == 0)
+  {
+    return HAL_ERROR;
+  }
+
+   
+  ((void)0);
+
+  hspi->State = HAL_SPI_STATE_BUSY;
+
+   
+  ((hspi)->Instance ->CR1 &= (~0x00000040U));
+
+   
+  HAL_SPI_MspDeInit(hspi);
+
+  hspi->ErrorCode = ((uint32_t)0x00000000U);
+  hspi->State = HAL_SPI_STATE_RESET;
+
+   
+  do{ (hspi)->Lock = HAL_UNLOCKED; }while (0);
+
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+__weak void HAL_SPI_MspInit(SPI_HandleTypeDef *hspi)
+{
+   
+  ((void)(hspi));
+  
+
+ 
+}
+
+
+
+
+
+
+ 
+__weak void HAL_SPI_MspDeInit(SPI_HandleTypeDef *hspi)
+{
+   
+  ((void)(hspi));
+  
+
+ 
+}
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_SPI_Transmit(SPI_HandleTypeDef *hspi, uint8_t *pData, uint16_t Size, uint32_t Timeout)
+{
+  uint32_t tickstart = 0U;
+  HAL_StatusTypeDef errorcode = HAL_OK;
+
+   
+  ((void)0);
+
+   
+  do{ if((hspi)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hspi)->Lock = HAL_LOCKED; } }while (0);
+
+   
+  tickstart = HAL_GetTick();
+
+  if(hspi->State != HAL_SPI_STATE_READY)
+  {
+    errorcode = HAL_BUSY;
+    goto error;
+  }
+
+  if((pData == 0 ) || (Size == 0U))
+  {
+    errorcode = HAL_ERROR;
+    goto error;
+  }
+
+   
+  hspi->State       = HAL_SPI_STATE_BUSY_TX;
+  hspi->ErrorCode   = ((uint32_t)0x00000000U);
+  hspi->pTxBuffPtr  = (uint8_t *)pData;
+  hspi->TxXferSize  = Size;
+  hspi->TxXferCount = Size;
+
+   
+  hspi->pRxBuffPtr  = (uint8_t *)0;
+  hspi->RxXferSize  = 0U;
+  hspi->RxXferCount = 0U;
+  hspi->TxISR       = 0;
+  hspi->RxISR       = 0;
+
+   
+  if(hspi->Init.Direction == 0x00008000U)
+  {
+    ((hspi)->Instance ->CR1 |= 0x00004000U);
+  }
+
+
+   
+  if(hspi->Init.CRCCalculation == 0x00002000U)
+  {
+    do{(hspi)->Instance ->CR1 &= (uint16_t)(~0x00002000U); (hspi)->Instance ->CR1 |= 0x00002000U;}while(0);
+  }
+
+
+   
+  if((hspi->Instance->CR1 & 0x00000040U) != 0x00000040U)
+  {
+     
+    ((hspi)->Instance ->CR1 |= 0x00000040U);
+  }
+
+   
+  if(hspi->Init.DataSize == 0x00000800U)
+  {
+    if((hspi->Init.Mode == ((uint32_t)0x00000000U)) || (hspi->TxXferCount == 0x01))
+    {
+      hspi->Instance->DR = *((uint16_t *)pData);
+      pData += sizeof(uint16_t);
+      hspi->TxXferCount--;
+    }
+     
+    while (hspi->TxXferCount > 0U)
+    {
+       
+      if(((((hspi)->Instance ->SR) & (0x00000002U)) == (0x00000002U)))
+      {
+          hspi->Instance->DR = *((uint16_t *)pData);
+          pData += sizeof(uint16_t);
+          hspi->TxXferCount--;
+      }
+      else
+      {
+         
+        if((Timeout == 0U) || ((Timeout != 0xFFFFFFFFU) && ((HAL_GetTick()-tickstart) >=  Timeout)))
+        {
+          errorcode = HAL_TIMEOUT;
+          goto error;
+        }
+      }
+    }
+  }
+   
+  else
+  {
+    if((hspi->Init.Mode == ((uint32_t)0x00000000U))|| (hspi->TxXferCount == 0x01))
+    {
+      *((volatile uint8_t*)&hspi->Instance->DR) = (*pData);
+      pData += sizeof(uint8_t);
+      hspi->TxXferCount--;
+    }
+    while (hspi->TxXferCount > 0U)
+    {
+       
+      if(((((hspi)->Instance ->SR) & (0x00000002U)) == (0x00000002U)))
+      {
+        *((volatile uint8_t*)&hspi->Instance->DR) = (*pData);
+        pData += sizeof(uint8_t);
+        hspi->TxXferCount--;
+      }
+      else
+      {
+         
+        if((Timeout == 0U) || ((Timeout != 0xFFFFFFFFU) && ((HAL_GetTick()-tickstart) >=  Timeout)))
+        {
+          errorcode = HAL_TIMEOUT;
+          goto error;
+        }
+      }
+    }
+  }
+
+   
+  if(SPI_WaitFlagStateUntilTimeout(hspi, 0x00000002U, SET, Timeout, tickstart) != HAL_OK)
+  {
+    errorcode = HAL_TIMEOUT;
+    goto error;
+  }
+  
+   
+  if(SPI_CheckFlag_BSY(hspi, Timeout, tickstart) != HAL_OK)
+  {
+    errorcode = HAL_ERROR;
+    hspi->ErrorCode = ((uint32_t)0x00000020U);
+    goto error;
+  }
+
+   
+  if(hspi->Init.Direction == ((uint32_t)0x00000000U))
+  {
+    do{ volatile uint32_t tmpreg_ovr = 0x00U; tmpreg_ovr = (hspi)->Instance ->DR; tmpreg_ovr = (hspi)->Instance ->SR; ((void)(tmpreg_ovr)); } while(0);
+  }
+
+   
+  if(hspi->Init.CRCCalculation == 0x00002000U)
+  {
+     ((hspi->Instance ->CR1) |= (0x00001000U));
+  }
+
+
+  if(hspi->ErrorCode != ((uint32_t)0x00000000U))
+  {
+    errorcode = HAL_ERROR;
+  }
+
+error:
+  hspi->State = HAL_SPI_STATE_READY;
+   
+  do{ (hspi)->Lock = HAL_UNLOCKED; }while (0);
+  return errorcode;
+}
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_SPI_Receive(SPI_HandleTypeDef *hspi, uint8_t *pData, uint16_t Size, uint32_t Timeout)
+{
+
+  volatile uint16_t tmpreg = 0U;
+
+  uint32_t tickstart = 0U;
+  HAL_StatusTypeDef errorcode = HAL_OK;
+
+  if((hspi->Init.Mode == (0x00000004U | 0x00000100U)) && (hspi->Init.Direction == ((uint32_t)0x00000000U)))
+  {
+     hspi->State = HAL_SPI_STATE_BUSY_RX;
+      
+    return HAL_SPI_TransmitReceive(hspi,pData,pData,Size,Timeout);
+  }
+
+   
+  do{ if((hspi)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hspi)->Lock = HAL_LOCKED; } }while (0);
+
+   
+  tickstart = HAL_GetTick();
+
+  if(hspi->State != HAL_SPI_STATE_READY)
+  {
+    errorcode = HAL_BUSY;
+    goto error;
+  }
+
+  if((pData == 0 ) || (Size == 0U))
+  {
+    errorcode = HAL_ERROR;
+    goto error;
+  }
+
+   
+  hspi->State       = HAL_SPI_STATE_BUSY_RX;
+  hspi->ErrorCode   = ((uint32_t)0x00000000U);
+  hspi->pRxBuffPtr  = (uint8_t *)pData;
+  hspi->RxXferSize  = Size;
+  hspi->RxXferCount = Size;
+
+   
+  hspi->pTxBuffPtr  = (uint8_t *)0;
+  hspi->TxXferSize  = 0U;
+  hspi->TxXferCount = 0U;
+  hspi->RxISR       = 0;
+  hspi->TxISR       = 0;
+
+
+   
+  if(hspi->Init.CRCCalculation == 0x00002000U)
+  {
+    do{(hspi)->Instance ->CR1 &= (uint16_t)(~0x00002000U); (hspi)->Instance ->CR1 |= 0x00002000U;}while(0);
+     
+    hspi->RxXferCount--;
+  }
+
+
+   
+  if(hspi->Init.Direction == 0x00008000U)
+  {
+    ((hspi)->Instance ->CR1 &= (~0x00004000U));
+  }
+
+   
+  if((hspi->Instance->CR1 & 0x00000040U) != 0x00000040U)
+  {
+     
+    ((hspi)->Instance ->CR1 |= 0x00000040U);
+  }
+
+     
+  if(hspi->Init.DataSize == ((uint32_t)0x00000000U))
+  {
+     
+    while(hspi->RxXferCount > 0U)
+    {
+       
+      if(((((hspi)->Instance ->SR) & (0x00000001U)) == (0x00000001U)))
+      {
+         
+        (* (uint8_t *)pData)= *(volatile uint8_t *)&hspi->Instance->DR;
+        pData += sizeof(uint8_t);
+        hspi->RxXferCount--;
+      }
+      else
+      {
+         
+        if((Timeout == 0U) || ((Timeout != 0xFFFFFFFFU) && ((HAL_GetTick()-tickstart) >=  Timeout)))
+        {
+          errorcode = HAL_TIMEOUT;
+          goto error;
+        }
+      }
+    }
+  }
+  else
+  {
+     
+    while(hspi->RxXferCount > 0U)
+    {
+       
+      if(((((hspi)->Instance ->SR) & (0x00000001U)) == (0x00000001U)))
+      {
+        *((uint16_t*)pData) = hspi->Instance->DR;
+        pData += sizeof(uint16_t);
+        hspi->RxXferCount--;
+      }
+      else
+      {
+         
+        if((Timeout == 0U) || ((Timeout != 0xFFFFFFFFU) && ((HAL_GetTick()-tickstart) >=  Timeout)))
+        {
+          errorcode = HAL_TIMEOUT;
+          goto error;
+        }
+      }
+    }
+  }
+
+
+   
+  if(hspi->Init.CRCCalculation == 0x00002000U)
+  {
+     
+    ((hspi->Instance ->CR1) |= (0x00001000U));
+
+     
+    if(SPI_WaitFlagStateUntilTimeout(hspi, 0x00000001U, SET, Timeout, tickstart) != HAL_OK)
+    {
+       
+      errorcode = HAL_TIMEOUT;
+      goto error;
+    }
+
+     
+    if(hspi->Init.DataSize == 0x00000800U)
+    {
+      *((uint16_t*)pData) = hspi->Instance->DR;
+    }
+     
+    else
+    {
+      (*(uint8_t *)pData) = *(volatile uint8_t *)&hspi->Instance->DR;
+    }
+
+     
+    if(SPI_WaitFlagStateUntilTimeout(hspi, 0x00000001U, SET, Timeout, tickstart) != HAL_OK)
+    {
+      ((hspi->ErrorCode) |= (((uint32_t)0x00000002U)));
+      errorcode = HAL_TIMEOUT;
+      goto error;
+    }
+
+     
+    tmpreg = hspi->Instance->DR;
+     
+    ((void)(tmpreg));
+  }
+
+
+  if((hspi->Init.Mode == (0x00000004U | 0x00000100U))&&((hspi->Init.Direction == 0x00008000U)||(hspi->Init.Direction == 0x00000400U)))
+  {
+     
+    ((hspi)->Instance ->CR1 &= (~0x00000040U));
+  }
+
+
+   
+  if(((((hspi)->Instance ->SR) & (0x00000010U)) == (0x00000010U)))
+  {
+    ((hspi->ErrorCode) |= (((uint32_t)0x00000002U)));
+    ((hspi)->Instance ->SR = (uint16_t)(~0x00000010U));
+  }
+
+
+  if(hspi->ErrorCode != ((uint32_t)0x00000000U))
+  {
+    errorcode = HAL_ERROR;
+  }
+
+error :
+  hspi->State = HAL_SPI_STATE_READY;
+  do{ (hspi)->Lock = HAL_UNLOCKED; }while (0);
+  return errorcode;
+}
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxData, uint8_t *pRxData, uint16_t Size, uint32_t Timeout)
+{
+  uint32_t tmp = 0U, tmp1 = 0U;
+
+  volatile uint16_t tmpreg1 = 0U;
+
+  uint32_t tickstart = 0U;
+   
+  uint32_t txallowed = 1U;
+  HAL_StatusTypeDef errorcode = HAL_OK;
+
+   
+  ((void)0);
+
+   
+  do{ if((hspi)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hspi)->Lock = HAL_LOCKED; } }while (0);
+
+   
+  tickstart = HAL_GetTick();
+  
+  tmp  = hspi->State;
+  tmp1 = hspi->Init.Mode;
+  
+  if(!((tmp == HAL_SPI_STATE_READY) ||     ((tmp1 == (0x00000004U | 0x00000100U)) && (hspi->Init.Direction == ((uint32_t)0x00000000U)) && (tmp == HAL_SPI_STATE_BUSY_RX))))
+
+  {
+    errorcode = HAL_BUSY;
+    goto error;
+  }
+
+  if((pTxData == 0) || (pRxData == 0) || (Size == 0U))
+  {
+    errorcode = HAL_ERROR;
+    goto error;
+  }
+
+   
+  if(hspi->State == HAL_SPI_STATE_READY)
+  {
+    hspi->State = HAL_SPI_STATE_BUSY_TX_RX;
+  }
+
+   
+  hspi->ErrorCode   = ((uint32_t)0x00000000U);
+  hspi->pRxBuffPtr  = (uint8_t *)pRxData;
+  hspi->RxXferCount = Size;
+  hspi->RxXferSize  = Size;
+  hspi->pTxBuffPtr  = (uint8_t *)pTxData;
+  hspi->TxXferCount = Size;
+  hspi->TxXferSize  = Size;
+
+   
+  hspi->RxISR       = 0;
+  hspi->TxISR       = 0;
+
+
+   
+  if(hspi->Init.CRCCalculation == 0x00002000U)
+  {
+    do{(hspi)->Instance ->CR1 &= (uint16_t)(~0x00002000U); (hspi)->Instance ->CR1 |= 0x00002000U;}while(0);
+  }
+
+
+   
+  if((hspi->Instance->CR1 &0x00000040U) != 0x00000040U)
+  {
+     
+    ((hspi)->Instance ->CR1 |= 0x00000040U);
+  }
+
+   
+  if(hspi->Init.DataSize == 0x00000800U)
+  {
+    if((hspi->Init.Mode == ((uint32_t)0x00000000U)) || (hspi->TxXferCount == 0x01))
+    {
+      hspi->Instance->DR = *((uint16_t *)pTxData);
+      pTxData += sizeof(uint16_t);
+      hspi->TxXferCount--;
+    }
+    while ((hspi->TxXferCount > 0U) || (hspi->RxXferCount > 0U))
+    {
+       
+      if(txallowed && (hspi->TxXferCount > 0U) && (((((hspi)->Instance ->SR) & (0x00000002U)) == (0x00000002U))))
+      {
+        hspi->Instance->DR = *((uint16_t *)pTxData);
+        pTxData += sizeof(uint16_t);
+        hspi->TxXferCount--;
+          
+        txallowed = 0U;
+
+
+         
+        if((hspi->TxXferCount == 0U) && (hspi->Init.CRCCalculation == 0x00002000U))
+        {
+          ((hspi->Instance ->CR1) |= (0x00001000U));
+        }
+
+      }
+
+       
+      if((hspi->RxXferCount > 0U) && (((((hspi)->Instance ->SR) & (0x00000001U)) == (0x00000001U))))
+      {
+        *((uint16_t *)pRxData) = hspi->Instance->DR;
+        pRxData += sizeof(uint16_t);
+        hspi->RxXferCount--;
+          
+        txallowed = 1U;
+      }
+      if((Timeout != 0xFFFFFFFFU) && ((HAL_GetTick()-tickstart) >=  Timeout))
+      {
+        errorcode = HAL_TIMEOUT;
+        goto error;
+      }
+    }
+  }
+   
+  else
+  {
+    if((hspi->Init.Mode == ((uint32_t)0x00000000U)) || (hspi->TxXferCount == 0x01))
+    {
+      *((volatile uint8_t*)&hspi->Instance->DR) = (*pTxData);
+      pTxData += sizeof(uint8_t);
+      hspi->TxXferCount--;
+    }
+    while((hspi->TxXferCount > 0U) || (hspi->RxXferCount > 0U))
+    {
+       
+      if(txallowed && (hspi->TxXferCount > 0U) && (((((hspi)->Instance ->SR) & (0x00000002U)) == (0x00000002U))))
+      {
+        *(volatile uint8_t *)&hspi->Instance->DR = (*pTxData++);
+        hspi->TxXferCount--;
+          
+        txallowed = 0U;
+
+
+         
+        if((hspi->TxXferCount == 0U) && (hspi->Init.CRCCalculation == 0x00002000U))
+        {
+          ((hspi->Instance ->CR1) |= (0x00001000U));
+        }
+
+      }
+
+       
+      if((hspi->RxXferCount > 0U) && (((((hspi)->Instance ->SR) & (0x00000001U)) == (0x00000001U))))
+      {
+        (*(uint8_t *)pRxData++) = hspi->Instance->DR;
+        hspi->RxXferCount--;
+          
+        txallowed = 1U;
+      }
+      if((Timeout != 0xFFFFFFFFU) && ((HAL_GetTick()-tickstart) >=  Timeout))
+      {
+        errorcode = HAL_TIMEOUT;
+        goto error;
+      }
+    }
+  }
+
+
+   
+  if(hspi->Init.CRCCalculation == 0x00002000U)
+  {
+     
+    if(SPI_WaitFlagStateUntilTimeout(hspi, 0x00000001U, SET, Timeout, tickstart) != HAL_OK)
+    {
+       
+      ((hspi->ErrorCode) |= (((uint32_t)0x00000002U)));
+      errorcode = HAL_TIMEOUT;
+      goto error;
+    }
+     
+    tmpreg1 = hspi->Instance->DR;
+     
+    ((void)(tmpreg1));
+  }
+
+   
+  if(((((hspi)->Instance ->SR) & (0x00000010U)) == (0x00000010U)))
+  {
+    ((hspi->ErrorCode) |= (((uint32_t)0x00000002U)));
+     
+    ((hspi)->Instance ->SR = (uint16_t)(~0x00000010U));
+
+    errorcode = HAL_ERROR;
+  }
+
+
+   
+  if(SPI_WaitFlagStateUntilTimeout(hspi, 0x00000002U, SET, Timeout, tickstart) != HAL_OK)
+  {
+    errorcode = HAL_TIMEOUT;
+    goto error;
+  }
+  
+   
+  if(SPI_CheckFlag_BSY(hspi, Timeout, tickstart) != HAL_OK)
+  {
+    errorcode = HAL_ERROR;
+    hspi->ErrorCode = ((uint32_t)0x00000020U);
+    goto error;
+  }
+
+   
+  if(hspi->Init.Direction == ((uint32_t)0x00000000U))
+  {
+    do{ volatile uint32_t tmpreg_ovr = 0x00U; tmpreg_ovr = (hspi)->Instance ->DR; tmpreg_ovr = (hspi)->Instance ->SR; ((void)(tmpreg_ovr)); } while(0);
+  }
+  
+error :
+  hspi->State = HAL_SPI_STATE_READY;
+  do{ (hspi)->Lock = HAL_UNLOCKED; }while (0);
+  return errorcode;
+}
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_SPI_Transmit_IT(SPI_HandleTypeDef *hspi, uint8_t *pData, uint16_t Size)
+{
+  HAL_StatusTypeDef errorcode = HAL_OK;
+
+   
+  ((void)0);
+
+   
+  do{ if((hspi)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hspi)->Lock = HAL_LOCKED; } }while (0);
+
+  if((pData == 0) || (Size == 0U))
+  {
+    errorcode = HAL_ERROR;
+    goto error;
+  }
+
+  if(hspi->State != HAL_SPI_STATE_READY)
+  {
+    errorcode = HAL_BUSY;
+    goto error;
+  }
+
+   
+  hspi->State       = HAL_SPI_STATE_BUSY_TX;
+  hspi->ErrorCode   = ((uint32_t)0x00000000U);
+  hspi->pTxBuffPtr  = (uint8_t *)pData;
+  hspi->TxXferSize  = Size;
+  hspi->TxXferCount = Size;
+
+   
+  hspi->pRxBuffPtr  = (uint8_t *)0;
+  hspi->RxXferSize  = 0U;
+  hspi->RxXferCount = 0U;
+  hspi->RxISR       = 0;
+
+   
+  if(hspi->Init.DataSize > ((uint32_t)0x00000000U) )
+  {
+    hspi->TxISR = SPI_TxISR_16BIT;
+  }
+  else
+  {
+    hspi->TxISR = SPI_TxISR_8BIT;
+  }
+
+   
+  if(hspi->Init.Direction == 0x00008000U)
+  {
+    ((hspi)->Instance ->CR1 |= 0x00004000U);
+  }
+
+
+   
+  if(hspi->Init.CRCCalculation == 0x00002000U)
+  {
+    do{(hspi)->Instance ->CR1 &= (uint16_t)(~0x00002000U); (hspi)->Instance ->CR1 |= 0x00002000U;}while(0);
+  }
+
+
+  if (hspi->Init.Direction == ((uint32_t)0x00000000U))
+  {
+     
+    ((hspi)->Instance ->CR2 |= ((0x00000080U)));
+  }
+  else
+  {
+     
+    ((hspi)->Instance ->CR2 |= ((0x00000080U | 0x00000020U)));
+  }
+
+   
+  if((hspi->Instance->CR1 &0x00000040U) != 0x00000040U)
+  {
+     
+    ((hspi)->Instance ->CR1 |= 0x00000040U);
+  }
+
+error :
+  do{ (hspi)->Lock = HAL_UNLOCKED; }while (0);
+  return errorcode;
+}
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_SPI_Receive_IT(SPI_HandleTypeDef *hspi, uint8_t *pData, uint16_t Size)
+{
+  HAL_StatusTypeDef errorcode = HAL_OK;
+
+  if((hspi->Init.Direction == ((uint32_t)0x00000000U)) && (hspi->Init.Mode == (0x00000004U | 0x00000100U)))
+  {
+     hspi->State = HAL_SPI_STATE_BUSY_RX;
+      
+     return HAL_SPI_TransmitReceive_IT(hspi, pData, pData, Size);
+  }
+
+   
+  do{ if((hspi)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hspi)->Lock = HAL_LOCKED; } }while (0);
+
+  if(hspi->State != HAL_SPI_STATE_READY)
+  {
+    errorcode = HAL_BUSY;
+    goto error;
+  }
+
+  if((pData == 0) || (Size == 0U))
+  {
+    errorcode = HAL_ERROR;
+    goto error;
+  }
+
+   
+  hspi->State       = HAL_SPI_STATE_BUSY_RX;
+  hspi->ErrorCode   = ((uint32_t)0x00000000U);
+  hspi->pRxBuffPtr  = (uint8_t *)pData;
+  hspi->RxXferSize  = Size;
+  hspi->RxXferCount = Size;
+
+   
+  hspi->pTxBuffPtr  = (uint8_t *)0;
+  hspi->TxXferSize  = 0U;
+  hspi->TxXferCount = 0U;
+  hspi->TxISR       = 0;
+
+   
+  if(hspi->Init.DataSize > ((uint32_t)0x00000000U) )
+  {
+    hspi->RxISR = SPI_RxISR_16BIT;
+  }
+  else
+  {
+    hspi->RxISR = SPI_RxISR_8BIT;
+  }
+
+   
+  if(hspi->Init.Direction == 0x00008000U)
+  {
+    ((hspi)->Instance ->CR1 &= (~0x00004000U));
+  }
+
+
+   
+  if(hspi->Init.CRCCalculation == 0x00002000U)
+  {
+    do{(hspi)->Instance ->CR1 &= (uint16_t)(~0x00002000U); (hspi)->Instance ->CR1 |= 0x00002000U;}while(0);
+  }
+
+
+   
+  ((hspi)->Instance ->CR2 |= ((0x00000040U | 0x00000020U)));
+
+  
+
+ 
+
+   
+  if((hspi->Instance->CR1 &0x00000040U) != 0x00000040U)
+  {
+     
+    ((hspi)->Instance ->CR1 |= 0x00000040U);
+  }
+
+error :
+   
+  do{ (hspi)->Lock = HAL_UNLOCKED; }while (0);
+  return errorcode;
+}
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_SPI_TransmitReceive_IT(SPI_HandleTypeDef *hspi, uint8_t *pTxData, uint8_t *pRxData, uint16_t Size)
+{
+  uint32_t tmp = 0U, tmp1 = 0U;
+  HAL_StatusTypeDef errorcode = HAL_OK;
+
+   
+  ((void)0);
+
+   
+  do{ if((hspi)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hspi)->Lock = HAL_LOCKED; } }while (0);
+
+  tmp  = hspi->State;
+  tmp1 = hspi->Init.Mode;
+  
+  if(!((tmp == HAL_SPI_STATE_READY) ||     ((tmp1 == (0x00000004U | 0x00000100U)) && (hspi->Init.Direction == ((uint32_t)0x00000000U)) && (tmp == HAL_SPI_STATE_BUSY_RX))))
+
+  {
+    errorcode = HAL_BUSY;
+    goto error;
+  }
+
+  if((pTxData == 0 ) || (pRxData == 0 ) || (Size == 0U))
+  {
+    errorcode = HAL_ERROR;
+    goto error;
+  }
+
+   
+  if(hspi->State == HAL_SPI_STATE_READY)
+  {
+    hspi->State = HAL_SPI_STATE_BUSY_TX_RX;
+  }
+
+   
+  hspi->ErrorCode   = ((uint32_t)0x00000000U);
+  hspi->pTxBuffPtr  = (uint8_t *)pTxData;
+  hspi->TxXferSize  = Size;
+  hspi->TxXferCount = Size;
+  hspi->pRxBuffPtr  = (uint8_t *)pRxData;
+  hspi->RxXferSize  = Size;
+  hspi->RxXferCount = Size;
+
+   
+  if(hspi->Init.DataSize > ((uint32_t)0x00000000U) )
+  {
+    hspi->RxISR     = SPI_2linesRxISR_16BIT;
+    hspi->TxISR     = SPI_2linesTxISR_16BIT;
+  }
+  else
+  {
+    hspi->RxISR     = SPI_2linesRxISR_8BIT;
+    hspi->TxISR     = SPI_2linesTxISR_8BIT;
+  }
+
+
+   
+  if(hspi->Init.CRCCalculation == 0x00002000U)
+  {
+    do{(hspi)->Instance ->CR1 &= (uint16_t)(~0x00002000U); (hspi)->Instance ->CR1 |= 0x00002000U;}while(0);
+  }
+
+
+   
+  ((hspi)->Instance ->CR2 |= ((0x00000080U | 0x00000040U | 0x00000020U)));
+
+   
+  if((hspi->Instance->CR1 &0x00000040U) != 0x00000040U)
+  {
+     
+    ((hspi)->Instance ->CR1 |= 0x00000040U);
+  }
+
+error :
+   
+  do{ (hspi)->Lock = HAL_UNLOCKED; }while (0);
+  return errorcode;
+}
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_SPI_Transmit_DMA(SPI_HandleTypeDef *hspi, uint8_t *pData, uint16_t Size)
+{
+  HAL_StatusTypeDef errorcode = HAL_OK;
+
+   
+  ((void)0);
+
+   
+  do{ if((hspi)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hspi)->Lock = HAL_LOCKED; } }while (0);
+
+  if(hspi->State != HAL_SPI_STATE_READY)
+  {
+    errorcode = HAL_BUSY;
+    goto error;
+  }
+
+  if((pData == 0) || (Size == 0U))
+  {
+    errorcode = HAL_ERROR;
+    goto error;
+  }
+
+   
+  hspi->State       = HAL_SPI_STATE_BUSY_TX;
+  hspi->ErrorCode   = ((uint32_t)0x00000000U);
+  hspi->pTxBuffPtr  = (uint8_t *)pData;
+  hspi->TxXferSize  = Size;
+  hspi->TxXferCount = Size;
+
+   
+  hspi->pRxBuffPtr  = (uint8_t *)0;
+  hspi->TxISR       = 0;
+  hspi->RxISR       = 0;
+  hspi->RxXferSize  = 0U;
+  hspi->RxXferCount = 0U;
+
+   
+  if(hspi->Init.Direction == 0x00008000U)
+  {
+    ((hspi)->Instance ->CR1 |= 0x00004000U);
+  }
+
+
+   
+  if(hspi->Init.CRCCalculation == 0x00002000U)
+  {
+    do{(hspi)->Instance ->CR1 &= (uint16_t)(~0x00002000U); (hspi)->Instance ->CR1 |= 0x00002000U;}while(0);
+  }
+
+
+   
+  hspi->hdmatx->XferHalfCpltCallback = SPI_DMAHalfTransmitCplt;
+
+   
+  hspi->hdmatx->XferCpltCallback = SPI_DMATransmitCplt;
+
+   
+  hspi->hdmatx->XferErrorCallback = SPI_DMAError;
+
+   
+  hspi->hdmatx->XferAbortCallback = 0;
+
+   
+  HAL_DMA_Start_IT(hspi->hdmatx, (uint32_t)hspi->pTxBuffPtr, (uint32_t)&hspi->Instance->DR, hspi->TxXferCount);
+
+   
+  if((hspi->Instance->CR1 &0x00000040U) != 0x00000040U)
+  {
+     
+    ((hspi)->Instance ->CR1 |= 0x00000040U);
+  }
+
+   
+  ((hspi->Instance ->CR2) |= (0x00000020U));
+
+   
+  ((hspi->Instance ->CR2) |= (0x00000002U));
+
+error :
+   
+  do{ (hspi)->Lock = HAL_UNLOCKED; }while (0);
+  return errorcode;
+}
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_SPI_Receive_DMA(SPI_HandleTypeDef *hspi, uint8_t *pData, uint16_t Size)
+{
+  HAL_StatusTypeDef errorcode = HAL_OK;
+
+  if((hspi->Init.Direction == ((uint32_t)0x00000000U))&&(hspi->Init.Mode == (0x00000004U | 0x00000100U)))
+  {
+     hspi->State = HAL_SPI_STATE_BUSY_RX;
+      
+     return HAL_SPI_TransmitReceive_DMA(hspi, pData, pData, Size);
+  }
+
+   
+  do{ if((hspi)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hspi)->Lock = HAL_LOCKED; } }while (0);
+
+  if(hspi->State != HAL_SPI_STATE_READY)
+  {
+    errorcode = HAL_BUSY;
+    goto error;
+  }
+
+  if((pData == 0) || (Size == 0U))
+  {
+    errorcode = HAL_ERROR;
+    goto error;
+  }
+
+   
+  hspi->State       = HAL_SPI_STATE_BUSY_RX;
+  hspi->ErrorCode   = ((uint32_t)0x00000000U);
+  hspi->pRxBuffPtr  = (uint8_t *)pData;
+  hspi->RxXferSize  = Size;
+  hspi->RxXferCount = Size;
+
+   
+  hspi->RxISR       = 0;
+  hspi->TxISR       = 0;
+  hspi->TxXferSize  = 0U;
+  hspi->TxXferCount = 0U;
+
+   
+  if(hspi->Init.Direction == 0x00008000U)
+  {
+    ((hspi)->Instance ->CR1 &= (~0x00004000U));
+  }
+
+
+   
+  if(hspi->Init.CRCCalculation == 0x00002000U)
+  {
+    do{(hspi)->Instance ->CR1 &= (uint16_t)(~0x00002000U); (hspi)->Instance ->CR1 |= 0x00002000U;}while(0);
+  }
+
+
+   
+  hspi->hdmarx->XferHalfCpltCallback = SPI_DMAHalfReceiveCplt;
+
+   
+  hspi->hdmarx->XferCpltCallback = SPI_DMAReceiveCplt;
+
+   
+  hspi->hdmarx->XferErrorCallback = SPI_DMAError;
+
+  
+  hspi->hdmarx->XferAbortCallback = 0;
+
+   
+  HAL_DMA_Start_IT(hspi->hdmarx, (uint32_t)&hspi->Instance->DR, (uint32_t)hspi->pRxBuffPtr, hspi->RxXferCount);
+
+   
+  if((hspi->Instance->CR1 &0x00000040U) != 0x00000040U)
+  {
+     
+    ((hspi)->Instance ->CR1 |= 0x00000040U);
+  }
+
+   
+  ((hspi->Instance ->CR2) |= (0x00000020U));
+
+   
+  ((hspi->Instance ->CR2) |= (0x00000001U));
+
+error:
+   
+  do{ (hspi)->Lock = HAL_UNLOCKED; }while (0);
+  return errorcode;
+}
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_SPI_TransmitReceive_DMA(SPI_HandleTypeDef *hspi, uint8_t *pTxData, uint8_t *pRxData, uint16_t Size)
+{
+  uint32_t tmp = 0U, tmp1 = 0U;
+  HAL_StatusTypeDef errorcode = HAL_OK;
+
+   
+  ((void)0);
+
+   
+  do{ if((hspi)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hspi)->Lock = HAL_LOCKED; } }while (0);
+
+  tmp  = hspi->State;
+  tmp1 = hspi->Init.Mode;
+  if(!((tmp == HAL_SPI_STATE_READY) ||
+      ((tmp1 == (0x00000004U | 0x00000100U)) && (hspi->Init.Direction == ((uint32_t)0x00000000U)) && (tmp == HAL_SPI_STATE_BUSY_RX))))
+  {
+    errorcode = HAL_BUSY;
+    goto error;
+  }
+
+  if((pTxData == 0 ) || (pRxData == 0 ) || (Size == 0U))
+  {
+    errorcode = HAL_ERROR;
+    goto error;
+  }
+
+   
+  if(hspi->State == HAL_SPI_STATE_READY)
+  {
+    hspi->State = HAL_SPI_STATE_BUSY_TX_RX;
+  }
+
+   
+  hspi->ErrorCode   = ((uint32_t)0x00000000U);
+  hspi->pTxBuffPtr  = (uint8_t*)pTxData;
+  hspi->TxXferSize  = Size;
+  hspi->TxXferCount = Size;
+  hspi->pRxBuffPtr  = (uint8_t*)pRxData;
+  hspi->RxXferSize  = Size;
+  hspi->RxXferCount = Size;
+
+   
+  hspi->RxISR       = 0;
+  hspi->TxISR       = 0;
+
+
+   
+  if(hspi->Init.CRCCalculation == 0x00002000U)
+  {
+    do{(hspi)->Instance ->CR1 &= (uint16_t)(~0x00002000U); (hspi)->Instance ->CR1 |= 0x00002000U;}while(0);
+  }
+
+
+   
+  if(hspi->State == HAL_SPI_STATE_BUSY_RX)
+  {
+     
+    hspi->hdmarx->XferHalfCpltCallback = SPI_DMAHalfReceiveCplt;
+    hspi->hdmarx->XferCpltCallback     = SPI_DMAReceiveCplt;
+  }
+  else
+  {
+     
+    hspi->hdmarx->XferHalfCpltCallback = SPI_DMAHalfTransmitReceiveCplt;
+    hspi->hdmarx->XferCpltCallback     = SPI_DMATransmitReceiveCplt;
+  }
+
+   
+  hspi->hdmarx->XferErrorCallback = SPI_DMAError;
+
+   
+  hspi->hdmarx->XferAbortCallback = 0;
+
+   
+  HAL_DMA_Start_IT(hspi->hdmarx, (uint32_t)&hspi->Instance->DR, (uint32_t)hspi->pRxBuffPtr, hspi->RxXferCount);
+
+   
+  ((hspi->Instance ->CR2) |= (0x00000001U));
+
+  
+ 
+  hspi->hdmatx->XferHalfCpltCallback = 0;
+  hspi->hdmatx->XferCpltCallback     = 0;
+  hspi->hdmatx->XferErrorCallback    = 0;
+  hspi->hdmatx->XferAbortCallback    = 0;
+
+   
+  HAL_DMA_Start_IT(hspi->hdmatx, (uint32_t)hspi->pTxBuffPtr, (uint32_t)&hspi->Instance->DR, hspi->TxXferCount);
+
+   
+  if((hspi->Instance->CR1 &0x00000040U) != 0x00000040U)
+  {
+     
+    ((hspi)->Instance ->CR1 |= 0x00000040U);
+  }
+   
+  ((hspi->Instance ->CR2) |= (0x00000020U));
+
+   
+  ((hspi->Instance ->CR2) |= (0x00000002U));
+
+error :
+   
+  do{ (hspi)->Lock = HAL_UNLOCKED; }while (0);
+  return errorcode;
+}
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_SPI_DMAStop(SPI_HandleTypeDef *hspi)
+{
+  
+
+
+
+ 
+
+   
+  if(hspi->hdmatx != 0)
+  {
+    HAL_DMA_Abort(hspi->hdmatx);
+  }
+   
+  if(hspi->hdmarx != 0)
+  {
+    HAL_DMA_Abort(hspi->hdmarx);
+  }
+
+   
+  ((hspi->Instance ->CR2) &= ~(0x00000002U | 0x00000001U));
+  hspi->State = HAL_SPI_STATE_READY;
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+void HAL_SPI_IRQHandler(SPI_HandleTypeDef *hspi)
+{
+  uint32_t itsource = hspi->Instance->CR2;
+  uint32_t itflag   = hspi->Instance->SR;
+
+   
+  if(((itflag & 0x00000040U) == RESET) &&
+     ((itflag & 0x00000001U) != RESET) && ((itsource & 0x00000040U) != RESET))
+  {
+    hspi->RxISR(hspi);
+    return;
+  }
+
+   
+  if(((itflag & 0x00000002U) != RESET) && ((itsource & 0x00000080U) != RESET))
+  {
+    hspi->TxISR(hspi);
+    return;
+  }
+
+   
+  if(((itflag & (0x00000020U | 0x00000040U | 0x00000100U)) != RESET) && ((itsource & 0x00000020U) != RESET))
+  {
+     
+    if((itflag & 0x00000040U) != RESET)
+    {
+      if(hspi->State != HAL_SPI_STATE_BUSY_TX)
+      {
+        ((hspi->ErrorCode) |= (((uint32_t)0x00000004U)));
+        do{ volatile uint32_t tmpreg_ovr = 0x00U; tmpreg_ovr = (hspi)->Instance ->DR; tmpreg_ovr = (hspi)->Instance ->SR; ((void)(tmpreg_ovr)); } while(0);
+      }
+      else
+      {
+        do{ volatile uint32_t tmpreg_ovr = 0x00U; tmpreg_ovr = (hspi)->Instance ->DR; tmpreg_ovr = (hspi)->Instance ->SR; ((void)(tmpreg_ovr)); } while(0);
+        return;
+      }
+    }
+
+     
+    if((itflag & 0x00000020U) != RESET)
+    {
+      ((hspi->ErrorCode) |= (((uint32_t)0x00000001U)));
+      do{ volatile uint32_t tmpreg_modf = 0x00U; tmpreg_modf = (hspi)->Instance ->SR; (hspi)->Instance ->CR1 &= (~0x00000040U); ((void)(tmpreg_modf)); } while(0);
+    }
+
+     
+    if((itflag & 0x00000100U) != RESET)
+    {
+      ((hspi->ErrorCode) |= (((uint32_t)0x00000008U)));
+      do{ volatile uint32_t tmpreg_fre = 0x00U; tmpreg_fre = (hspi)->Instance ->SR; ((void)(tmpreg_fre)); }while(0);
+    }
+
+    if(hspi->ErrorCode != ((uint32_t)0x00000000U))
+    {
+       
+      ((hspi)->Instance ->CR2 &= (~(0x00000040U | 0x00000080U | 0x00000020U)));
+
+      hspi->State = HAL_SPI_STATE_READY;
+       
+      if (((((itsource) & (0x00000002U)) != RESET))||((((itsource) & (0x00000001U)) != RESET)))
+      {
+        ((hspi->Instance ->CR2) &= ~((0x00000002U | 0x00000001U)));
+
+         
+        if(hspi->hdmarx != 0)
+        {
+          
+ 
+          hspi->hdmarx->XferAbortCallback = SPI_DMAAbortOnError;
+          HAL_DMA_Abort_IT(hspi->hdmarx);
+        }
+         
+        if(hspi->hdmatx != 0)
+        {
+          
+ 
+          hspi->hdmatx->XferAbortCallback = SPI_DMAAbortOnError;
+          HAL_DMA_Abort_IT(hspi->hdmatx);
+        }
+      }
+      else
+      {
+         
+        HAL_SPI_ErrorCallback(hspi);
+      }
+    }
+    return;
+  }
+}
+
+
+
+
+
+
+ 
+__weak void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
+{
+   
+  ((void)(hspi));
+  
+
+ 
+}
+
+
+
+
+
+
+ 
+__weak void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi)
+{
+   
+  ((void)(hspi));
+  
+
+ 
+}
+
+
+
+
+
+
+ 
+__weak void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)
+{
+   
+  ((void)(hspi));
+  
+
+ 
+}
+
+
+
+
+
+
+ 
+__weak void HAL_SPI_TxHalfCpltCallback(SPI_HandleTypeDef *hspi)
+{
+   
+  ((void)(hspi));
+  
+
+ 
+}
+
+
+
+
+
+
+ 
+__weak void HAL_SPI_RxHalfCpltCallback(SPI_HandleTypeDef *hspi)
+{
+   
+  ((void)(hspi));
+  
+
+ 
+}
+
+
+
+
+
+
+ 
+__weak void HAL_SPI_TxRxHalfCpltCallback(SPI_HandleTypeDef *hspi)
+{
+   
+  ((void)(hspi));
+  
+
+ 
+}
+
+
+
+
+
+
+ 
+ __weak void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi)
+{
+   
+  ((void)(hspi));
+  
+
+ 
+  
+
+ 
+}
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+HAL_SPI_StateTypeDef HAL_SPI_GetState(SPI_HandleTypeDef *hspi)
+{
+   
+  return hspi->State;
+}
+
+
+
+
+
+
+ 
+uint32_t HAL_SPI_GetError(SPI_HandleTypeDef *hspi)
+{
+   
+  return hspi->ErrorCode;
+}
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+static void SPI_DMATransmitCplt(DMA_HandleTypeDef *hdma)
+{
+  SPI_HandleTypeDef* hspi = ( SPI_HandleTypeDef* )((DMA_HandleTypeDef* )hdma)->Parent;
+  uint32_t tickstart = 0U;
+
+   
+  tickstart = HAL_GetTick();
+
+   
+  if((hdma->Instance->CR & 0x00000100U) == 0U)
+  {
+     
+    ((hspi->Instance ->CR2) &= ~(0x00000002U));
+
+     
+    if(SPI_CheckFlag_BSY(hspi, 100U, tickstart) != HAL_OK)
+    {
+      ((hspi->ErrorCode) |= (((uint32_t)0x00000020U)));
+    }
+
+     
+    if(hspi->Init.Direction == ((uint32_t)0x00000000U))
+    {
+      do{ volatile uint32_t tmpreg_ovr = 0x00U; tmpreg_ovr = (hspi)->Instance ->DR; tmpreg_ovr = (hspi)->Instance ->SR; ((void)(tmpreg_ovr)); } while(0);
+    }
+
+    hspi->TxXferCount = 0U;
+    hspi->State = HAL_SPI_STATE_READY;
+
+    if(hspi->ErrorCode != ((uint32_t)0x00000000U))
+    {
+      HAL_SPI_ErrorCallback(hspi);
+      return;
+    }
+  }
+  HAL_SPI_TxCpltCallback(hspi);
+}
+
+
+
+
+
+
+ 
+static void SPI_DMAReceiveCplt(DMA_HandleTypeDef *hdma)
+{
+  SPI_HandleTypeDef* hspi = ( SPI_HandleTypeDef* )((DMA_HandleTypeDef* )hdma)->Parent;
+
+  uint32_t tickstart = 0U;
+  volatile uint16_t tmpreg = 0U;
+
+   
+  tickstart = HAL_GetTick();
+
+
+  if((hdma->Instance->CR & 0x00000100U) == 0U)
+  {
+
+     
+    if(hspi->Init.CRCCalculation == 0x00002000U)
+    {
+       
+      if(SPI_WaitFlagStateUntilTimeout(hspi, 0x00000001U, 0x00000001U, 100U, tickstart) != HAL_OK)
+      {
+         
+        ((hspi->ErrorCode) |= (((uint32_t)0x00000002U)));
+      }
+       
+      tmpreg = hspi->Instance->DR;
+       
+      ((void)(tmpreg));
+    }
+
+
+     
+    ((hspi->Instance ->CR2) &= ~(0x00000002U | 0x00000001U));
+
+    if((hspi->Init.Mode == (0x00000004U | 0x00000100U))&&((hspi->Init.Direction == 0x00008000U)||(hspi->Init.Direction == 0x00000400U)))
+    {
+       
+      ((hspi)->Instance ->CR1 &= (~0x00000040U));
+    }
+
+    hspi->RxXferCount = 0U;
+    hspi->State = HAL_SPI_STATE_READY;
+
+
+     
+    if(((((hspi)->Instance ->SR) & (0x00000010U)) == (0x00000010U)))
+    {
+      ((hspi->ErrorCode) |= (((uint32_t)0x00000002U)));
+      ((hspi)->Instance ->SR = (uint16_t)(~0x00000010U));
+    }
+
+
+    if(hspi->ErrorCode != ((uint32_t)0x00000000U))
+    {
+      HAL_SPI_ErrorCallback(hspi);
+      return;
+    }
+  }
+  HAL_SPI_RxCpltCallback(hspi);
+}
+
+
+
+
+
+
+ 
+static void SPI_DMATransmitReceiveCplt(DMA_HandleTypeDef *hdma)
+{
+  SPI_HandleTypeDef* hspi = ( SPI_HandleTypeDef* )((DMA_HandleTypeDef* )hdma)->Parent;
+  uint32_t tickstart = 0U;
+
+  volatile int16_t tmpreg = 0U;
+
+   
+  tickstart = HAL_GetTick();
+
+  if((hdma->Instance->CR & 0x00000100U) == 0U)
+  {
+
+     
+    if(hspi->Init.CRCCalculation == 0x00002000U)
+    {
+       
+      if(SPI_WaitFlagStateUntilTimeout(hspi, 0x00000001U, SET, 100U, tickstart) != HAL_OK)
+      {
+        ((hspi->ErrorCode) |= (((uint32_t)0x00000002U)));
+      }
+       
+      tmpreg = hspi->Instance->DR;
+       
+      ((void)(tmpreg));
+    }
+
+     
+    if(SPI_CheckFlag_BSY(hspi, 100U, tickstart) != HAL_OK)
+    {
+      ((hspi->ErrorCode) |= (((uint32_t)0x00000020U)));
+    }
+
+     
+    ((hspi->Instance ->CR2) &= ~(0x00000002U | 0x00000001U));
+
+    hspi->TxXferCount = 0U;
+    hspi->RxXferCount = 0U;
+    hspi->State = HAL_SPI_STATE_READY;
+
+
+     
+    if(((((hspi)->Instance ->SR) & (0x00000010U)) == (0x00000010U)))
+    {
+      ((hspi->ErrorCode) |= (((uint32_t)0x00000002U)));
+      ((hspi)->Instance ->SR = (uint16_t)(~0x00000010U));
+    }
+
+
+    if(hspi->ErrorCode != ((uint32_t)0x00000000U))
+    {
+      HAL_SPI_ErrorCallback(hspi);
+      return;
+    }
+  }
+  HAL_SPI_TxRxCpltCallback(hspi);
+}
+
+
+
+
+
+
+ 
+static void SPI_DMAHalfTransmitCplt(DMA_HandleTypeDef *hdma)
+{
+  SPI_HandleTypeDef* hspi = ( SPI_HandleTypeDef* )((DMA_HandleTypeDef* )hdma)->Parent;
+
+  HAL_SPI_TxHalfCpltCallback(hspi);
+}
+
+
+
+
+
+
+ 
+static void SPI_DMAHalfReceiveCplt(DMA_HandleTypeDef *hdma)
+{
+  SPI_HandleTypeDef* hspi = ( SPI_HandleTypeDef* )((DMA_HandleTypeDef* )hdma)->Parent;
+
+  HAL_SPI_RxHalfCpltCallback(hspi);
+}
+
+
+
+
+
+
+ 
+static void SPI_DMAHalfTransmitReceiveCplt(DMA_HandleTypeDef *hdma)
+{
+  SPI_HandleTypeDef* hspi = ( SPI_HandleTypeDef* )((DMA_HandleTypeDef* )hdma)->Parent;
+
+  HAL_SPI_TxRxHalfCpltCallback(hspi);
+}
+
+
+
+
+
+
+ 
+static void SPI_DMAError(DMA_HandleTypeDef *hdma)
+{
+  SPI_HandleTypeDef* hspi = (SPI_HandleTypeDef* )((DMA_HandleTypeDef* )hdma)->Parent;
+
+ 
+  ((hspi->Instance ->CR2) &= ~(0x00000002U | 0x00000001U));
+
+  ((hspi->ErrorCode) |= (((uint32_t)0x00000010U)));
+  hspi->State = HAL_SPI_STATE_READY;
+  HAL_SPI_ErrorCallback(hspi);
+}
+
+
+
+
+
+
+ 
+static void SPI_DMAAbortOnError(DMA_HandleTypeDef *hdma)
+{
+  SPI_HandleTypeDef* hspi = ( SPI_HandleTypeDef* )((DMA_HandleTypeDef* )hdma)->Parent;
+  hspi->RxXferCount = 0;
+  hspi->TxXferCount = 0;
+
+  HAL_SPI_ErrorCallback(hspi);
+}
+
+
+
+
+
+
+ 
+static void SPI_2linesRxISR_8BIT(struct __SPI_HandleTypeDef *hspi)
+{
+   
+  *hspi->pRxBuffPtr++ = *((volatile uint8_t *)&hspi->Instance->DR);
+  hspi->RxXferCount--;
+
+   
+  if(hspi->RxXferCount == 0U)
+  {
+
+    if(hspi->Init.CRCCalculation == 0x00002000U)
+    {
+      hspi->RxISR =  SPI_2linesRxISR_8BITCRC;
+      return;
+    }
+
+
+     
+    ((hspi)->Instance ->CR2 &= (~((0x00000040U | 0x00000020U))));
+
+    if(hspi->TxXferCount == 0U)
+    {
+      SPI_CloseRxTx_ISR(hspi);
+    }
+  }
+}
+
+
+
+
+
+
+
+ 
+static void SPI_2linesRxISR_8BITCRC(struct __SPI_HandleTypeDef *hspi)
+{
+  volatile uint8_t tmpreg = 0U;
+
+   
+  tmpreg = *((volatile uint8_t *)&hspi->Instance->DR);
+
+   
+
+  ((void)(tmpreg));
+
+    
+  ((hspi)->Instance ->CR2 &= (~((0x00000040U | 0x00000020U))));
+
+  if(hspi->TxXferCount == 0U)
+  {
+    SPI_CloseRxTx_ISR(hspi);
+  }
+}
+
+
+
+
+
+
+
+ 
+static void SPI_2linesTxISR_8BIT(struct __SPI_HandleTypeDef *hspi)
+{
+  *(volatile uint8_t *)&hspi->Instance->DR = (*hspi->pTxBuffPtr++);
+  hspi->TxXferCount--;
+
+   
+  if(hspi->TxXferCount == 0U)
+  {
+
+    if(hspi->Init.CRCCalculation == 0x00002000U)
+    {
+      ((hspi->Instance ->CR1) |= (0x00001000U));
+      ((hspi)->Instance ->CR2 &= (~(0x00000080U)));
+      return;
+    }
+
+
+     
+    ((hspi)->Instance ->CR2 &= (~(0x00000080U)));
+
+    if(hspi->RxXferCount == 0U)
+    {
+      SPI_CloseRxTx_ISR(hspi);
+    }
+  }
+}
+
+
+
+
+
+
+ 
+static void SPI_2linesRxISR_16BIT(struct __SPI_HandleTypeDef *hspi)
+{
+   
+  *((uint16_t*)hspi->pRxBuffPtr) = hspi->Instance->DR;
+  hspi->pRxBuffPtr += sizeof(uint16_t);
+  hspi->RxXferCount--;
+
+  if(hspi->RxXferCount == 0U)
+  {
+
+    if(hspi->Init.CRCCalculation == 0x00002000U)
+    {
+      hspi->RxISR =  SPI_2linesRxISR_16BITCRC;
+      return;
+    }
+
+
+     
+    ((hspi)->Instance ->CR2 &= (~(0x00000040U)));
+
+    if(hspi->TxXferCount == 0U)
+    {
+      SPI_CloseRxTx_ISR(hspi);
+    }
+  }
+}
+
+
+
+
+
+
+
+ 
+static void SPI_2linesRxISR_16BITCRC(struct __SPI_HandleTypeDef *hspi)
+{
+   
+  volatile uint16_t tmpreg = 0U;
+
+   
+  tmpreg = hspi->Instance->DR;
+
+   
+  ((void)(tmpreg));
+
+   
+  ((hspi)->Instance ->CR2 &= (~(0x00000040U)));
+
+  SPI_CloseRxTx_ISR(hspi);
+}
+
+
+
+
+
+
+
+ 
+static void SPI_2linesTxISR_16BIT(struct __SPI_HandleTypeDef *hspi)
+{
+   
+  hspi->Instance->DR = *((uint16_t *)hspi->pTxBuffPtr);
+  hspi->pTxBuffPtr += sizeof(uint16_t);
+  hspi->TxXferCount--;
+
+   
+  if(hspi->TxXferCount == 0U)
+  {
+
+    if(hspi->Init.CRCCalculation == 0x00002000U)
+    {
+      ((hspi->Instance ->CR1) |= (0x00001000U));
+      ((hspi)->Instance ->CR2 &= (~(0x00000080U)));
+      return;
+    }
+
+
+     
+    ((hspi)->Instance ->CR2 &= (~(0x00000080U)));
+
+    if(hspi->RxXferCount == 0U)
+    {
+      SPI_CloseRxTx_ISR(hspi);
+    }
+  }
+}
+
+
+
+
+
+
+
+ 
+static void SPI_RxISR_8BITCRC(struct __SPI_HandleTypeDef *hspi)
+{
+  volatile uint8_t tmpreg = 0U;
+
+   
+  tmpreg = *((volatile uint8_t*)&hspi->Instance->DR);
+
+   
+  ((void)(tmpreg));
+
+  SPI_CloseRx_ISR(hspi);
+}
+
+
+
+
+
+
+
+ 
+static void SPI_RxISR_8BIT(struct __SPI_HandleTypeDef *hspi)
+{
+  *hspi->pRxBuffPtr++ = (*(volatile uint8_t *)&hspi->Instance->DR);
+  hspi->RxXferCount--;
+
+
+   
+  if((hspi->RxXferCount == 1U) && (hspi->Init.CRCCalculation == 0x00002000U))
+  {
+    ((hspi->Instance ->CR1) |= (0x00001000U));
+  }
+
+
+  if(hspi->RxXferCount == 0U)
+  {
+
+    if(hspi->Init.CRCCalculation == 0x00002000U)
+    {
+      hspi->RxISR =  SPI_RxISR_8BITCRC;
+      return;
+    }
+
+    SPI_CloseRx_ISR(hspi);
+  }
+}
+
+
+
+
+
+
+
+ 
+static void SPI_RxISR_16BITCRC(struct __SPI_HandleTypeDef *hspi)
+{
+  volatile uint16_t tmpreg = 0U;
+
+   
+  tmpreg = hspi->Instance->DR;
+
+   
+  ((void)(tmpreg));
+
+   
+  ((hspi)->Instance ->CR2 &= (~((0x00000040U | 0x00000020U))));
+
+  SPI_CloseRx_ISR(hspi);
+}
+
+
+
+
+
+
+
+ 
+static void SPI_RxISR_16BIT(struct __SPI_HandleTypeDef *hspi)
+{
+  *((uint16_t *)hspi->pRxBuffPtr) = hspi->Instance->DR;
+  hspi->pRxBuffPtr += sizeof(uint16_t);
+  hspi->RxXferCount--;
+
+
+   
+  if((hspi->RxXferCount == 1U) && (hspi->Init.CRCCalculation == 0x00002000U))
+  {
+    ((hspi->Instance ->CR1) |= (0x00001000U));
+  }
+
+
+  if(hspi->RxXferCount == 0U)
+  {
+
+    if(hspi->Init.CRCCalculation == 0x00002000U)
+    {
+      hspi->RxISR = SPI_RxISR_16BITCRC;
+      return;
+    }
+
+    SPI_CloseRx_ISR(hspi);
+  }
+}
+
+
+
+
+
+
+ 
+static void SPI_TxISR_8BIT(struct __SPI_HandleTypeDef *hspi)
+{
+  *(volatile uint8_t *)&hspi->Instance->DR = (*hspi->pTxBuffPtr++);
+  hspi->TxXferCount--;
+
+  if(hspi->TxXferCount == 0U)
+  {
+
+    if(hspi->Init.CRCCalculation == 0x00002000U)
+    {
+       
+      ((hspi->Instance ->CR1) |= (0x00001000U));
+    }
+
+    SPI_CloseTx_ISR(hspi);
+  }
+}
+
+
+
+
+
+
+ 
+static void SPI_TxISR_16BIT(struct __SPI_HandleTypeDef *hspi)
+{
+   
+  hspi->Instance->DR = *((uint16_t *)hspi->pTxBuffPtr);
+  hspi->pTxBuffPtr += sizeof(uint16_t);
+  hspi->TxXferCount--;
+
+  if(hspi->TxXferCount == 0U)
+  {
+
+    if(hspi->Init.CRCCalculation == 0x00002000U)
+    {
+       
+      ((hspi->Instance ->CR1) |= (0x00001000U));
+    }
+
+    SPI_CloseTx_ISR(hspi);
+  }
+}
+
+
+
+
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef SPI_WaitFlagStateUntilTimeout(SPI_HandleTypeDef *hspi, uint32_t Flag, uint32_t State, uint32_t Timeout, uint32_t Tickstart)
+{
+  while((((hspi->Instance->SR & Flag) == (Flag)) ? SET : RESET) != State)
+  {
+    if(Timeout != 0xFFFFFFFFU)
+    {
+      if((Timeout == 0U) || ((HAL_GetTick()-Tickstart) >= Timeout))
+      {
+        
+
+ 
+
+         
+        ((hspi)->Instance ->CR2 &= (~((0x00000080U | 0x00000040U | 0x00000020U))));
+
+        if((hspi->Init.Mode == (0x00000004U | 0x00000100U))&&((hspi->Init.Direction == 0x00008000U)||(hspi->Init.Direction == 0x00000400U)))
+        {
+           
+          ((hspi)->Instance ->CR1 &= (~0x00000040U));
+        }
+
+         
+        if(hspi->Init.CRCCalculation == 0x00002000U)
+        {
+          do{(hspi)->Instance ->CR1 &= (uint16_t)(~0x00002000U); (hspi)->Instance ->CR1 |= 0x00002000U;}while(0);
+        }
+
+        hspi->State= HAL_SPI_STATE_READY;
+
+         
+        do{ (hspi)->Lock = HAL_UNLOCKED; }while (0);
+
+        return HAL_TIMEOUT;
+      }
+    }
+  }
+
+  return HAL_OK;
+}
+
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef SPI_CheckFlag_BSY(SPI_HandleTypeDef *hspi, uint32_t Timeout, uint32_t Tickstart)
+{
+   
+  if(SPI_WaitFlagStateUntilTimeout(hspi, 0x00000080U, RESET, Timeout, Tickstart) != HAL_OK)
+  {
+    ((hspi->ErrorCode) |= (((uint32_t)0x00000020U)));
+    return HAL_TIMEOUT;
+  }
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+static void SPI_CloseRxTx_ISR(SPI_HandleTypeDef *hspi)
+{
+  uint32_t tickstart = 0U;
+  volatile uint32_t count = 100U * (SystemCoreClock / 24 / 1000);
+   
+  tickstart = HAL_GetTick();
+
+   
+  ((hspi)->Instance ->CR2 &= (~(0x00000020U)));
+
+   
+  do
+  {
+    if(count-- == 0)
+    {
+      ((hspi->ErrorCode) |= (((uint32_t)0x00000020U)));
+      break;
+    }
+  }
+  while((hspi->Instance->SR & 0x00000002U) == RESET);
+  
+   
+  if(SPI_CheckFlag_BSY(hspi, 100U, tickstart)!=HAL_OK)
+  {
+    ((hspi->ErrorCode) |= (((uint32_t)0x00000020U)));
+  }
+
+   
+  if(hspi->Init.Direction == ((uint32_t)0x00000000U))
+  {
+    do{ volatile uint32_t tmpreg_ovr = 0x00U; tmpreg_ovr = (hspi)->Instance ->DR; tmpreg_ovr = (hspi)->Instance ->SR; ((void)(tmpreg_ovr)); } while(0);
+  }
+
+
+   
+  if(((((hspi)->Instance ->SR) & (0x00000010U)) == (0x00000010U)) != RESET)
+  {
+    hspi->State = HAL_SPI_STATE_READY;
+    ((hspi->ErrorCode) |= (((uint32_t)0x00000002U)));
+    ((hspi)->Instance ->SR = (uint16_t)(~0x00000010U));
+    HAL_SPI_ErrorCallback(hspi);
+  }
+  else
+  {
+
+    if(hspi->ErrorCode == ((uint32_t)0x00000000U))
+    {
+      if(hspi->State == HAL_SPI_STATE_BUSY_RX)
+      {
+      	hspi->State = HAL_SPI_STATE_READY;
+        HAL_SPI_RxCpltCallback(hspi);
+      }
+      else
+      {
+      	hspi->State = HAL_SPI_STATE_READY;
+        HAL_SPI_TxRxCpltCallback(hspi);
+      }
+    }
+    else
+    {
+      hspi->State = HAL_SPI_STATE_READY;
+      HAL_SPI_ErrorCallback(hspi);
+    }
+
+  }
+
+}
+
+
+
+
+
+
+ 
+static void SPI_CloseRx_ISR(SPI_HandleTypeDef *hspi)
+{
+     
+    ((hspi)->Instance ->CR2 &= (~((0x00000040U | 0x00000020U))));
+
+     
+    if((hspi->Init.Mode == (0x00000004U | 0x00000100U))&&((hspi->Init.Direction == 0x00008000U)||(hspi->Init.Direction == 0x00000400U)))
+    {
+       
+      ((hspi)->Instance ->CR1 &= (~0x00000040U));
+    }
+
+     
+    if(hspi->Init.Direction == ((uint32_t)0x00000000U))
+    {
+      do{ volatile uint32_t tmpreg_ovr = 0x00U; tmpreg_ovr = (hspi)->Instance ->DR; tmpreg_ovr = (hspi)->Instance ->SR; ((void)(tmpreg_ovr)); } while(0);
+    }
+    hspi->State = HAL_SPI_STATE_READY;
+
+
+     
+    if(((((hspi)->Instance ->SR) & (0x00000010U)) == (0x00000010U)) != RESET)
+    {
+      ((hspi->ErrorCode) |= (((uint32_t)0x00000002U)));
+      ((hspi)->Instance ->SR = (uint16_t)(~0x00000010U));
+      HAL_SPI_ErrorCallback(hspi);
+    }
+    else
+    {
+
+      if(hspi->ErrorCode == ((uint32_t)0x00000000U))
+      {
+        HAL_SPI_RxCpltCallback(hspi);
+      }
+      else
+      {
+        HAL_SPI_ErrorCallback(hspi);
+      }
+
+    }
+
+}
+
+
+
+
+
+
+ 
+static void SPI_CloseTx_ISR(SPI_HandleTypeDef *hspi)
+{
+  uint32_t tickstart = 0U;
+  volatile uint32_t count = 100U * (SystemCoreClock / 24 / 1000);
+
+   
+  tickstart = HAL_GetTick();
+
+   
+  do
+  {
+    if(count-- == 0)
+    {
+      ((hspi->ErrorCode) |= (((uint32_t)0x00000020U)));
+      break;
+    }
+  }
+  while((hspi->Instance->SR & 0x00000002U) == RESET);
+
+   
+  ((hspi)->Instance ->CR2 &= (~((0x00000080U | 0x00000020U))));
+
+   
+  if(SPI_CheckFlag_BSY(hspi, 100U, tickstart) != HAL_OK)
+  {
+    ((hspi->ErrorCode) |= (((uint32_t)0x00000020U)));
+  }
+
+   
+  if(hspi->Init.Direction == ((uint32_t)0x00000000U))
+  {
+    do{ volatile uint32_t tmpreg_ovr = 0x00U; tmpreg_ovr = (hspi)->Instance ->DR; tmpreg_ovr = (hspi)->Instance ->SR; ((void)(tmpreg_ovr)); } while(0);
+  }
+
+  hspi->State = HAL_SPI_STATE_READY;
+  if(hspi->ErrorCode != ((uint32_t)0x00000000U))
+  {
+    HAL_SPI_ErrorCallback(hspi);
+  }
+  else
+  {
+    HAL_SPI_TxCpltCallback(hspi);
+  }
+}
+
+
+
+ 
+
+
+
+
+
+ 
+
+
+
+ 
+
+ 

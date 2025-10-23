@@ -1,8 +1,64 @@
-#line 1 "MyLib\\Delay.c"
-#line 1 ".\\Inc\\main.h"
+#line 1 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_i2c_ex.c"
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+ 
 #line 1 ".\\Drivers\\STM32F4xx_HAL_Driver\\Inc\\stm32f4xx_hal.h"
 
 
@@ -27756,36 +27812,148 @@ void HAL_DisableCompensationCell(void);
 
 
  
-#line 5 ".\\Inc\\main.h"
+#line 62 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_i2c_ex.c"
 
-void SystemClock_Config(void);
-void Error_Handler(void);
 
-#line 2 "MyLib\\Delay.c"
 
-static uint8_t timer_initialized = 0;
-static TIM_HandleTypeDef htim2;
+ 
 
-void Timer_Delay_us(uint8_t xus) {
-	if(!timer_initialized) {
-		do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x00000001U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x00000001U)); ((void)(tmpreg)); } while(0);
-		timer_initialized = 1;
 
-		htim2.Instance = ((TIM_TypeDef *) (0x40000000U + 0x0000U));
-		htim2.Init.Prescaler = 84 - 1;
-		htim2.Init.Period = 0xFFFFFFFF;
-		htim2.Init.CounterMode = ((uint32_t)0x00000000U);
-		htim2.Init.ClockDivision = ((uint32_t)0x00000000U);
-		if(HAL_TIM_Base_Init(&htim2) != HAL_OK) {
-			Error_Handler();
-		}
-	}
-	((&htim2)->Instance ->CNT = (0));
-	if(HAL_TIM_Base_Start(&htim2) != HAL_OK) {
-		Error_Handler();
-	}
-	while(((&htim2)->Instance ->CNT) < xus) {
-		
-	}
-	HAL_TIM_Base_Stop(&htim2);
+
+
+ 
+
+
+
+
+
+
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+  
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_I2CEx_ConfigAnalogFilter(I2C_HandleTypeDef *hi2c, uint32_t AnalogFilter)
+{
+   
+  ((void)0);
+  ((void)0);
+  
+  if(hi2c->State == HAL_I2C_STATE_READY)
+  {
+    hi2c->State = HAL_I2C_STATE_BUSY;
+
+     
+    ((hi2c)->Instance ->CR1 &= ~0x00000001U);    
+
+     
+    hi2c->Instance->FLTR &= ~(0x00000010U);
+
+     
+    hi2c->Instance->FLTR |= AnalogFilter;
+
+    ((hi2c)->Instance ->CR1 |= 0x00000001U); 
+
+    hi2c->State = HAL_I2C_STATE_READY;
+
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
 }
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_I2CEx_ConfigDigitalFilter(I2C_HandleTypeDef *hi2c, uint32_t DigitalFilter)
+{
+  uint16_t tmpreg = 0U;
+
+   
+  ((void)0);
+  ((void)0);
+  
+  if(hi2c->State == HAL_I2C_STATE_READY)
+  {
+    hi2c->State = HAL_I2C_STATE_BUSY;
+    
+     
+    ((hi2c)->Instance ->CR1 &= ~0x00000001U);  
+    
+     
+    tmpreg = hi2c->Instance->FLTR;
+    
+     
+    tmpreg &= ~(0x0000000FU);
+    
+     
+    tmpreg |= DigitalFilter;
+    
+     
+    hi2c->Instance->FLTR = tmpreg;
+    
+    ((hi2c)->Instance ->CR1 |= 0x00000001U); 
+    
+    hi2c->State = HAL_I2C_STATE_READY;
+    
+    return HAL_OK; 
+  }
+  else
+  {
+    return HAL_BUSY; 
+  }
+}  
+
+
+
+ 
+
+
+
+   
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+ 

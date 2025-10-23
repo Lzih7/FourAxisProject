@@ -1,8 +1,46 @@
-#line 1 "MyLib\\Delay.c"
-#line 1 ".\\Inc\\main.h"
+#line 1 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_pwr_ex.c"
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+ 
 #line 1 ".\\Drivers\\STM32F4xx_HAL_Driver\\Inc\\stm32f4xx_hal.h"
 
 
@@ -27756,36 +27794,350 @@ void HAL_DisableCompensationCell(void);
 
 
  
-#line 5 ".\\Inc\\main.h"
+#line 44 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_pwr_ex.c"
 
-void SystemClock_Config(void);
-void Error_Handler(void);
 
-#line 2 "MyLib\\Delay.c"
 
-static uint8_t timer_initialized = 0;
-static TIM_HandleTypeDef htim2;
+ 
 
-void Timer_Delay_us(uint8_t xus) {
-	if(!timer_initialized) {
-		do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x00000001U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x00000001U)); ((void)(tmpreg)); } while(0);
-		timer_initialized = 1;
 
-		htim2.Instance = ((TIM_TypeDef *) (0x40000000U + 0x0000U));
-		htim2.Init.Prescaler = 84 - 1;
-		htim2.Init.Period = 0xFFFFFFFF;
-		htim2.Init.CounterMode = ((uint32_t)0x00000000U);
-		htim2.Init.ClockDivision = ((uint32_t)0x00000000U);
-		if(HAL_TIM_Base_Init(&htim2) != HAL_OK) {
-			Error_Handler();
-		}
-	}
-	((&htim2)->Instance ->CNT = (0));
-	if(HAL_TIM_Base_Start(&htim2) != HAL_OK) {
-		Error_Handler();
-	}
-	while(((&htim2)->Instance ->CNT) < xus) {
-		
-	}
-	HAL_TIM_Base_Stop(&htim2);
+
+
+ 
+
+
+
+ 
+ 
+
+
+     
+
+
+
+
+
+
+ 
+
+   
+ 
+ 
+ 
+ 
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_PWREx_EnableBkUpReg(void)
+{
+  uint32_t tickstart = 0U;
+
+  *(volatile uint32_t *) (uint32_t)(0x42000000U + ((((0x40000000U + 0x7000U) - 0x40000000U) + 0x04U) * 32U) + ((__clz(__rbit(0x00000200U))) * 4U)) = (uint32_t)ENABLE;
+
+   
+  tickstart = HAL_GetTick();
+
+     
+  while(((((PWR_TypeDef *) (0x40000000U + 0x7000U))->CSR & (0x00000008U)) == (0x00000008U)) == RESET)
+  {
+    if((HAL_GetTick() - tickstart ) > 1000U)
+    {
+      return HAL_TIMEOUT;
+    } 
+  }
+  return HAL_OK;
 }
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_PWREx_DisableBkUpReg(void)
+{
+  uint32_t tickstart = 0U;
+
+  *(volatile uint32_t *) (uint32_t)(0x42000000U + ((((0x40000000U + 0x7000U) - 0x40000000U) + 0x04U) * 32U) + ((__clz(__rbit(0x00000200U))) * 4U)) = (uint32_t)DISABLE;
+
+   
+  tickstart = HAL_GetTick();
+
+     
+  while(((((PWR_TypeDef *) (0x40000000U + 0x7000U))->CSR & (0x00000008U)) == (0x00000008U)) != RESET)
+  {
+    if((HAL_GetTick() - tickstart ) > 1000U)
+    {
+      return HAL_TIMEOUT;
+    } 
+  }
+  return HAL_OK;
+}
+
+
+
+
+ 
+void HAL_PWREx_EnableFlashPowerDown(void)
+{
+  *(volatile uint32_t *) (uint32_t)(0x42000000U + ((((0x40000000U + 0x7000U) - 0x40000000U) + 0x00U) * 32U) + ((__clz(__rbit(0x00000200U))) * 4U)) = (uint32_t)ENABLE;
+}
+
+
+
+
+ 
+void HAL_PWREx_DisableFlashPowerDown(void)
+{
+  *(volatile uint32_t *) (uint32_t)(0x42000000U + ((((0x40000000U + 0x7000U) - 0x40000000U) + 0x00U) * 32U) + ((__clz(__rbit(0x00000200U))) * 4U)) = (uint32_t)DISABLE;
+}
+
+
+
+
+
+
+
+
+   
+uint32_t HAL_PWREx_GetVoltageRange(void)
+{
+  return (((PWR_TypeDef *) (0x40000000U + 0x7000U))->CR & 0x0000C000U);
+}
+
+#line 282 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_pwr_ex.c"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_PWREx_ControlVoltageScaling(uint32_t VoltageScaling)
+{
+  uint32_t tickstart = 0U;
+  
+  ((void)0);
+  
+   
+  do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x10000000U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x10000000U)); ((void)(tmpreg)); } while(0);
+  
+   
+  if(((uint32_t)(((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR & 0x0000000CU)) != 0x00000008U)
+  {
+     
+    (*(volatile uint32_t *) (0x42000000U + (((((0x40000000U + 0x00020000U) + 0x3800U) - 0x40000000U) + 0x00U) * 32U) + (0x18U * 4U)) = DISABLE);
+    
+     
+    tickstart = HAL_GetTick();    
+       
+    while((((((((((uint8_t)0x39U)) >> 5U) == 1U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR :((((((uint8_t)0x39U)) >> 5U) == 2U) ? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->BDCR :((((((uint8_t)0x39U)) >> 5U) == 3U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CSR :((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CIR))) & ((uint32_t)1U << ((((uint8_t)0x39U)) & ((uint8_t)0x1FU))))!= 0U)? 1U : 0U) != RESET)
+    {
+      if((HAL_GetTick() - tickstart ) > ((uint32_t)2))
+      {
+        return HAL_TIMEOUT;
+      }
+    }
+    
+     
+    do { volatile uint32_t tmpreg = 0x00U; (((((PWR_TypeDef *) (0x40000000U + 0x7000U))->CR)) = ((((((((PWR_TypeDef *) (0x40000000U + 0x7000U))->CR))) & (~(0x0000C000U))) | ((VoltageScaling))))); tmpreg = ((((PWR_TypeDef *) (0x40000000U + 0x7000U))->CR) & (0x0000C000U)); ((void)(tmpreg)); } while(0);
+    
+     
+    (*(volatile uint32_t *) (0x42000000U + (((((0x40000000U + 0x00020000U) + 0x3800U) - 0x40000000U) + 0x00U) * 32U) + (0x18U * 4U)) = ENABLE);
+    
+     
+    tickstart = HAL_GetTick();
+       
+    while((((((((((uint8_t)0x39U)) >> 5U) == 1U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR :((((((uint8_t)0x39U)) >> 5U) == 2U) ? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->BDCR :((((((uint8_t)0x39U)) >> 5U) == 3U)? ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CSR :((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CIR))) & ((uint32_t)1U << ((((uint8_t)0x39U)) & ((uint8_t)0x1FU))))!= 0U)? 1U : 0U) == RESET)
+    {
+      if((HAL_GetTick() - tickstart ) > ((uint32_t)2))
+      {
+        return HAL_TIMEOUT;
+      } 
+    }
+    
+     
+    tickstart = HAL_GetTick();
+    while((((((PWR_TypeDef *) (0x40000000U + 0x7000U))->CSR & (0x00004000U)) == (0x00004000U)) == RESET))
+    {
+      if((HAL_GetTick() - tickstart ) > 1000U)
+      {
+        return HAL_TIMEOUT;
+      } 
+    }
+  }
+  else
+  {
+    return HAL_ERROR;
+  }
+
+  return HAL_OK;
+}
+
+
+#line 389 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_pwr_ex.c"
+
+
+
+
+
+
+
+ 
+void HAL_PWREx_EnableMainRegulatorLowVoltage(void)
+{
+  *(volatile uint32_t *) (uint32_t)(0x42000000U + ((((0x40000000U + 0x7000U) - 0x40000000U) + 0x00U) * 32U) + ((__clz(__rbit(0x00000800U))) * 4U)) = (uint32_t)ENABLE;
+}
+
+
+
+
+
+ 
+void HAL_PWREx_DisableMainRegulatorLowVoltage(void)
+{
+  *(volatile uint32_t *) (uint32_t)(0x42000000U + ((((0x40000000U + 0x7000U) - 0x40000000U) + 0x00U) * 32U) + ((__clz(__rbit(0x00000800U))) * 4U)) = (uint32_t)DISABLE;
+}
+
+
+
+
+
+ 
+void HAL_PWREx_EnableLowRegulatorLowVoltage(void)
+{
+  *(volatile uint32_t *) (uint32_t)(0x42000000U + ((((0x40000000U + 0x7000U) - 0x40000000U) + 0x00U) * 32U) + ((__clz(__rbit(0x00000400U))) * 4U)) = (uint32_t)ENABLE;
+}
+
+
+
+
+
+ 
+void HAL_PWREx_DisableLowRegulatorLowVoltage(void)
+{
+  *(volatile uint32_t *) (uint32_t)(0x42000000U + ((((0x40000000U + 0x7000U) - 0x40000000U) + 0x00U) * 32U) + ((__clz(__rbit(0x00000400U))) * 4U)) = (uint32_t)DISABLE;
+}
+
+
+
+#line 632 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_pwr_ex.c"
+
+
+ 
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+ 
+
+ 

@@ -1,4 +1,4 @@
-#line 1 "MyLib\\Delay.c"
+#line 1 "MyLib\\MyI2C.c"
 #line 1 ".\\Inc\\main.h"
 
 
@@ -27761,31 +27761,103 @@ void HAL_DisableCompensationCell(void);
 void SystemClock_Config(void);
 void Error_Handler(void);
 
-#line 2 "MyLib\\Delay.c"
+#line 2 "MyLib\\MyI2C.c"
+#line 1 "MyLib\\Delay.h"
 
-static uint8_t timer_initialized = 0;
-static TIM_HandleTypeDef htim2;
 
-void Timer_Delay_us(uint8_t xus) {
-	if(!timer_initialized) {
-		do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x00000001U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x00000001U)); ((void)(tmpreg)); } while(0);
-		timer_initialized = 1;
 
-		htim2.Instance = ((TIM_TypeDef *) (0x40000000U + 0x0000U));
-		htim2.Init.Prescaler = 84 - 1;
-		htim2.Init.Period = 0xFFFFFFFF;
-		htim2.Init.CounterMode = ((uint32_t)0x00000000U);
-		htim2.Init.ClockDivision = ((uint32_t)0x00000000U);
-		if(HAL_TIM_Base_Init(&htim2) != HAL_OK) {
-			Error_Handler();
+void Timer_Delay_us(uint8_t xus);
+
+#line 3 "MyLib\\MyI2C.c"
+#line 1 "MyLib\\GPIO_Set.h"
+
+
+
+
+#line 6 "MyLib\\GPIO_Set.h"
+
+#line 16 "MyLib\\GPIO_Set.h"
+
+#line 27 "MyLib\\GPIO_Set.h"
+
+#line 4 "MyLib\\MyI2C.c"
+
+
+
+
+
+
+void MyI2C_W_SCL(uint8_t BitValue) {
+	HAL_GPIO_WritePin(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0400U)), ((uint16_t)0x0100U), (GPIO_PinState)BitValue);
+	Timer_Delay_us(10);
+}
+
+void MyI2C_W_SDA(uint8_t BitValue) {
+	HAL_GPIO_WritePin(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0400U)), ((uint16_t)0x0200U), (GPIO_PinState)BitValue);
+	Timer_Delay_us(10);
+}
+
+uint8_t MyI2C_R_SDA(void) {
+	uint8_t BitValue;
+	BitValue = HAL_GPIO_ReadPin(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0400U)), ((uint16_t)0x0200U));
+	Timer_Delay_us(10);
+	return BitValue;
+}
+
+void MyI2C_Init(void) {
+	do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1ENR) |= (0x00000002U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1ENR) & (0x00000002U)); ((void)(tmpreg)); } while(0);
+	do { GPIO_InitTypeDef GPIO_InitStructure = {0}; GPIO_InitStructure . Pin = ((uint16_t)0x0100U) | ((uint16_t)0x0200U); GPIO_InitStructure . Mode = ((uint32_t)0x00000011U); GPIO_InitStructure . Speed = ((uint32_t)0x00000003U); GPIO_InitStructure . Pull = ((uint32_t)0x00000000U); HAL_GPIO_Init(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0400U)), &GPIO_InitStructure); } while(0);
+
+	HAL_GPIO_WritePin(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0400U)), ((uint16_t)0x0200U) | ((uint16_t)0x0100U), GPIO_PIN_SET);
+}
+
+void MyI2C_Start(void) {
+	MyI2C_W_SDA(1);
+	MyI2C_W_SCL(1);
+	MyI2C_W_SDA(0);
+	MyI2C_W_SCL(0);
+}
+
+void MyI2C_Stop(void) {
+	MyI2C_W_SDA(0);
+	MyI2C_W_SCL(1);
+	MyI2C_W_SDA(1);
+}
+
+void MyI2C_SendByte(uint8_t Byte) {
+	for(uint8_t i = 0; i < 8; i++) {
+		MyI2C_W_SDA(Byte & ((1 << 7) >> i));
+		MyI2C_W_SCL(1);
+		MyI2C_W_SCL(0);
+	}
+}
+
+uint8_t MyI2C_ReceiveByte(void) {
+	uint8_t ByteRec = 0x0;
+	MyI2C_W_SDA(1);
+	for(uint8_t i = 0; i < 8; i++) {
+		MyI2C_W_SCL(1);
+		if(MyI2C_R_SDA() == 1) {
+			ByteRec |= ((1 << 7) >> i);
 		}
+		MyI2C_W_SCL(0);
 	}
-	((&htim2)->Instance ->CNT = (0));
-	if(HAL_TIM_Base_Start(&htim2) != HAL_OK) {
-		Error_Handler();
-	}
-	while(((&htim2)->Instance ->CNT) < xus) {
-		
-	}
-	HAL_TIM_Base_Stop(&htim2);
+	return ByteRec;
+}
+
+void MyI2C_SendAck(uint8_t AckBit)
+{	
+	MyI2C_W_SDA(AckBit);
+	MyI2C_W_SCL(1);
+	MyI2C_W_SCL(0);
+}
+
+uint8_t MyI2C_ReceiveAck(void)
+{
+	uint8_t AckBit;
+	MyI2C_W_SDA(1);
+	MyI2C_W_SCL(1);
+	AckBit=MyI2C_R_SDA();
+	MyI2C_W_SCL(0);
+	return AckBit;
 }

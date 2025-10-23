@@ -1,8 +1,225 @@
-#line 1 "MyLib\\Delay.c"
-#line 1 ".\\Inc\\main.h"
+#line 1 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_i2c.c"
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+ 
 #line 1 ".\\Drivers\\STM32F4xx_HAL_Driver\\Inc\\stm32f4xx_hal.h"
 
 
@@ -27756,36 +27973,5091 @@ void HAL_DisableCompensationCell(void);
 
 
  
-#line 5 ".\\Inc\\main.h"
+#line 223 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_i2c.c"
 
-void SystemClock_Config(void);
-void Error_Handler(void);
 
-#line 2 "MyLib\\Delay.c"
 
-static uint8_t timer_initialized = 0;
-static TIM_HandleTypeDef htim2;
+ 
 
-void Timer_Delay_us(uint8_t xus) {
-	if(!timer_initialized) {
-		do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x00000001U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x00000001U)); ((void)(tmpreg)); } while(0);
-		timer_initialized = 1;
 
-		htim2.Instance = ((TIM_TypeDef *) (0x40000000U + 0x0000U));
-		htim2.Init.Prescaler = 84 - 1;
-		htim2.Init.Period = 0xFFFFFFFF;
-		htim2.Init.CounterMode = ((uint32_t)0x00000000U);
-		htim2.Init.ClockDivision = ((uint32_t)0x00000000U);
-		if(HAL_TIM_Base_Init(&htim2) != HAL_OK) {
-			Error_Handler();
-		}
-	}
-	((&htim2)->Instance ->CNT = (0));
-	if(HAL_TIM_Base_Start(&htim2) != HAL_OK) {
-		Error_Handler();
-	}
-	while(((&htim2)->Instance ->CNT) < xus) {
-		
-	}
-	HAL_TIM_Base_Stop(&htim2);
+
+
+ 
+
+
+
+ 
+ 
+
+
+     
+
+
+
+
+
+ 
+#line 252 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_i2c.c"
+
+
+
+ 
+
+ 
+ 
+ 
+
+
+ 
+ 
+static void I2C_DMAXferCplt(DMA_HandleTypeDef *hdma);
+static void I2C_DMAError(DMA_HandleTypeDef *hdma);
+static void I2C_DMAAbort(DMA_HandleTypeDef *hdma);
+
+static void I2C_ITError(I2C_HandleTypeDef *hi2c);
+
+static HAL_StatusTypeDef I2C_MasterRequestWrite(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint32_t Timeout, uint32_t Tickstart);
+static HAL_StatusTypeDef I2C_MasterRequestRead(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint32_t Timeout, uint32_t Tickstart);
+static HAL_StatusTypeDef I2C_RequestMemoryWrite(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint16_t MemAddSize, uint32_t Timeout, uint32_t Tickstart);
+static HAL_StatusTypeDef I2C_RequestMemoryRead(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint16_t MemAddSize, uint32_t Timeout, uint32_t Tickstart);
+static HAL_StatusTypeDef I2C_WaitOnFlagUntilTimeout(I2C_HandleTypeDef *hi2c, uint32_t Flag, FlagStatus Status, uint32_t Timeout, uint32_t Tickstart);
+static HAL_StatusTypeDef I2C_WaitOnMasterAddressFlagUntilTimeout(I2C_HandleTypeDef *hi2c, uint32_t Flag, uint32_t Timeout, uint32_t Tickstart);
+static HAL_StatusTypeDef I2C_WaitOnTXEFlagUntilTimeout(I2C_HandleTypeDef *hi2c, uint32_t Timeout, uint32_t Tickstart);
+static HAL_StatusTypeDef I2C_WaitOnBTFFlagUntilTimeout(I2C_HandleTypeDef *hi2c, uint32_t Timeout, uint32_t Tickstart);
+static HAL_StatusTypeDef I2C_WaitOnRXNEFlagUntilTimeout(I2C_HandleTypeDef *hi2c, uint32_t Timeout, uint32_t Tickstart);
+static HAL_StatusTypeDef I2C_WaitOnSTOPFlagUntilTimeout(I2C_HandleTypeDef *hi2c, uint32_t Timeout, uint32_t Tickstart);
+static HAL_StatusTypeDef I2C_IsAcknowledgeFailed(I2C_HandleTypeDef *hi2c);
+
+ 
+static HAL_StatusTypeDef I2C_MasterTransmit_TXE(I2C_HandleTypeDef *hi2c);
+static HAL_StatusTypeDef I2C_MasterTransmit_BTF(I2C_HandleTypeDef *hi2c);
+static HAL_StatusTypeDef I2C_MasterReceive_RXNE(I2C_HandleTypeDef *hi2c);
+static HAL_StatusTypeDef I2C_MasterReceive_BTF(I2C_HandleTypeDef *hi2c);
+static HAL_StatusTypeDef I2C_Master_SB(I2C_HandleTypeDef *hi2c);
+static HAL_StatusTypeDef I2C_Master_ADD10(I2C_HandleTypeDef *hi2c);
+static HAL_StatusTypeDef I2C_Master_ADDR(I2C_HandleTypeDef *hi2c);
+
+static HAL_StatusTypeDef I2C_SlaveTransmit_TXE(I2C_HandleTypeDef *hi2c);
+static HAL_StatusTypeDef I2C_SlaveTransmit_BTF(I2C_HandleTypeDef *hi2c);
+static HAL_StatusTypeDef I2C_SlaveReceive_RXNE(I2C_HandleTypeDef *hi2c);
+static HAL_StatusTypeDef I2C_SlaveReceive_BTF(I2C_HandleTypeDef *hi2c);
+static HAL_StatusTypeDef I2C_Slave_ADDR(I2C_HandleTypeDef *hi2c);
+static HAL_StatusTypeDef I2C_Slave_STOPF(I2C_HandleTypeDef *hi2c);
+static HAL_StatusTypeDef I2C_Slave_AF(I2C_HandleTypeDef *hi2c);
+
+
+ 
+
+ 
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_I2C_Init(I2C_HandleTypeDef *hi2c)
+{
+  uint32_t freqrange = 0U;
+  uint32_t pclk1 = 0U;
+
+   
+  if(hi2c == 0)
+  {
+    return HAL_ERROR;
+  }
+
+   
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+
+  if(hi2c->State == HAL_I2C_STATE_RESET)
+  {
+     
+    hi2c->Lock = HAL_UNLOCKED;
+     
+    HAL_I2C_MspInit(hi2c);
+  }
+
+  hi2c->State = HAL_I2C_STATE_BUSY;
+
+   
+  ((hi2c)->Instance ->CR1 &= ~0x00000001U);
+
+   
+  pclk1 = HAL_RCC_GetPCLK1Freq();
+
+   
+  freqrange = ((pclk1)/1000000U);
+
+   
+   
+  hi2c->Instance->CR2 = freqrange;
+
+   
+   
+  hi2c->Instance->TRISE = (((hi2c->Init . ClockSpeed) <= 100000U) ? ((freqrange) + 1U) : ((((freqrange) * 300U) / 1000U) + 1U));
+
+   
+   
+  hi2c->Instance->CCR = (((hi2c->Init . ClockSpeed) <= 100000U)? (((((((pclk1))/(((hi2c->Init . ClockSpeed)) << 1U)) & 0x00000FFFU) < 4U)? 4U:(((pclk1)) / (((hi2c->Init . ClockSpeed)) << 1U)))) : ((((((hi2c->Init . DutyCycle)) == ((uint32_t)0x00000000U))? (((pclk1)) / (((hi2c->Init . ClockSpeed)) * 3U)) : ((((pclk1)) / (((hi2c->Init . ClockSpeed)) * 25U)) | 0x00004000U)) & 0x00000FFFU) == 0U)? 1U : ((((((hi2c->Init . DutyCycle)) == ((uint32_t)0x00000000U))? (((pclk1)) / (((hi2c->Init . ClockSpeed)) * 3U)) : ((((pclk1)) / (((hi2c->Init . ClockSpeed)) * 25U)) | 0x00004000U))) | 0x00008000U));
+
+   
+   
+  hi2c->Instance->CR1 = (hi2c->Init.GeneralCallMode | hi2c->Init.NoStretchMode);
+
+   
+   
+  hi2c->Instance->OAR1 = (hi2c->Init.AddressingMode | hi2c->Init.OwnAddress1);
+
+   
+   
+  hi2c->Instance->OAR2 = (hi2c->Init.DualAddressMode | hi2c->Init.OwnAddress2);
+
+   
+  ((hi2c)->Instance ->CR1 |= 0x00000001U);
+
+  hi2c->ErrorCode = ((uint32_t)0x00000000U);
+  hi2c->State = HAL_I2C_STATE_READY;
+  hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+  hi2c->Mode = HAL_I2C_MODE_NONE;
+
+  return HAL_OK;
 }
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_I2C_DeInit(I2C_HandleTypeDef *hi2c)
+{
+   
+  if(hi2c == 0)
+  {
+    return HAL_ERROR;
+  }
+
+   
+  ((void)0);
+
+  hi2c->State = HAL_I2C_STATE_BUSY;
+
+   
+  ((hi2c)->Instance ->CR1 &= ~0x00000001U);
+
+   
+  HAL_I2C_MspDeInit(hi2c);
+
+  hi2c->ErrorCode = ((uint32_t)0x00000000U);
+  hi2c->State = HAL_I2C_STATE_RESET;
+  hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+  hi2c->Mode = HAL_I2C_MODE_NONE;
+    
+   
+  do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+ __weak void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c)
+{
+   
+  ((void)(hi2c));
+  
+
+ 
+}
+
+
+
+
+
+
+ 
+ __weak void HAL_I2C_MspDeInit(I2C_HandleTypeDef *hi2c)
+{
+   
+  ((void)(hi2c));
+  
+
+ 
+}
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_I2C_Master_Transmit(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size, uint32_t Timeout)
+{
+  uint32_t tickstart = 0x00U;
+
+   
+  tickstart = HAL_GetTick();
+  
+  if(hi2c->State == HAL_I2C_STATE_READY)
+  {
+     
+    if(I2C_WaitOnFlagUntilTimeout(hi2c, ((uint32_t)0x00100002U), SET, ((uint32_t)25U), tickstart) != HAL_OK)
+    {
+      return HAL_BUSY;
+    }
+
+     
+    do{ if((hi2c)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hi2c)->Lock = HAL_LOCKED; } }while (0);
+    
+     
+    hi2c->Instance->CR1 &= ~0x00000800U;
+	
+    hi2c->State = HAL_I2C_STATE_BUSY_TX;
+    hi2c->Mode = HAL_I2C_MODE_MASTER;
+    hi2c->ErrorCode = ((uint32_t)0x00000000U);
+    hi2c->XferOptions = ((uint32_t)0xFFFF0000U);
+    
+     
+    if(I2C_MasterRequestWrite(hi2c, DevAddress, Timeout, tickstart) != HAL_OK)
+    {
+      if(hi2c->ErrorCode == ((uint32_t)0x00000004U))
+      {
+         
+        do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+        return HAL_ERROR;
+      }
+      else
+      {
+         
+        do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+        return HAL_TIMEOUT;
+      }
+    }
+
+     
+    do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+
+    while(Size > 0U)
+    {
+       
+      if(I2C_WaitOnTXEFlagUntilTimeout(hi2c, Timeout, tickstart) != HAL_OK)
+      {
+        if(hi2c->ErrorCode == ((uint32_t)0x00000004U))
+        {
+           
+          hi2c->Instance->CR1 |= 0x00000200U;
+          return HAL_ERROR;
+        }
+        else
+        {
+          return HAL_TIMEOUT;
+        }
+      }
+
+       
+      hi2c->Instance->DR = (*pData++);
+      Size--;
+
+      if((((((uint8_t)((((uint32_t)0x00010004U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00010004U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010004U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00010004U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010004U)) & ((uint32_t)0x0000FFFFU)))) == SET) && (Size != 0U))
+      {
+         
+        hi2c->Instance->DR = (*pData++);
+        Size--;
+      }
+      
+       
+      if(I2C_WaitOnBTFFlagUntilTimeout(hi2c, Timeout, tickstart) != HAL_OK)
+      {
+        if(hi2c->ErrorCode == ((uint32_t)0x00000004U))
+        {
+           
+          hi2c->Instance->CR1 |= 0x00000200U;
+          return HAL_ERROR;
+        }
+        else
+        {
+          return HAL_TIMEOUT;
+        }
+      }
+    }
+
+     
+    hi2c->Instance->CR1 |= 0x00000200U;
+
+    hi2c->State = HAL_I2C_STATE_READY;
+    hi2c->Mode = HAL_I2C_MODE_NONE;
+    
+     
+    do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_I2C_Master_Receive(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size, uint32_t Timeout)
+{
+  uint32_t tickstart = 0x00U;
+
+   
+  tickstart = HAL_GetTick();
+  
+  if(hi2c->State == HAL_I2C_STATE_READY)
+  {
+     
+    if(I2C_WaitOnFlagUntilTimeout(hi2c, ((uint32_t)0x00100002U), SET, ((uint32_t)25U), tickstart) != HAL_OK)
+    {
+      return HAL_BUSY;
+    }
+    
+     
+    do{ if((hi2c)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hi2c)->Lock = HAL_LOCKED; } }while (0);
+    
+     
+    hi2c->Instance->CR1 &= ~0x00000800U;
+
+    hi2c->State = HAL_I2C_STATE_BUSY_RX;
+    hi2c->Mode = HAL_I2C_MODE_MASTER;
+    hi2c->ErrorCode = ((uint32_t)0x00000000U);
+    hi2c->XferOptions = ((uint32_t)0xFFFF0000U);
+    
+     
+    if(I2C_MasterRequestRead(hi2c, DevAddress, Timeout, tickstart) != HAL_OK)
+    {
+      if(hi2c->ErrorCode == ((uint32_t)0x00000004U))
+      {
+         
+        do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+        return HAL_ERROR;
+      }
+      else
+      {
+         
+        do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+        return HAL_TIMEOUT;
+      }
+    }
+
+    if(Size == 0U)
+    {
+       
+      do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+      
+       
+      hi2c->Instance->CR1 |= 0x00000200U;
+    }
+    else if(Size == 1U)
+    {
+       
+      hi2c->Instance->CR1 &= ~0x00000400U;
+
+       
+      do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+
+       
+      hi2c->Instance->CR1 |= 0x00000200U;
+    }
+    else if(Size == 2U)
+    {
+       
+      hi2c->Instance->CR1 &= ~0x00000400U;
+
+       
+      hi2c->Instance->CR1 |= 0x00000800U;
+
+       
+      do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+    }
+    else
+    {
+       
+      hi2c->Instance->CR1 |= 0x00000400U;
+
+       
+      do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+    }
+
+    while(Size > 0U)
+    {
+      if(Size <= 3U)
+      {
+         
+        if(Size == 1U)
+        {
+           
+          if(I2C_WaitOnRXNEFlagUntilTimeout(hi2c, Timeout, tickstart) != HAL_OK)      
+          {
+            if(hi2c->ErrorCode == ((uint32_t)0x00000020U))
+            {
+              return HAL_TIMEOUT;
+            }
+            else
+            {
+              return HAL_ERROR;
+            }
+          }
+
+           
+          (*pData++) = hi2c->Instance->DR;
+          Size--;
+        }
+         
+        else if(Size == 2U)
+        {
+           
+          if(I2C_WaitOnFlagUntilTimeout(hi2c, ((uint32_t)0x00010004U), RESET, Timeout, tickstart) != HAL_OK)
+          {
+            return HAL_TIMEOUT;
+          }
+
+           
+          hi2c->Instance->CR1 |= 0x00000200U;
+
+           
+          (*pData++) = hi2c->Instance->DR;
+          Size--;
+
+           
+          (*pData++) = hi2c->Instance->DR;
+          Size--;
+        }
+         
+        else
+        {
+           
+          if(I2C_WaitOnFlagUntilTimeout(hi2c, ((uint32_t)0x00010004U), RESET, Timeout, tickstart) != HAL_OK)
+          {
+            return HAL_TIMEOUT;
+          }
+
+           
+          hi2c->Instance->CR1 &= ~0x00000400U;
+
+           
+          (*pData++) = hi2c->Instance->DR;
+          Size--;
+
+           
+          if(I2C_WaitOnFlagUntilTimeout(hi2c, ((uint32_t)0x00010004U), RESET, Timeout, tickstart) != HAL_OK)
+          {
+            return HAL_TIMEOUT;
+          }
+
+           
+          hi2c->Instance->CR1 |= 0x00000200U;
+
+           
+          (*pData++) = hi2c->Instance->DR;
+          Size--;
+
+           
+          (*pData++) = hi2c->Instance->DR;
+          Size--;
+        }
+      }
+      else
+      {
+         
+        if(I2C_WaitOnRXNEFlagUntilTimeout(hi2c, Timeout, tickstart) != HAL_OK)      
+        {
+          if(hi2c->ErrorCode == ((uint32_t)0x00000020U))
+          {
+            return HAL_TIMEOUT;
+          }
+          else
+          {
+            return HAL_ERROR;
+          }
+        }
+
+         
+        (*pData++) = hi2c->Instance->DR;
+        Size--;
+
+        if(((((uint8_t)((((uint32_t)0x00010004U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00010004U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010004U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00010004U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010004U)) & ((uint32_t)0x0000FFFFU)))) == SET)
+        {
+           
+          (*pData++) = hi2c->Instance->DR;
+          Size--;
+        }
+      }
+    }
+
+    hi2c->State = HAL_I2C_STATE_READY;
+    hi2c->Mode = HAL_I2C_MODE_NONE;
+
+     
+    do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_I2C_Slave_Transmit(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint16_t Size, uint32_t Timeout)
+{
+  uint32_t tickstart = 0x00U;
+  
+   
+  tickstart = HAL_GetTick();
+  
+  if(hi2c->State == HAL_I2C_STATE_READY)
+  {
+    if((pData == 0) || (Size == 0U))
+    {
+      return  HAL_ERROR;
+    }
+
+     
+    if(I2C_WaitOnFlagUntilTimeout(hi2c, ((uint32_t)0x00100002U), SET, ((uint32_t)25U), tickstart) != HAL_OK)
+    {
+      return HAL_BUSY;
+    }
+
+     
+    do{ if((hi2c)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hi2c)->Lock = HAL_LOCKED; } }while (0);
+    
+     
+    hi2c->Instance->CR1 &= ~0x00000800U;
+
+    hi2c->State = HAL_I2C_STATE_BUSY_TX;
+    hi2c->Mode = HAL_I2C_MODE_SLAVE;
+    hi2c->ErrorCode = ((uint32_t)0x00000000U);
+    hi2c->XferOptions = ((uint32_t)0xFFFF0000U);
+    
+     
+    hi2c->Instance->CR1 |= 0x00000400U;
+
+     
+    if(I2C_WaitOnFlagUntilTimeout(hi2c, ((uint32_t)0x00010002U), RESET, Timeout, tickstart) != HAL_OK)
+    {
+      return HAL_TIMEOUT;
+    }
+
+     
+    do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+
+     
+    if(hi2c->Init.AddressingMode == (0x00008000U | ((uint32_t)0x00004000U)))
+    {
+       
+      if(I2C_WaitOnFlagUntilTimeout(hi2c, ((uint32_t)0x00010002U), RESET, Timeout, tickstart) != HAL_OK)
+      {
+        return HAL_TIMEOUT;
+      }
+
+       
+      do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+    }
+
+    while(Size > 0U)
+    {
+       
+      if(I2C_WaitOnTXEFlagUntilTimeout(hi2c, Timeout, tickstart) != HAL_OK)
+      {
+         
+        hi2c->Instance->CR1 &= ~0x00000400U;
+        if(hi2c->ErrorCode == ((uint32_t)0x00000004U))
+        {
+          return HAL_ERROR;
+        }
+        else
+        {
+          return HAL_TIMEOUT;
+        }
+      }
+
+       
+      hi2c->Instance->DR = (*pData++);
+      Size--;
+
+      if((((((uint8_t)((((uint32_t)0x00010004U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00010004U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010004U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00010004U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010004U)) & ((uint32_t)0x0000FFFFU)))) == SET) && (Size != 0U))
+      {
+         
+        hi2c->Instance->DR = (*pData++);
+        Size--;
+      }
+    }
+
+     
+    if(I2C_WaitOnFlagUntilTimeout(hi2c, ((uint32_t)0x00010400U), RESET, Timeout, tickstart) != HAL_OK)
+    {
+      return HAL_TIMEOUT;
+    }
+
+     
+    ((hi2c)->Instance ->SR1 = ~((((uint32_t)0x00010400U)) & ((uint32_t)0x0000FFFFU)));
+
+     
+    hi2c->Instance->CR1 &= ~0x00000400U;
+
+    hi2c->State = HAL_I2C_STATE_READY;
+    hi2c->Mode = HAL_I2C_MODE_NONE;
+    
+     
+    do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_I2C_Slave_Receive(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint16_t Size, uint32_t Timeout)
+{
+  uint32_t tickstart = 0x00U;
+  
+   
+  tickstart = HAL_GetTick();
+
+  if(hi2c->State == HAL_I2C_STATE_READY)
+  {
+    if((pData == 0) || (Size == 0U))
+    {
+      return  HAL_ERROR;
+    }
+
+     
+    if(I2C_WaitOnFlagUntilTimeout(hi2c, ((uint32_t)0x00100002U), SET, ((uint32_t)25U), tickstart) != HAL_OK)
+    {
+      return HAL_BUSY;
+    }
+
+     
+    do{ if((hi2c)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hi2c)->Lock = HAL_LOCKED; } }while (0);
+    
+     
+    hi2c->Instance->CR1 &= ~0x00000800U;
+
+    hi2c->State = HAL_I2C_STATE_BUSY_RX;
+    hi2c->Mode = HAL_I2C_MODE_SLAVE;
+    hi2c->ErrorCode = ((uint32_t)0x00000000U);
+    hi2c->XferOptions = ((uint32_t)0xFFFF0000U);
+    
+     
+    hi2c->Instance->CR1 |= 0x00000400U;
+
+     
+    if(I2C_WaitOnFlagUntilTimeout(hi2c, ((uint32_t)0x00010002U), RESET, Timeout, tickstart) != HAL_OK)
+    {
+      return HAL_TIMEOUT;
+    }
+
+     
+    do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+
+    while(Size > 0U)
+    {
+       
+      if(I2C_WaitOnRXNEFlagUntilTimeout(hi2c, Timeout, tickstart) != HAL_OK)      
+      {
+         
+        hi2c->Instance->CR1 &= ~0x00000400U;
+        if(hi2c->ErrorCode == ((uint32_t)0x00000020U))
+        {
+          return HAL_TIMEOUT;
+        }
+        else
+        {
+          return HAL_ERROR;
+        }
+      }
+
+       
+      (*pData++) = hi2c->Instance->DR;
+      Size--;
+
+      if((((((uint8_t)((((uint32_t)0x00010004U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00010004U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010004U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00010004U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010004U)) & ((uint32_t)0x0000FFFFU)))) == SET) && (Size != 0U))
+      {
+         
+        (*pData++) = hi2c->Instance->DR;
+        Size--;
+      }
+    }
+
+     
+    if(I2C_WaitOnSTOPFlagUntilTimeout(hi2c, Timeout, tickstart) != HAL_OK)
+    {
+       
+      hi2c->Instance->CR1 &= ~0x00000400U;
+
+      if(hi2c->ErrorCode == ((uint32_t)0x00000004U))
+      {
+        return HAL_ERROR;
+      }
+      else
+      {
+        return HAL_TIMEOUT;
+      }
+    }
+
+     
+    do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; (hi2c)->Instance ->CR1 |= 0x00000001U; ((void)(tmpreg)); } while(0);
+
+     
+    hi2c->Instance->CR1 &= ~0x00000400U;
+
+    hi2c->State = HAL_I2C_STATE_READY;
+    hi2c->Mode = HAL_I2C_MODE_NONE;
+    
+     
+    do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_I2C_Master_Transmit_IT(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size)
+{
+  volatile uint32_t count = 0U;
+
+  if(hi2c->State == HAL_I2C_STATE_READY)
+  {
+     
+    count = ((uint32_t)25U) * (SystemCoreClock /25U /1000U);
+    do
+    {
+      if(count-- == 0U)
+      {
+        hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+        hi2c->State= HAL_I2C_STATE_READY;
+
+         
+        do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+        return HAL_TIMEOUT; 
+      }
+    }
+    while(((((uint8_t)((((uint32_t)0x00100002U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU)))) != RESET);
+
+     
+    do{ if((hi2c)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hi2c)->Lock = HAL_LOCKED; } }while (0);
+
+     
+    hi2c->Instance->CR1 &= ~0x00000800U;
+
+    hi2c->State = HAL_I2C_STATE_BUSY_TX;
+    hi2c->Mode = HAL_I2C_MODE_MASTER;
+    hi2c->ErrorCode = ((uint32_t)0x00000000U);
+
+    hi2c->pBuffPtr = pData;
+    hi2c->XferSize = Size;
+    hi2c->XferCount = Size;
+    hi2c->XferOptions = ((uint32_t)0xFFFF0000U);
+    hi2c->Devaddress = DevAddress;
+
+     
+    hi2c->Instance->CR1 |= 0x00000100U;
+
+     
+    do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+    
+
+ 
+     
+    ((hi2c)->Instance ->CR2 |= (0x00000200U | 0x00000400U | 0x00000100U));
+
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_I2C_Master_Receive_IT(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size)
+{
+  volatile uint32_t count = 0U;
+
+  if(hi2c->State == HAL_I2C_STATE_READY)
+  {
+     
+    count = ((uint32_t)25U) * (SystemCoreClock /25U /1000U);
+    do
+    {
+      if(count-- == 0U)
+      {
+        hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+        hi2c->State= HAL_I2C_STATE_READY;
+
+         
+        do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+        return HAL_TIMEOUT; 
+      }
+    }
+    while(((((uint8_t)((((uint32_t)0x00100002U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU)))) != RESET);
+
+     
+    do{ if((hi2c)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hi2c)->Lock = HAL_LOCKED; } }while (0);
+    
+     
+    hi2c->Instance->CR1 &= ~0x00000800U;
+
+    hi2c->State = HAL_I2C_STATE_BUSY_RX;
+    hi2c->Mode = HAL_I2C_MODE_MASTER;
+    hi2c->ErrorCode = ((uint32_t)0x00000000U);
+    hi2c->pBuffPtr = pData;
+    hi2c->XferSize = Size;
+    hi2c->XferCount = Size;
+    hi2c->XferOptions = ((uint32_t)0xFFFF0000U);
+    hi2c->Devaddress = DevAddress;
+    
+     
+    hi2c->Instance->CR1 |= 0x00000400U;
+    
+     
+    hi2c->Instance->CR1 |= 0x00000100U;
+    
+     
+    do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+    
+    
+
+ 
+    
+     
+    ((hi2c)->Instance ->CR2 |= (0x00000200U | 0x00000400U | 0x00000100U));
+    
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_I2C_Master_Sequential_Transmit_IT(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size, uint32_t XferOptions)
+{
+  uint32_t Prev_State = 0x00U;
+  volatile uint32_t count = 0U;
+  
+   
+  ((void)0);
+
+  if(hi2c->State == HAL_I2C_STATE_READY)
+  {
+     
+    if((XferOptions == ((uint32_t)0x00000004U)) || (XferOptions == ((uint32_t)0x00000001U)))
+    {
+       
+      count = ((uint32_t)25U) * (SystemCoreClock /25U /1000U);
+      do
+      {
+        if(count-- == 0U)
+        {
+          hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+          hi2c->State= HAL_I2C_STATE_READY;
+          
+           
+          do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+          
+          return HAL_TIMEOUT; 
+        }
+      }
+      while(((((uint8_t)((((uint32_t)0x00100002U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU)))) != RESET);
+    }
+
+     
+    do{ if((hi2c)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hi2c)->Lock = HAL_LOCKED; } }while (0);
+
+     
+    hi2c->Instance->CR1 &= ~0x00000800U;
+
+    hi2c->State = HAL_I2C_STATE_BUSY_TX;
+    hi2c->Mode = HAL_I2C_MODE_MASTER;
+    hi2c->ErrorCode = ((uint32_t)0x00000000U);
+
+    hi2c->pBuffPtr = pData;
+    hi2c->XferSize = Size;
+    hi2c->XferCount = Size;
+    hi2c->XferOptions = XferOptions;
+    hi2c->Devaddress = DevAddress;
+
+    Prev_State = hi2c->PreviousState;
+    
+         
+    if((Prev_State == ((uint32_t)((HAL_I2C_STATE_BUSY_RX & ((uint32_t)((HAL_I2C_STATE_BUSY_TX | HAL_I2C_STATE_BUSY_RX) & (~(uint32_t)HAL_I2C_STATE_READY)))) | HAL_I2C_MODE_MASTER))) || (Prev_State == ((uint32_t)(HAL_I2C_MODE_NONE))))
+    {
+       
+      if((XferOptions == ((uint32_t)0x00000004U)) || (XferOptions == ((uint32_t)0x00000001U)))
+      {
+         
+        hi2c->Instance->CR1 |= 0x00000100U;
+      }
+      else if(Prev_State == ((uint32_t)((HAL_I2C_STATE_BUSY_RX & ((uint32_t)((HAL_I2C_STATE_BUSY_TX | HAL_I2C_STATE_BUSY_RX) & (~(uint32_t)HAL_I2C_STATE_READY)))) | HAL_I2C_MODE_MASTER)))
+      {
+         
+        hi2c->Instance->CR1 |= 0x00000100U;
+      }
+    }
+
+     
+    do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+    
+    
+
+ 
+    
+     
+    ((hi2c)->Instance ->CR2 |= (0x00000200U | 0x00000400U | 0x00000100U));
+    
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_I2C_Master_Sequential_Receive_IT(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size, uint32_t XferOptions)
+{
+  uint32_t Prev_State = 0x00U;
+  volatile uint32_t count = 0U;
+    
+   
+  ((void)0);
+
+  if(hi2c->State == HAL_I2C_STATE_READY)
+  {
+     
+    if((XferOptions == ((uint32_t)0x00000004U)) || (XferOptions == ((uint32_t)0x00000001U)))
+    {
+       
+      count = ((uint32_t)25U) * (SystemCoreClock /25U /1000U);
+      do
+      {
+        if(count-- == 0U)
+        {
+          hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+          hi2c->State= HAL_I2C_STATE_READY;
+
+           
+          do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+          return HAL_TIMEOUT; 
+        }
+      }
+      while(((((uint8_t)((((uint32_t)0x00100002U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU)))) != RESET);
+    }
+
+     
+    do{ if((hi2c)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hi2c)->Lock = HAL_LOCKED; } }while (0);
+
+     
+    hi2c->Instance->CR1 &= ~0x00000800U;
+
+    hi2c->State = HAL_I2C_STATE_BUSY_RX;
+    hi2c->Mode = HAL_I2C_MODE_MASTER;
+    hi2c->ErrorCode = ((uint32_t)0x00000000U);
+
+    hi2c->pBuffPtr = pData;
+    hi2c->XferSize = Size;
+    hi2c->XferCount = Size;
+    hi2c->XferOptions = XferOptions;
+    hi2c->Devaddress = DevAddress;
+    
+    Prev_State = hi2c->PreviousState;
+
+    if((Prev_State == ((uint32_t)((HAL_I2C_STATE_BUSY_TX & ((uint32_t)((HAL_I2C_STATE_BUSY_TX | HAL_I2C_STATE_BUSY_RX) & (~(uint32_t)HAL_I2C_STATE_READY)))) | HAL_I2C_MODE_MASTER))) || (Prev_State == ((uint32_t)(HAL_I2C_MODE_NONE))))
+    {
+       
+      if((XferOptions == ((uint32_t)0x00000004U)) || (XferOptions == ((uint32_t)0x00000001U))  || (XferOptions == ((uint32_t)0xFFFF0000U)))
+      {
+         
+        hi2c->Instance->CR1 |= 0x00000400U;
+        
+         
+        hi2c->Instance->CR1 |= 0x00000100U;
+      }
+      else if(Prev_State == ((uint32_t)((HAL_I2C_STATE_BUSY_TX & ((uint32_t)((HAL_I2C_STATE_BUSY_TX | HAL_I2C_STATE_BUSY_RX) & (~(uint32_t)HAL_I2C_STATE_READY)))) | HAL_I2C_MODE_MASTER)))
+      {
+         
+        hi2c->Instance->CR1 |= 0x00000400U;
+        
+         
+        hi2c->Instance->CR1 |= 0x00000100U;
+      }
+    }
+
+     
+    do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+    
+
+ 
+
+     
+    ((hi2c)->Instance ->CR2 |= (0x00000200U | 0x00000400U | 0x00000100U));
+
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_I2C_Slave_Transmit_IT(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint16_t Size)
+{
+  volatile uint32_t count = 0U;
+  
+  if(hi2c->State == HAL_I2C_STATE_READY)
+  {
+    if((pData == 0) || (Size == 0U))
+    {
+      return  HAL_ERROR;
+    }
+    
+     
+    count = ((uint32_t)25U) * (SystemCoreClock /25U /1000U);
+    do
+    {
+      if(count-- == 0U)
+      {
+        hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+        hi2c->State= HAL_I2C_STATE_READY;
+
+         
+        do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+        return HAL_TIMEOUT; 
+      }
+    }
+    while(((((uint8_t)((((uint32_t)0x00100002U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU)))) != RESET);
+
+     
+    do{ if((hi2c)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hi2c)->Lock = HAL_LOCKED; } }while (0);
+    
+     
+    hi2c->Instance->CR1 &= ~0x00000800U;
+
+    hi2c->State = HAL_I2C_STATE_BUSY_TX;
+    hi2c->Mode = HAL_I2C_MODE_SLAVE;
+    hi2c->ErrorCode = ((uint32_t)0x00000000U);
+
+    hi2c->pBuffPtr = pData;
+    hi2c->XferSize = Size;
+    hi2c->XferCount = Size;
+    hi2c->XferOptions = ((uint32_t)0xFFFF0000U);
+
+     
+    hi2c->Instance->CR1 |= 0x00000400U;
+
+     
+    do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+    
+
+ 
+
+     
+    ((hi2c)->Instance ->CR2 |= (0x00000200U | 0x00000400U | 0x00000100U));
+
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_I2C_Slave_Receive_IT(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint16_t Size)
+{
+  volatile uint32_t count = 0U;
+
+  if(hi2c->State == HAL_I2C_STATE_READY)
+  {
+    if((pData == 0) || (Size == 0U))
+    {
+      return  HAL_ERROR;
+    }
+
+     
+    count = ((uint32_t)25U) * (SystemCoreClock /25U /1000U);
+    do
+    {
+      if(count-- == 0U)
+      {
+        hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+        hi2c->State= HAL_I2C_STATE_READY;
+
+         
+        do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+        return HAL_TIMEOUT; 
+      }
+    }
+    while(((((uint8_t)((((uint32_t)0x00100002U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU)))) != RESET);
+
+     
+    do{ if((hi2c)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hi2c)->Lock = HAL_LOCKED; } }while (0);
+    
+     
+    hi2c->Instance->CR1 &= ~0x00000800U;
+
+    hi2c->State = HAL_I2C_STATE_BUSY_RX;
+    hi2c->Mode = HAL_I2C_MODE_SLAVE;
+    hi2c->ErrorCode = ((uint32_t)0x00000000U);
+
+    hi2c->pBuffPtr = pData;
+    hi2c->XferSize = Size;
+    hi2c->XferCount = Size;
+    hi2c->XferOptions = ((uint32_t)0xFFFF0000U);
+
+     
+    hi2c->Instance->CR1 |= 0x00000400U;
+
+     
+    do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+    
+
+ 
+
+     
+    ((hi2c)->Instance ->CR2 |= (0x00000200U | 0x00000400U | 0x00000100U));
+
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_I2C_Slave_Sequential_Transmit_IT(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint16_t Size, uint32_t XferOptions)
+{
+   
+  ((void)0);
+
+  if(hi2c->State == HAL_I2C_STATE_LISTEN)
+  {
+    if((pData == 0) || (Size == 0U))
+    {
+      return  HAL_ERROR;
+    }
+
+     
+    do{ if((hi2c)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hi2c)->Lock = HAL_LOCKED; } }while (0);
+
+     
+    hi2c->Instance->CR1 &= ~0x00000800U;
+
+    hi2c->State = HAL_I2C_STATE_BUSY_TX_LISTEN;
+    hi2c->Mode = HAL_I2C_MODE_SLAVE;
+    hi2c->ErrorCode = ((uint32_t)0x00000000U);
+
+    hi2c->pBuffPtr = pData;
+    hi2c->XferSize = Size;
+    hi2c->XferCount = Size;
+    hi2c->XferOptions = XferOptions;
+
+     
+    do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+    
+     
+    do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+    
+
+ 
+
+     
+    ((hi2c)->Instance ->CR2 |= (0x00000200U | 0x00000400U | 0x00000100U));
+
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_I2C_Slave_Sequential_Receive_IT(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint16_t Size, uint32_t XferOptions)
+{
+   
+  ((void)0);
+
+  if(hi2c->State == HAL_I2C_STATE_LISTEN)
+  {
+    if((pData == 0) || (Size == 0U))
+    {
+      return  HAL_ERROR;
+    }
+
+     
+    do{ if((hi2c)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hi2c)->Lock = HAL_LOCKED; } }while (0);
+
+     
+    hi2c->Instance->CR1 &= ~0x00000800U;
+
+    hi2c->State = HAL_I2C_STATE_BUSY_RX_LISTEN;
+    hi2c->Mode = HAL_I2C_MODE_SLAVE;
+    hi2c->ErrorCode = ((uint32_t)0x00000000U);
+
+    hi2c->pBuffPtr = pData;
+    hi2c->XferSize = Size;
+    hi2c->XferCount = Size;
+    hi2c->XferOptions = XferOptions;
+
+     
+    do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+
+     
+    do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+    
+
+ 
+
+     
+    ((hi2c)->Instance ->CR2 |= (0x00000200U | 0x00000400U | 0x00000100U));
+
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_I2C_EnableListen_IT(I2C_HandleTypeDef *hi2c)
+{
+  if(hi2c->State == HAL_I2C_STATE_READY)
+  {
+    hi2c->State = HAL_I2C_STATE_LISTEN;
+    
+     
+    hi2c->Instance->CR1 |= 0x00000400U;
+
+     
+    ((hi2c)->Instance ->CR2 |= (0x00000200U | 0x00000100U));
+    
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_I2C_DisableListen_IT(I2C_HandleTypeDef *hi2c)
+{
+   
+  uint32_t tmp;
+  
+   
+  if(hi2c->State == HAL_I2C_STATE_LISTEN)
+  {
+    tmp = (uint32_t)(hi2c->State) & ((uint32_t)((HAL_I2C_STATE_BUSY_TX | HAL_I2C_STATE_BUSY_RX) & (~(uint32_t)HAL_I2C_STATE_READY)));
+    hi2c->PreviousState = tmp | (uint32_t)(hi2c->Mode);
+    hi2c->State = HAL_I2C_STATE_READY;
+    hi2c->Mode = HAL_I2C_MODE_NONE;
+    
+     
+    hi2c->Instance->CR1 &= ~0x00000400U;
+
+     
+    ((hi2c)->Instance ->CR2 &= (~(0x00000200U | 0x00000100U)));
+  
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_I2C_Master_Transmit_DMA(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size)
+{
+  uint32_t tickstart = 0x00U;
+
+  volatile uint32_t count = 0U;
+
+   
+  tickstart = HAL_GetTick();
+
+  if(hi2c->State == HAL_I2C_STATE_READY)
+  {
+     
+    count = ((uint32_t)25U) * (SystemCoreClock /25U /1000U);
+    do
+    {
+      if(count-- == 0U)
+      {
+        hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+        hi2c->State= HAL_I2C_STATE_READY;
+
+         
+        do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+        return HAL_TIMEOUT; 
+      }
+    }
+    while(((((uint8_t)((((uint32_t)0x00100002U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU)))) != RESET);
+
+     
+    do{ if((hi2c)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hi2c)->Lock = HAL_LOCKED; } }while (0);
+
+     
+    hi2c->Instance->CR1 &= ~0x00000800U;
+
+    hi2c->State = HAL_I2C_STATE_BUSY_TX;
+    hi2c->Mode = HAL_I2C_MODE_MASTER;
+    hi2c->ErrorCode = ((uint32_t)0x00000000U);
+
+    hi2c->pBuffPtr = pData;
+    hi2c->XferSize = Size;
+    hi2c->XferCount = Size;
+    hi2c->XferOptions = ((uint32_t)0xFFFF0000U);
+
+    if(hi2c->XferSize > 0U)
+    {
+       
+      hi2c->hdmatx->XferCpltCallback = I2C_DMAXferCplt;
+
+             
+      hi2c->hdmatx->XferErrorCallback = I2C_DMAError;
+
+       
+      hi2c->hdmatx->XferHalfCpltCallback = 0;
+      hi2c->hdmatx->XferM1CpltCallback = 0;
+      hi2c->hdmatx->XferM1HalfCpltCallback = 0;
+      hi2c->hdmatx->XferAbortCallback = 0;
+
+       
+      HAL_DMA_Start_IT(hi2c->hdmatx, (uint32_t)pData, (uint32_t)&hi2c->Instance->DR, Size);
+
+       
+      if(I2C_MasterRequestWrite(hi2c, DevAddress, ((uint32_t)35U), tickstart) != HAL_OK)
+      {
+        if(hi2c->ErrorCode == ((uint32_t)0x00000004U))
+        {
+           
+          do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+          return HAL_ERROR;
+        }
+        else
+        {
+           
+          do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+          return HAL_TIMEOUT;
+        }
+      }
+
+       
+      do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+
+       
+      ((hi2c)->Instance ->CR2 |= (0x00000100U));
+
+       
+      hi2c->Instance->CR2 |= 0x00000800U;
+    }
+    else
+    {
+       
+      if(I2C_MasterRequestWrite(hi2c, DevAddress, ((uint32_t)35U), tickstart) != HAL_OK)
+      {
+        if(hi2c->ErrorCode == ((uint32_t)0x00000004U))
+        {
+           
+          do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+          return HAL_ERROR;
+        }
+        else
+        {
+           
+          do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+          return HAL_TIMEOUT;
+        }
+      }
+
+       
+      do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+
+       
+      hi2c->Instance->CR1 |= 0x00000200U;
+
+      hi2c->State = HAL_I2C_STATE_READY;
+    }
+    
+     
+    do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_I2C_Master_Receive_DMA(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size)
+{
+  uint32_t tickstart = 0x00U;
+  
+  volatile uint32_t count = 0U;
+  
+   
+  tickstart = HAL_GetTick();
+  
+  if(hi2c->State == HAL_I2C_STATE_READY)
+  {
+     
+    count = ((uint32_t)25U) * (SystemCoreClock /25U /1000U);
+    do
+    {
+      if(count-- == 0U)
+      {
+        hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+        hi2c->State= HAL_I2C_STATE_READY;
+
+         
+        do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+        return HAL_TIMEOUT; 
+      }
+    }
+    while(((((uint8_t)((((uint32_t)0x00100002U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU)))) != RESET);
+
+     
+    do{ if((hi2c)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hi2c)->Lock = HAL_LOCKED; } }while (0);
+    
+     
+    hi2c->Instance->CR1 &= ~0x00000800U;
+    
+    hi2c->State = HAL_I2C_STATE_BUSY_RX;
+    hi2c->Mode = HAL_I2C_MODE_MASTER;
+    hi2c->ErrorCode = ((uint32_t)0x00000000U);
+    
+    hi2c->pBuffPtr = pData;
+    hi2c->XferSize = Size;
+    hi2c->XferCount = Size;
+    hi2c->XferOptions = ((uint32_t)0xFFFF0000U);
+    
+    if(hi2c->XferSize > 0U)
+    {
+       
+      hi2c->hdmarx->XferCpltCallback = I2C_DMAXferCplt;
+
+       
+      hi2c->hdmarx->XferErrorCallback = I2C_DMAError;
+
+       
+      hi2c->hdmarx->XferHalfCpltCallback = 0;
+      hi2c->hdmarx->XferM1CpltCallback = 0;
+      hi2c->hdmarx->XferM1HalfCpltCallback = 0;
+      hi2c->hdmarx->XferAbortCallback = 0;
+
+       
+      HAL_DMA_Start_IT(hi2c->hdmarx, (uint32_t)&hi2c->Instance->DR, (uint32_t)pData, Size);
+
+       
+      if(I2C_MasterRequestRead(hi2c, DevAddress, ((uint32_t)35U), tickstart) != HAL_OK)
+      {
+        if(hi2c->ErrorCode == ((uint32_t)0x00000004U))
+        {
+           
+          do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+          return HAL_ERROR;
+        }
+        else
+        {
+           
+          do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+          return HAL_TIMEOUT;
+        }
+      }
+
+      if(Size == 1U)
+      {
+         
+        hi2c->Instance->CR1 &= ~0x00000400U;
+      }
+      else
+      {
+         
+        hi2c->Instance->CR2 |= 0x00001000U;
+      }
+
+       
+      do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+
+       
+      do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+      
+
+ 
+       
+      ((hi2c)->Instance ->CR2 |= (0x00000100U));
+
+       
+      hi2c->Instance->CR2 |= 0x00000800U;
+    }
+    else
+    {
+       
+      if(I2C_MasterRequestRead(hi2c, DevAddress, ((uint32_t)35U), tickstart) != HAL_OK)
+      {
+        if(hi2c->ErrorCode == ((uint32_t)0x00000004U))
+        {
+           
+          do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+          return HAL_ERROR;
+        }
+        else
+        {
+           
+          do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+          return HAL_TIMEOUT;
+        }
+      }
+
+       
+      do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+      
+       
+      hi2c->Instance->CR1 |= 0x00000200U;
+      
+      hi2c->State = HAL_I2C_STATE_READY;
+      
+       
+      do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+    }
+    
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_I2C_Master_Abort_IT(I2C_HandleTypeDef *hi2c, uint16_t DevAddress)
+{
+   
+  if(hi2c->Mode == HAL_I2C_MODE_MASTER)
+  {
+     
+    do{ if((hi2c)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hi2c)->Lock = HAL_LOCKED; } }while (0);
+
+    hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+    hi2c->State = HAL_I2C_STATE_ABORT;
+
+     
+    hi2c->Instance->CR1 &= ~0x00000400U;
+
+     
+    hi2c->Instance->CR1 |= 0x00000200U;
+
+    hi2c->XferCount = 0U;
+
+     
+    ((hi2c)->Instance ->CR2 &= (~(0x00000200U | 0x00000400U | 0x00000100U)));
+
+     
+    do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+    if(hi2c->State == HAL_I2C_STATE_ABORT)
+    {
+      hi2c->State = HAL_I2C_STATE_READY;
+
+       
+      HAL_I2C_AbortCpltCallback(hi2c);
+    }
+
+    return HAL_OK;
+  }
+  else
+  {
+     
+     
+    return HAL_ERROR;
+  }
+}
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_I2C_Slave_Transmit_DMA(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint16_t Size)
+{
+  volatile uint32_t count = 0U;
+  
+  if(hi2c->State == HAL_I2C_STATE_READY)
+  {
+    if((pData == 0) || (Size == 0U))
+    {
+      return  HAL_ERROR;
+    }
+
+     
+    count = ((uint32_t)25U) * (SystemCoreClock /25U /1000U);
+    do
+    {
+      if(count-- == 0U)
+      {
+        hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+        hi2c->State= HAL_I2C_STATE_READY;
+
+         
+        do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+        return HAL_TIMEOUT; 
+      }
+    }
+    while(((((uint8_t)((((uint32_t)0x00100002U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU)))) != RESET);
+
+     
+    do{ if((hi2c)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hi2c)->Lock = HAL_LOCKED; } }while (0);
+    
+     
+    hi2c->Instance->CR1 &= ~0x00000800U;
+
+    hi2c->State = HAL_I2C_STATE_BUSY_TX;
+    hi2c->Mode = HAL_I2C_MODE_SLAVE;
+    hi2c->ErrorCode = ((uint32_t)0x00000000U);
+
+    hi2c->pBuffPtr = pData;
+    hi2c->XferSize = Size;
+    hi2c->XferCount = Size;
+    hi2c->XferOptions = ((uint32_t)0xFFFF0000U);
+
+     
+    hi2c->hdmatx->XferCpltCallback = I2C_DMAXferCplt;
+    
+     
+    hi2c->hdmatx->XferErrorCallback = I2C_DMAError;
+
+     
+    hi2c->hdmatx->XferHalfCpltCallback = 0;
+    hi2c->hdmatx->XferM1CpltCallback = 0;
+    hi2c->hdmatx->XferM1HalfCpltCallback = 0;
+    hi2c->hdmatx->XferAbortCallback = 0;
+
+     
+    HAL_DMA_Start_IT(hi2c->hdmatx, (uint32_t)pData, (uint32_t)&hi2c->Instance->DR, Size);
+
+     
+    ((hi2c)->Instance ->CR2 |= (0x00000100U));
+    
+     
+    hi2c->Instance->CR2 |= 0x00000800U;
+
+     
+    hi2c->Instance->CR1 |= 0x00000400U;
+
+     
+    count = ((uint32_t)10000U) * (SystemCoreClock /25U /1000U);
+    do
+    {
+      if(count-- == 0U)
+      {
+        hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+        hi2c->State= HAL_I2C_STATE_READY;
+        
+         
+        do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+        
+        return HAL_TIMEOUT; 
+      }
+    }
+    while(((((uint8_t)((((uint32_t)0x00010002U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00010002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010002U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00010002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010002U)) & ((uint32_t)0x0000FFFFU)))) == RESET);
+    
+     
+    if(hi2c->Init.AddressingMode == ((uint32_t)0x00004000U))
+    {
+       
+      do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+    }
+    else
+    {
+       
+      do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+
+       
+      count = ((uint32_t)10000U) * (SystemCoreClock /25U /1000U);
+      do
+      {
+        if(count-- == 0U)
+        {
+          hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+          hi2c->State= HAL_I2C_STATE_READY;
+          
+           
+          do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+          
+          return HAL_TIMEOUT; 
+        }
+      }
+      while(((((uint8_t)((((uint32_t)0x00010002U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00010002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010002U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00010002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010002U)) & ((uint32_t)0x0000FFFFU)))) == RESET);
+
+       
+      do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+    }
+
+     
+    do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+      
+
+ 
+       
+      ((hi2c)->Instance ->CR2 |= (0x00000100U));      
+
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_I2C_Slave_Receive_DMA(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint16_t Size)
+{
+  volatile uint32_t count = 0U;
+
+  if(hi2c->State == HAL_I2C_STATE_READY)
+  {
+    if((pData == 0) || (Size == 0U))
+    {
+      return  HAL_ERROR;
+    }
+
+     
+    count = ((uint32_t)25U) * (SystemCoreClock /25U /1000U);
+    do
+    {
+      if(count-- == 0U)
+      {
+        hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+        hi2c->State= HAL_I2C_STATE_READY;
+
+         
+        do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+        return HAL_TIMEOUT; 
+      }
+    }
+    while(((((uint8_t)((((uint32_t)0x00100002U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU)))) != RESET);
+
+     
+    do{ if((hi2c)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hi2c)->Lock = HAL_LOCKED; } }while (0);
+    
+     
+    hi2c->Instance->CR1 &= ~0x00000800U;
+
+    hi2c->State = HAL_I2C_STATE_BUSY_RX;
+    hi2c->Mode = HAL_I2C_MODE_SLAVE;
+    hi2c->ErrorCode = ((uint32_t)0x00000000U);
+
+    hi2c->pBuffPtr = pData;
+    hi2c->XferSize = Size;
+    hi2c->XferCount = Size;
+    hi2c->XferOptions = ((uint32_t)0xFFFF0000U);
+    
+     
+    hi2c->hdmarx->XferCpltCallback = I2C_DMAXferCplt;
+
+     
+    hi2c->hdmarx->XferErrorCallback = I2C_DMAError;
+    
+     
+    hi2c->hdmarx->XferHalfCpltCallback = 0;
+    hi2c->hdmarx->XferM1CpltCallback = 0;
+    hi2c->hdmarx->XferM1HalfCpltCallback = 0;
+    hi2c->hdmarx->XferAbortCallback = 0;
+
+     
+    HAL_DMA_Start_IT(hi2c->hdmarx, (uint32_t)&hi2c->Instance->DR, (uint32_t)pData, Size);
+
+     
+    ((hi2c)->Instance ->CR2 |= (0x00000100U));
+
+     
+    hi2c->Instance->CR2 |= 0x00000800U;
+
+     
+    hi2c->Instance->CR1 |= 0x00000400U;
+
+     
+    count = ((uint32_t)10000U) * (SystemCoreClock /25U /1000U);
+    do
+    {
+      if(count-- == 0U)
+      {
+        hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+        hi2c->State= HAL_I2C_STATE_READY;
+
+         
+        do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+        return HAL_TIMEOUT; 
+      }
+    }
+    while(((((uint8_t)((((uint32_t)0x00010002U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00010002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010002U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00010002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010002U)) & ((uint32_t)0x0000FFFFU)))) == RESET);
+
+     
+    do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+
+     
+    do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+    
+
+ 
+     
+    ((hi2c)->Instance ->CR2 |= (0x00000100U));
+
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout)
+{
+  uint32_t tickstart = 0x00U;
+
+   
+  tickstart = HAL_GetTick();
+  
+   
+  ((void)0);
+
+  if(hi2c->State == HAL_I2C_STATE_READY)
+  {
+     
+    if(I2C_WaitOnFlagUntilTimeout(hi2c, ((uint32_t)0x00100002U), SET, ((uint32_t)25U), tickstart) != HAL_OK)
+    {
+      return HAL_BUSY;
+    }
+
+     
+    do{ if((hi2c)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hi2c)->Lock = HAL_LOCKED; } }while (0);
+    
+     
+    hi2c->Instance->CR1 &= ~0x00000800U;
+
+    hi2c->State = HAL_I2C_STATE_BUSY_TX;
+    hi2c->Mode = HAL_I2C_MODE_MEM;
+    hi2c->ErrorCode = ((uint32_t)0x00000000U);
+    hi2c->XferOptions = ((uint32_t)0xFFFF0000U);
+    
+     
+    if(I2C_RequestMemoryWrite(hi2c, DevAddress, MemAddress, MemAddSize, Timeout, tickstart) != HAL_OK)
+    {
+      if(hi2c->ErrorCode == ((uint32_t)0x00000004U))
+      {
+         
+        do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+        return HAL_ERROR;
+      }
+      else
+      {
+         
+        do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+        return HAL_TIMEOUT;
+      }
+    }
+
+    while(Size > 0U)
+    {
+       
+      if(I2C_WaitOnTXEFlagUntilTimeout(hi2c, Timeout, tickstart) != HAL_OK)
+      {
+        if(hi2c->ErrorCode == ((uint32_t)0x00000004U))
+        {
+           
+          hi2c->Instance->CR1 |= 0x00000200U;
+          return HAL_ERROR;
+        }
+        else
+        {
+          return HAL_TIMEOUT;
+        }
+      }
+
+       
+      hi2c->Instance->DR = (*pData++);
+      Size--;
+
+      if((((((uint8_t)((((uint32_t)0x00010004U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00010004U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010004U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00010004U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010004U)) & ((uint32_t)0x0000FFFFU)))) == SET) && (Size != 0))
+      {
+         
+        hi2c->Instance->DR = (*pData++);
+        Size--;
+      }
+    }
+    
+     
+    if(I2C_WaitOnBTFFlagUntilTimeout(hi2c, Timeout, tickstart) != HAL_OK)
+    {
+      if(hi2c->ErrorCode == ((uint32_t)0x00000004U))
+      {
+         
+        hi2c->Instance->CR1 |= 0x00000200U;
+        return HAL_ERROR;
+      }
+      else
+      {
+        return HAL_TIMEOUT;
+      }
+    }
+
+     
+    hi2c->Instance->CR1 |= 0x00000200U;
+
+    hi2c->State = HAL_I2C_STATE_READY;
+    hi2c->Mode = HAL_I2C_MODE_NONE;
+    
+     
+    do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_I2C_Mem_Read(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout)
+{
+  uint32_t tickstart = 0x00U;
+
+   
+  tickstart = HAL_GetTick();
+  
+   
+  ((void)0);
+
+  if(hi2c->State == HAL_I2C_STATE_READY)
+  {
+     
+    if(I2C_WaitOnFlagUntilTimeout(hi2c, ((uint32_t)0x00100002U), SET, ((uint32_t)25U), tickstart) != HAL_OK)
+    {
+      return HAL_BUSY;
+    }
+
+     
+    do{ if((hi2c)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hi2c)->Lock = HAL_LOCKED; } }while (0);
+    
+     
+    hi2c->Instance->CR1 &= ~0x00000800U;
+
+    hi2c->State = HAL_I2C_STATE_BUSY_RX;
+    hi2c->Mode = HAL_I2C_MODE_MEM;
+    hi2c->ErrorCode = ((uint32_t)0x00000000U);
+    hi2c->XferOptions = ((uint32_t)0xFFFF0000U);
+    
+     
+    if(I2C_RequestMemoryRead(hi2c, DevAddress, MemAddress, MemAddSize, Timeout, tickstart) != HAL_OK)
+    {
+      if(hi2c->ErrorCode == ((uint32_t)0x00000004U))
+      {
+         
+        do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+        return HAL_ERROR;
+      }
+      else
+      {
+         
+        do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+        return HAL_TIMEOUT;
+      }
+    }
+
+    if(Size == 0U)
+    {
+       
+      do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+      
+       
+      hi2c->Instance->CR1 |= 0x00000200U;
+    }
+    else if(Size == 1U)
+    {
+       
+      hi2c->Instance->CR1 &= ~0x00000400U;
+
+       
+      do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+
+       
+      hi2c->Instance->CR1 |= 0x00000200U;
+    }
+    else if(Size == 2U)
+    {
+       
+      hi2c->Instance->CR1 &= ~0x00000400U;
+
+       
+      hi2c->Instance->CR1 |= 0x00000800U;
+
+       
+      do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+    }
+    else
+    {
+       
+      do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+    }
+
+    while(Size > 0U)
+    {
+      if(Size <= 3U)
+      {
+         
+        if(Size== 1U)
+        {
+           
+          if(I2C_WaitOnRXNEFlagUntilTimeout(hi2c, Timeout, tickstart) != HAL_OK)      
+          {
+            if(hi2c->ErrorCode == ((uint32_t)0x00000020U))
+            {
+              return HAL_TIMEOUT;
+            }
+            else
+            {
+              return HAL_ERROR;
+            }
+          }
+
+           
+          (*pData++) = hi2c->Instance->DR;
+          Size--;
+        }
+         
+        else if(Size == 2U)
+        {
+           
+          if(I2C_WaitOnFlagUntilTimeout(hi2c, ((uint32_t)0x00010004U), RESET, Timeout, tickstart) != HAL_OK)
+          {
+            return HAL_TIMEOUT;
+          }
+
+           
+          hi2c->Instance->CR1 |= 0x00000200U;
+
+           
+          (*pData++) = hi2c->Instance->DR;
+          Size--;
+
+           
+          (*pData++) = hi2c->Instance->DR;
+          Size--;
+        }
+         
+        else
+        {
+           
+          if(I2C_WaitOnFlagUntilTimeout(hi2c, ((uint32_t)0x00010004U), RESET, Timeout, tickstart) != HAL_OK)
+          {
+            return HAL_TIMEOUT;
+          }
+
+           
+          hi2c->Instance->CR1 &= ~0x00000400U;
+
+           
+          (*pData++) = hi2c->Instance->DR;
+          Size--;
+
+           
+          if(I2C_WaitOnFlagUntilTimeout(hi2c, ((uint32_t)0x00010004U), RESET, Timeout, tickstart) != HAL_OK)
+          {
+            return HAL_TIMEOUT;
+          }
+
+           
+          hi2c->Instance->CR1 |= 0x00000200U;
+
+           
+          (*pData++) = hi2c->Instance->DR;
+          Size--;
+
+           
+          (*pData++) = hi2c->Instance->DR;
+          Size--;
+        }
+      }
+      else
+      {
+         
+        if(I2C_WaitOnRXNEFlagUntilTimeout(hi2c, Timeout, tickstart) != HAL_OK)      
+        {
+          if(hi2c->ErrorCode == ((uint32_t)0x00000020U))
+          {
+            return HAL_TIMEOUT;
+          }
+          else
+          {
+            return HAL_ERROR;
+          }
+        }
+
+         
+        (*pData++) = hi2c->Instance->DR;
+        Size--;
+
+        if(((((uint8_t)((((uint32_t)0x00010004U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00010004U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010004U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00010004U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010004U)) & ((uint32_t)0x0000FFFFU)))) == SET)
+        {
+           
+          (*pData++) = hi2c->Instance->DR;
+          Size--;
+        }
+      }
+    }
+
+    hi2c->State = HAL_I2C_STATE_READY;
+    hi2c->Mode = HAL_I2C_MODE_NONE;
+    
+     
+    do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_I2C_Mem_Write_IT(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint16_t MemAddSize, uint8_t *pData, uint16_t Size)
+{
+  volatile uint32_t count = 0U;
+
+   
+  ((void)0);
+
+  if(hi2c->State == HAL_I2C_STATE_READY)
+  {
+     
+    count = ((uint32_t)25U) * (SystemCoreClock /25U /1000U);
+    do
+    {
+      if(count-- == 0U)
+      {
+        hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+        hi2c->State= HAL_I2C_STATE_READY;
+
+         
+        do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+        return HAL_TIMEOUT; 
+      }
+    }
+    while(((((uint8_t)((((uint32_t)0x00100002U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU)))) != RESET);
+
+     
+    do{ if((hi2c)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hi2c)->Lock = HAL_LOCKED; } }while (0);
+    
+     
+    hi2c->Instance->CR1 &= ~0x00000800U;
+
+    hi2c->State = HAL_I2C_STATE_BUSY_TX;
+    hi2c->Mode = HAL_I2C_MODE_MEM;
+    hi2c->ErrorCode = ((uint32_t)0x00000000U);
+
+    hi2c->pBuffPtr = pData;
+    hi2c->XferSize = Size;
+    hi2c->XferCount = Size;
+    hi2c->XferOptions = ((uint32_t)0xFFFF0000U);
+    hi2c->Devaddress = DevAddress;
+    hi2c->Memaddress = MemAddress;
+    hi2c->MemaddSize = MemAddSize;
+    hi2c->EventCount = 0U;
+
+     
+    hi2c->Instance->CR1 |= 0x00000100U;
+
+     
+    do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+    
+
+ 
+
+     
+    ((hi2c)->Instance ->CR2 |= (0x00000200U | 0x00000400U | 0x00000100U));
+
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_I2C_Mem_Read_IT(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint16_t MemAddSize, uint8_t *pData, uint16_t Size)
+{
+  volatile uint32_t count = 0U;
+
+   
+  ((void)0);
+
+  if(hi2c->State == HAL_I2C_STATE_READY)
+  {
+     
+    count = ((uint32_t)25U) * (SystemCoreClock /25U /1000U);
+    do
+    {
+      if(count-- == 0U)
+      {
+        hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+        hi2c->State= HAL_I2C_STATE_READY;
+
+         
+        do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+        return HAL_TIMEOUT; 
+      }
+    }
+    while(((((uint8_t)((((uint32_t)0x00100002U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU)))) != RESET);
+
+     
+    do{ if((hi2c)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hi2c)->Lock = HAL_LOCKED; } }while (0);
+
+     
+    hi2c->Instance->CR1 &= ~0x00000800U;
+
+    hi2c->State = HAL_I2C_STATE_BUSY_RX;
+    hi2c->Mode = HAL_I2C_MODE_MEM;
+    hi2c->ErrorCode = ((uint32_t)0x00000000U);
+
+    hi2c->pBuffPtr = pData;
+    hi2c->XferSize = Size;
+    hi2c->XferCount = Size;
+    hi2c->XferOptions = ((uint32_t)0xFFFF0000U);
+    hi2c->Devaddress = DevAddress;
+    hi2c->Memaddress = MemAddress;
+    hi2c->MemaddSize = MemAddSize;
+    hi2c->EventCount = 0U;
+
+     
+    hi2c->Instance->CR1 |= 0x00000400U;
+
+     
+    hi2c->Instance->CR1 |= 0x00000100U;
+
+     
+    do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+    if(hi2c->XferSize > 0U)
+    {
+      
+
+ 
+      
+       
+      ((hi2c)->Instance ->CR2 |= (0x00000200U | 0x00000400U | 0x00000100U));
+    }
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_I2C_Mem_Write_DMA(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint16_t MemAddSize, uint8_t *pData, uint16_t Size)
+{
+  uint32_t tickstart = 0x00U;
+
+   
+  tickstart = HAL_GetTick();
+  
+  volatile uint32_t count = 0U;
+
+   
+  ((void)0);
+
+  if(hi2c->State == HAL_I2C_STATE_READY)
+  {
+     
+    count = ((uint32_t)25U) * (SystemCoreClock /25U /1000U);
+    do
+    {
+      if(count-- == 0U)
+      {
+        hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+        hi2c->State= HAL_I2C_STATE_READY;
+
+         
+        do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+        return HAL_TIMEOUT; 
+      }
+    }
+    while(((((uint8_t)((((uint32_t)0x00100002U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU)))) != RESET);
+
+     
+    do{ if((hi2c)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hi2c)->Lock = HAL_LOCKED; } }while (0);
+
+     
+    hi2c->Instance->CR1 &= ~0x00000800U;
+
+    hi2c->State = HAL_I2C_STATE_BUSY_TX;
+    hi2c->Mode = HAL_I2C_MODE_MEM;
+    hi2c->ErrorCode = ((uint32_t)0x00000000U);
+
+    hi2c->pBuffPtr = pData;
+    hi2c->XferSize = Size;
+    hi2c->XferCount = Size;
+    hi2c->XferOptions = ((uint32_t)0xFFFF0000U);
+
+    if(hi2c->XferSize > 0U)
+    {    
+       
+      hi2c->hdmatx->XferCpltCallback = I2C_DMAXferCplt;
+
+       
+      hi2c->hdmatx->XferErrorCallback = I2C_DMAError;
+
+       
+      hi2c->hdmatx->XferHalfCpltCallback = 0;
+      hi2c->hdmatx->XferM1CpltCallback = 0;
+      hi2c->hdmatx->XferM1HalfCpltCallback = 0;
+      hi2c->hdmatx->XferAbortCallback = 0;
+
+       
+      HAL_DMA_Start_IT(hi2c->hdmatx, (uint32_t)pData, (uint32_t)&hi2c->Instance->DR, Size);
+
+       
+      if(I2C_RequestMemoryWrite(hi2c, DevAddress, MemAddress, MemAddSize, ((uint32_t)35U), tickstart) != HAL_OK)
+      {
+        if(hi2c->ErrorCode == ((uint32_t)0x00000004U))
+        {
+           
+          do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+          return HAL_ERROR;
+        }
+        else
+        {
+           
+          do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+          return HAL_TIMEOUT;
+        }
+      }
+
+       
+      ((hi2c)->Instance ->CR2 |= (0x00000100U));
+
+       
+      hi2c->Instance->CR2 |= 0x00000800U;
+    }
+    else
+    {
+       
+      if(I2C_RequestMemoryRead(hi2c, DevAddress, MemAddress, MemAddSize, ((uint32_t)35U), tickstart) != HAL_OK)
+      {
+        if(hi2c->ErrorCode == ((uint32_t)0x00000004U))
+        {
+           
+          do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+          return HAL_ERROR;
+        }
+        else
+        {
+           
+          do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+          return HAL_TIMEOUT;
+        }
+      }
+
+       
+      hi2c->Instance->CR1 |= 0x00000200U;
+
+      hi2c->State = HAL_I2C_STATE_READY;
+    }
+
+     
+    do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_I2C_Mem_Read_DMA(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint16_t MemAddSize, uint8_t *pData, uint16_t Size)
+{
+  uint32_t tickstart = 0x00U;
+
+   
+  tickstart = HAL_GetTick();
+
+  volatile uint32_t count = 0U;
+
+   
+  ((void)0);
+
+  if(hi2c->State == HAL_I2C_STATE_READY)
+  {
+     
+    count = ((uint32_t)25U) * (SystemCoreClock /25U /1000U);
+    do
+    {
+      if(count-- == 0U)
+      {
+        hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+        hi2c->State= HAL_I2C_STATE_READY;
+
+         
+        do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+        return HAL_TIMEOUT; 
+      }
+    }
+    while(((((uint8_t)((((uint32_t)0x00100002U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00100002U)) & ((uint32_t)0x0000FFFFU)))) != RESET);
+
+     
+    do{ if((hi2c)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hi2c)->Lock = HAL_LOCKED; } }while (0);
+
+     
+    hi2c->Instance->CR1 &= ~0x00000800U;
+
+    hi2c->State = HAL_I2C_STATE_BUSY_RX;
+    hi2c->Mode = HAL_I2C_MODE_MEM;
+    hi2c->ErrorCode = ((uint32_t)0x00000000U);
+
+    hi2c->pBuffPtr = pData;
+    hi2c->XferSize = Size;
+    hi2c->XferCount = Size;
+    hi2c->XferOptions = ((uint32_t)0xFFFF0000U);
+
+    if(hi2c->XferSize > 0U)
+    {
+       
+      hi2c->hdmarx->XferCpltCallback = I2C_DMAXferCplt;
+
+       
+      hi2c->hdmarx->XferErrorCallback = I2C_DMAError;
+
+       
+      hi2c->hdmarx->XferHalfCpltCallback = 0;
+      hi2c->hdmarx->XferM1CpltCallback = 0;
+      hi2c->hdmarx->XferM1HalfCpltCallback = 0;
+      hi2c->hdmarx->XferAbortCallback = 0;
+
+       
+      HAL_DMA_Start_IT(hi2c->hdmarx, (uint32_t)&hi2c->Instance->DR, (uint32_t)pData, Size);
+
+       
+      if(I2C_RequestMemoryRead(hi2c, DevAddress, MemAddress, MemAddSize, ((uint32_t)35U), tickstart) != HAL_OK)
+      {
+        if(hi2c->ErrorCode == ((uint32_t)0x00000004U))
+        {
+           
+          do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+          return HAL_ERROR;
+        }
+        else
+        {
+           
+          do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+          return HAL_TIMEOUT;
+        }
+      }
+
+      if(Size == 1U)
+      {
+         
+        hi2c->Instance->CR1 &= ~0x00000400U;
+      }
+      else
+      {
+         
+        hi2c->Instance->CR2 |= 0x00001000U;
+      }
+
+       
+      do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+
+       
+      do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+      
+
+ 
+       
+      ((hi2c)->Instance ->CR2 |= (0x00000100U));
+      
+      
+      hi2c->Instance->CR2 |= 0x00000800U;
+    }
+    else
+    {
+       
+      if(I2C_RequestMemoryRead(hi2c, DevAddress, MemAddress, MemAddSize, ((uint32_t)35U), tickstart) != HAL_OK)
+      {
+        if(hi2c->ErrorCode == ((uint32_t)0x00000004U))
+        {
+           
+          do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+          return HAL_ERROR;
+        }
+        else
+        {
+           
+          do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+          return HAL_TIMEOUT;
+        }
+      }
+
+       
+      do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+
+       
+      hi2c->Instance->CR1 |= 0x00000200U;
+
+      hi2c->State = HAL_I2C_STATE_READY;
+
+       
+      do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+    }
+
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_I2C_IsDeviceReady(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint32_t Trials, uint32_t Timeout)
+{
+  uint32_t tickstart = 0U, tmp1 = 0U, tmp2 = 0U, tmp3 = 0U, I2C_Trials = 1U;
+
+   
+  tickstart = HAL_GetTick();
+
+  if(hi2c->State == HAL_I2C_STATE_READY)
+  {
+     
+    if(I2C_WaitOnFlagUntilTimeout(hi2c, ((uint32_t)0x00100002U), SET, ((uint32_t)25U), tickstart) != HAL_OK)
+    {
+      return HAL_BUSY;
+    }
+
+     
+    do{ if((hi2c)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hi2c)->Lock = HAL_LOCKED; } }while (0);
+    
+     
+    hi2c->Instance->CR1 &= ~0x00000800U;
+
+    hi2c->State = HAL_I2C_STATE_BUSY;
+    hi2c->ErrorCode = ((uint32_t)0x00000000U);
+    hi2c->XferOptions = ((uint32_t)0xFFFF0000U);
+    
+    do
+    {
+       
+      hi2c->Instance->CR1 |= 0x00000100U;
+
+       
+      if(I2C_WaitOnFlagUntilTimeout(hi2c, ((uint32_t)0x00010001U), RESET, Timeout, tickstart) != HAL_OK)
+      {
+        return HAL_TIMEOUT;
+      }
+
+       
+      hi2c->Instance->DR = ((uint8_t)((DevAddress) & (~0x00000001U)));
+
+       
+       
+      tickstart = HAL_GetTick();
+
+      tmp1 = ((((uint8_t)((((uint32_t)0x00010002U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00010002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010002U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00010002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010002U)) & ((uint32_t)0x0000FFFFU))));
+      tmp2 = ((((uint8_t)((((uint32_t)0x00010400U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00010400U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010400U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00010400U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010400U)) & ((uint32_t)0x0000FFFFU))));
+      tmp3 = hi2c->State;
+      while((tmp1 == RESET) && (tmp2 == RESET) && (tmp3 != HAL_I2C_STATE_TIMEOUT))
+      {
+        if((Timeout == 0U)||((HAL_GetTick() - tickstart ) > Timeout))
+        {
+          hi2c->State = HAL_I2C_STATE_TIMEOUT;
+        }
+        tmp1 = ((((uint8_t)((((uint32_t)0x00010002U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00010002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010002U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00010002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010002U)) & ((uint32_t)0x0000FFFFU))));
+        tmp2 = ((((uint8_t)((((uint32_t)0x00010400U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00010400U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010400U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00010400U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010400U)) & ((uint32_t)0x0000FFFFU))));
+        tmp3 = hi2c->State;
+      }
+
+      hi2c->State = HAL_I2C_STATE_READY;
+
+       
+      if(((((uint8_t)((((uint32_t)0x00010002U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00010002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010002U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00010002U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010002U)) & ((uint32_t)0x0000FFFFU)))) == SET)
+      {
+         
+        hi2c->Instance->CR1 |= 0x00000200U;
+
+         
+        do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+
+         
+        if(I2C_WaitOnFlagUntilTimeout(hi2c, ((uint32_t)0x00100002U), SET, ((uint32_t)25U), tickstart) != HAL_OK)
+        {
+          return HAL_TIMEOUT;
+        }
+
+        hi2c->State = HAL_I2C_STATE_READY;
+
+         
+        do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+        return HAL_OK;
+      }
+      else
+      {
+         
+        hi2c->Instance->CR1 |= 0x00000200U;
+
+         
+        ((hi2c)->Instance ->SR1 = ~((((uint32_t)0x00010400U)) & ((uint32_t)0x0000FFFFU)));
+
+         
+        if(I2C_WaitOnFlagUntilTimeout(hi2c, ((uint32_t)0x00100002U), SET, ((uint32_t)25U), tickstart) != HAL_OK)
+        {
+          return HAL_TIMEOUT;
+        }
+      }
+    }while(I2C_Trials++ < Trials);
+
+    hi2c->State = HAL_I2C_STATE_READY;
+
+     
+    do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+    return HAL_ERROR;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+ 
+void HAL_I2C_EV_IRQHandler(I2C_HandleTypeDef *hi2c)
+{
+  uint32_t sr2itflags   = ((hi2c->Instance ->SR2));
+  uint32_t sr1itflags   = ((hi2c->Instance ->SR1));
+  uint32_t itsources    = ((hi2c->Instance ->CR2));
+
+  uint32_t CurrentMode  = hi2c->Mode;
+
+   
+  if((CurrentMode == HAL_I2C_MODE_MASTER) || (CurrentMode == HAL_I2C_MODE_MEM))
+  {
+     
+    if(((sr1itflags & ((uint32_t)0x00010001U)) != RESET) && ((itsources & 0x00000200U) != RESET))
+    {
+      I2C_Master_SB(hi2c);
+    }
+     
+    else if(((sr1itflags & ((uint32_t)0x00010008U)) != RESET) && ((itsources & 0x00000200U) != RESET))
+    {
+      I2C_Master_ADD10(hi2c);
+    }
+     
+    else if(((sr1itflags & ((uint32_t)0x00010002U)) != RESET) && ((itsources & 0x00000200U) != RESET))
+    {
+      I2C_Master_ADDR(hi2c);
+    }
+
+     
+    if((sr2itflags & ((uint32_t)0x00100004U)) != RESET)
+    {
+       
+      if(((sr1itflags & ((uint32_t)0x00010080U)) != RESET) && ((itsources & 0x00000400U) != RESET) && ((sr1itflags & ((uint32_t)0x00010004U)) == RESET))
+      {
+        I2C_MasterTransmit_TXE(hi2c);
+      }
+       
+      else if(((sr1itflags & ((uint32_t)0x00010004U)) != RESET) && ((itsources & 0x00000200U) != RESET))
+      {
+        I2C_MasterTransmit_BTF(hi2c);
+      }
+    }
+     
+    else
+    {
+       
+      if(((sr1itflags & ((uint32_t)0x00010040U)) != RESET) && ((itsources & 0x00000400U) != RESET) && ((sr1itflags & ((uint32_t)0x00010004U)) == RESET))
+      {
+        I2C_MasterReceive_RXNE(hi2c);
+      }
+       
+      else if(((sr1itflags & ((uint32_t)0x00010004U)) != RESET) && ((itsources & 0x00000200U) != RESET))
+      {
+        I2C_MasterReceive_BTF(hi2c);
+      }
+    }
+  }
+   
+  else
+  {
+     
+    if(((sr1itflags & ((uint32_t)0x00010002U)) != RESET) && ((itsources & 0x00000200U) != RESET))
+    {
+      I2C_Slave_ADDR(hi2c);
+    }
+     
+    else if(((sr1itflags & ((uint32_t)0x00010010U)) != RESET) && ((itsources & 0x00000200U) != RESET))
+    {
+      I2C_Slave_STOPF(hi2c);
+    }
+     
+    else if((sr2itflags & ((uint32_t)0x00100004U)) != RESET)
+    {
+       
+      if(((sr1itflags & ((uint32_t)0x00010080U)) != RESET) && ((itsources & 0x00000400U) != RESET) && ((sr1itflags & ((uint32_t)0x00010004U)) == RESET))
+      {
+        I2C_SlaveTransmit_TXE(hi2c);
+      }
+       
+      else if(((sr1itflags & ((uint32_t)0x00010004U)) != RESET) && ((itsources & 0x00000200U) != RESET))
+      {
+        I2C_SlaveTransmit_BTF(hi2c);
+      }
+    }
+     
+    else
+    {
+       
+      if(((sr1itflags & ((uint32_t)0x00010040U)) != RESET) && ((itsources & 0x00000400U) != RESET) && ((sr1itflags & ((uint32_t)0x00010004U)) == RESET))
+      {
+        I2C_SlaveReceive_RXNE(hi2c);
+      }
+       
+      else if(((sr1itflags & ((uint32_t)0x00010004U)) != RESET) && ((itsources & 0x00000200U) != RESET))
+      {
+        I2C_SlaveReceive_BTF(hi2c);
+      }
+    }
+  }
+}
+
+
+
+
+
+
+ 
+void HAL_I2C_ER_IRQHandler(I2C_HandleTypeDef *hi2c)
+{
+  uint32_t tmp1 = 0U, tmp2 = 0U, tmp3 = 0U, tmp4 = 0U;
+  uint32_t sr1itflags = ((hi2c->Instance ->SR1));
+  uint32_t itsources  = ((hi2c->Instance ->CR2));
+
+   
+  if(((sr1itflags & ((uint32_t)0x00010100U)) != RESET) && ((itsources & 0x00000100U) != RESET))
+  {
+    hi2c->ErrorCode |= ((uint32_t)0x00000001U);
+
+     
+    ((hi2c)->Instance ->SR1 = ~((((uint32_t)0x00010100U)) & ((uint32_t)0x0000FFFFU)));
+  }
+
+   
+  if(((sr1itflags & ((uint32_t)0x00010200U)) != RESET) && ((itsources & 0x00000100U) != RESET))
+  {
+    hi2c->ErrorCode |= ((uint32_t)0x00000002U);
+
+     
+    ((hi2c)->Instance ->SR1 = ~((((uint32_t)0x00010200U)) & ((uint32_t)0x0000FFFFU)));
+  }
+
+   
+  if(((sr1itflags & ((uint32_t)0x00010400U)) != RESET) && ((itsources & 0x00000100U) != RESET))
+  {
+    tmp1 = hi2c->Mode;
+    tmp2 = hi2c->XferCount;
+    tmp3 = hi2c->State;
+    tmp4 = hi2c->PreviousState;
+    if((tmp1 == HAL_I2C_MODE_SLAVE) && (tmp2 == 0U) &&       ((tmp3 == HAL_I2C_STATE_BUSY_TX) || (tmp3 == HAL_I2C_STATE_BUSY_TX_LISTEN) ||       ((tmp3 == HAL_I2C_STATE_LISTEN) && (tmp4 == ((uint32_t)((HAL_I2C_STATE_BUSY_TX & ((uint32_t)((HAL_I2C_STATE_BUSY_TX | HAL_I2C_STATE_BUSY_RX) & (~(uint32_t)HAL_I2C_STATE_READY)))) | HAL_I2C_MODE_SLAVE))))))
+
+
+    {
+      I2C_Slave_AF(hi2c);
+    }
+    else
+    {
+      hi2c->ErrorCode |= ((uint32_t)0x00000004U);
+
+       
+      ((hi2c->Instance ->CR1) |= (0x00000200U));
+
+       
+      ((hi2c)->Instance ->SR1 = ~((((uint32_t)0x00010400U)) & ((uint32_t)0x0000FFFFU)));
+
+    }
+  }
+
+   
+  if(((sr1itflags & ((uint32_t)0x00010800U)) != RESET) && ((itsources & 0x00000100U) != RESET))
+  {
+    hi2c->ErrorCode |= ((uint32_t)0x00000008U);
+     
+    ((hi2c)->Instance ->SR1 = ~((((uint32_t)0x00010800U)) & ((uint32_t)0x0000FFFFU)));
+  }
+
+   
+  if(hi2c->ErrorCode != ((uint32_t)0x00000000U))
+  {
+    I2C_ITError(hi2c);
+  }
+}
+
+
+
+
+
+
+ 
+__weak void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+   
+  ((void)(hi2c));
+  
+
+ 
+}
+
+
+
+
+
+
+ 
+__weak void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+   
+  ((void)(hi2c));
+  
+
+ 
+}
+
+
+
+
+
+ 
+__weak void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+   
+  ((void)(hi2c));
+  
+
+ 
+}
+
+
+
+
+
+
+ 
+__weak void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+   
+  ((void)(hi2c));
+  
+
+ 
+}
+
+
+
+
+
+
+
+
+ 
+__weak void HAL_I2C_AddrCallback(I2C_HandleTypeDef *hi2c, uint8_t TransferDirection, uint16_t AddrMatchCode)
+{
+   
+  ((void)(hi2c));
+  ((void)(TransferDirection));
+  ((void)(AddrMatchCode));
+  
+
+ 
+}
+
+
+
+
+
+
+ 
+__weak void HAL_I2C_ListenCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+   
+  ((void)(hi2c));
+    
+
+ 
+}
+
+
+
+
+
+
+ 
+__weak void HAL_I2C_MemTxCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+   
+  ((void)(hi2c));
+  
+
+ 
+}
+
+
+
+
+
+
+ 
+__weak void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+   
+  ((void)(hi2c));
+  
+
+ 
+}
+
+
+
+
+
+
+ 
+__weak void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c)
+{
+   
+  ((void)(hi2c));
+  
+
+ 
+}
+
+
+
+
+
+
+ 
+__weak void HAL_I2C_AbortCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+   
+  ((void)(hi2c));
+
+  
+
+ 
+}
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+HAL_I2C_StateTypeDef HAL_I2C_GetState(I2C_HandleTypeDef *hi2c)
+{
+  return hi2c->State;
+}
+
+
+
+
+
+
+ 
+HAL_I2C_ModeTypeDef HAL_I2C_GetMode(I2C_HandleTypeDef *hi2c)
+{
+  return hi2c->Mode;
+}
+
+
+
+
+
+
+ 
+uint32_t HAL_I2C_GetError(I2C_HandleTypeDef *hi2c)
+{
+  return hi2c->ErrorCode;
+}
+
+
+
+ 
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef I2C_MasterTransmit_TXE(I2C_HandleTypeDef *hi2c)
+{
+   
+  uint32_t CurrentState       = hi2c->State;
+  uint32_t CurrentMode        = hi2c->Mode;
+  uint32_t CurrentXferOptions = hi2c->XferOptions;
+  uint32_t tmp;
+
+  if((hi2c->XferSize == 0U) && (CurrentState == HAL_I2C_STATE_BUSY_TX))
+  {
+     
+    if((CurrentXferOptions != ((uint32_t)0x00000004U)) && (CurrentXferOptions != ((uint32_t)0x00000008U)) && (CurrentXferOptions != ((uint32_t)0xFFFF0000U)))
+    {
+      ((hi2c)->Instance ->CR2 &= (~(0x00000200U | 0x00000400U | 0x00000100U)));
+      
+      tmp = (uint32_t)(hi2c->State) & ((uint32_t)((HAL_I2C_STATE_BUSY_TX | HAL_I2C_STATE_BUSY_RX) & (~(uint32_t)HAL_I2C_STATE_READY)));
+      hi2c->PreviousState = tmp | (uint32_t)(hi2c->Mode);
+      hi2c->Mode = HAL_I2C_MODE_NONE;
+      hi2c->State = HAL_I2C_STATE_READY;
+      
+      HAL_I2C_MasterTxCpltCallback(hi2c);
+    }
+    else  
+    {
+       
+      ((hi2c)->Instance ->CR2 &= (~(0x00000200U | 0x00000400U | 0x00000100U)));
+      
+       
+      hi2c->Instance->CR1 |= 0x00000200U;
+      
+      hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+      hi2c->State = HAL_I2C_STATE_READY;
+      
+      if(hi2c->Mode == HAL_I2C_MODE_MEM)
+      {
+        hi2c->Mode = HAL_I2C_MODE_NONE;
+        HAL_I2C_MemTxCpltCallback(hi2c);
+      }
+      else
+      {
+        hi2c->Mode = HAL_I2C_MODE_NONE;
+        HAL_I2C_MasterTxCpltCallback(hi2c);
+      }
+    }
+  }
+  else if((CurrentState == HAL_I2C_STATE_BUSY_TX) ||     ((CurrentMode == HAL_I2C_MODE_MEM) && (CurrentState == HAL_I2C_STATE_BUSY_RX)))
+
+  {
+    if(hi2c->XferCount == 0U)
+    {
+       
+      ((hi2c)->Instance ->CR2 &= (~(0x00000400U)));
+    }
+    else
+    {
+      if(hi2c->Mode == HAL_I2C_MODE_MEM)
+      {
+        if(hi2c->EventCount == 0)
+        {
+           
+          if(hi2c->MemaddSize == ((uint32_t)0x00000001U))
+          {
+             
+            hi2c->Instance->DR = ((uint8_t)((uint16_t)((hi2c->Memaddress) & (uint16_t)(0x00FFU))));
+            
+            hi2c->EventCount += 2;
+          }
+           
+          else
+          {
+             
+            hi2c->Instance->DR = ((uint8_t)((uint16_t)(((uint16_t)((hi2c->Memaddress) & (uint16_t)(0xFF00U))) >> 8U)));
+            
+            hi2c->EventCount++;
+          }
+        }
+        else if(hi2c->EventCount == 1)
+        {
+           
+          hi2c->Instance->DR = ((uint8_t)((uint16_t)((hi2c->Memaddress) & (uint16_t)(0x00FFU))));
+          
+          hi2c->EventCount++;
+        }
+        else if(hi2c->EventCount == 2)
+        {
+          if(hi2c->State == HAL_I2C_STATE_BUSY_RX)
+          {
+             
+            hi2c->Instance->CR1 |= 0x00000100U;
+          }
+          else if(hi2c->State == HAL_I2C_STATE_BUSY_TX)
+          {
+             
+            hi2c->Instance->DR = (*hi2c->pBuffPtr++);
+            hi2c->XferCount--;
+          }
+        }
+      }
+      else
+      {
+         
+        hi2c->Instance->DR = (*hi2c->pBuffPtr++);
+        hi2c->XferCount--;
+      }
+    }
+  }
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef I2C_MasterTransmit_BTF(I2C_HandleTypeDef *hi2c)
+{
+   
+  uint32_t tmp;
+  uint32_t CurrentXferOptions = hi2c->XferOptions;
+
+  if(hi2c->State == HAL_I2C_STATE_BUSY_TX)
+  {    
+    if(hi2c->XferCount != 0U)
+    {
+       
+      hi2c->Instance->DR = (*hi2c->pBuffPtr++);
+      hi2c->XferCount--;
+    }
+    else
+    {
+       
+      if((CurrentXferOptions != ((uint32_t)0x00000004U)) && (CurrentXferOptions != ((uint32_t)0x00000008U)) && (CurrentXferOptions != ((uint32_t)0xFFFF0000U)))
+      {
+        ((hi2c)->Instance ->CR2 &= (~(0x00000200U | 0x00000400U | 0x00000100U)));
+        
+        tmp = (uint32_t)(hi2c->State) & ((uint32_t)((HAL_I2C_STATE_BUSY_TX | HAL_I2C_STATE_BUSY_RX) & (~(uint32_t)HAL_I2C_STATE_READY)));
+        hi2c->PreviousState = tmp | (uint32_t)(hi2c->Mode);
+        hi2c->Mode = HAL_I2C_MODE_NONE;
+        hi2c->State = HAL_I2C_STATE_READY;
+        
+        HAL_I2C_MasterTxCpltCallback(hi2c);
+      }
+      else  
+      {
+         
+        ((hi2c)->Instance ->CR2 &= (~(0x00000200U | 0x00000400U | 0x00000100U)));
+        
+         
+        hi2c->Instance->CR1 |= 0x00000200U;
+        
+        hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+        hi2c->State = HAL_I2C_STATE_READY;
+        
+        if(hi2c->Mode == HAL_I2C_MODE_MEM)
+        {
+          hi2c->Mode = HAL_I2C_MODE_NONE;
+          
+          HAL_I2C_MemTxCpltCallback(hi2c);
+        }
+        else
+        {
+          hi2c->Mode = HAL_I2C_MODE_NONE;
+          
+          HAL_I2C_MasterTxCpltCallback(hi2c);
+        }
+      }
+    }
+  }
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef I2C_MasterReceive_RXNE(I2C_HandleTypeDef *hi2c)
+{
+  if(hi2c->State == HAL_I2C_STATE_BUSY_RX)
+  {
+    uint32_t tmp = 0U;
+    
+    tmp = hi2c->XferCount;
+    if(tmp > 3U)
+    {
+       
+      (*hi2c->pBuffPtr++) = hi2c->Instance->DR;
+      hi2c->XferCount--;
+    }
+    else if((tmp == 2U) || (tmp == 3U))
+    {
+      if(hi2c->XferOptions != ((uint32_t)0x00000002U))
+      {
+         
+        hi2c->Instance->CR1 &= ~0x00000400U;
+        
+         
+        hi2c->Instance->CR1 |= 0x00000800U;
+      }
+      else
+      {
+         
+        hi2c->Instance->CR1 |= 0x00000400U;
+      }
+      
+       
+      ((hi2c)->Instance ->CR2 &= (~(0x00000400U)));
+    }
+    else
+    {
+      if(hi2c->XferOptions != ((uint32_t)0x00000002U))
+      {
+         
+        hi2c->Instance->CR1 &= ~0x00000400U;
+      }
+      else
+      {
+         
+        hi2c->Instance->CR1 |= 0x00000400U;
+      }
+
+       
+      ((hi2c)->Instance ->CR2 &= (~(0x00000200U | 0x00000400U | 0x00000100U)));
+      
+       
+      (*hi2c->pBuffPtr++) = hi2c->Instance->DR;
+      hi2c->XferCount--;
+
+      tmp = (uint32_t)(hi2c->State) & ((uint32_t)((HAL_I2C_STATE_BUSY_TX | HAL_I2C_STATE_BUSY_RX) & (~(uint32_t)HAL_I2C_STATE_READY)));
+      hi2c->PreviousState = tmp | (uint32_t)(hi2c->Mode);
+      hi2c->State = HAL_I2C_STATE_READY;
+
+      if(hi2c->Mode == HAL_I2C_MODE_MEM)
+      {
+        hi2c->Mode = HAL_I2C_MODE_NONE;
+        HAL_I2C_MemRxCpltCallback(hi2c);
+      }
+      else
+      {
+        hi2c->Mode = HAL_I2C_MODE_NONE;
+        HAL_I2C_MasterRxCpltCallback(hi2c);
+      }
+    }
+  }
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef I2C_MasterReceive_BTF(I2C_HandleTypeDef *hi2c)
+{
+   
+  uint32_t tmp;
+  uint32_t CurrentXferOptions = hi2c->XferOptions;
+
+  if(hi2c->XferCount == 3U)
+  {
+    if((CurrentXferOptions == ((uint32_t)0x00000004U)) || (CurrentXferOptions == ((uint32_t)0x00000008U)) || (CurrentXferOptions == ((uint32_t)0xFFFF0000U)))
+    {
+       
+      hi2c->Instance->CR1 &= ~0x00000400U;
+    }
+
+     
+    (*hi2c->pBuffPtr++) = hi2c->Instance->DR;
+    hi2c->XferCount--;
+  }
+  else if(hi2c->XferCount == 2U)
+  {
+     
+    if((CurrentXferOptions != ((uint32_t)0x00000004U)) && (CurrentXferOptions != ((uint32_t)0x00000008U)) && (CurrentXferOptions != ((uint32_t)0xFFFF0000U)))
+    {
+      if(CurrentXferOptions != ((uint32_t)0x00000002U))
+      {
+         
+        hi2c->Instance->CR1 &= ~0x00000400U;
+      }
+      else
+      {
+         
+        hi2c->Instance->CR1 |= 0x00000400U;
+      }
+      tmp = (uint32_t)(hi2c->State) & ((uint32_t)((HAL_I2C_STATE_BUSY_TX | HAL_I2C_STATE_BUSY_RX) & (~(uint32_t)HAL_I2C_STATE_READY)));
+      hi2c->PreviousState = tmp | (uint32_t)(hi2c->Mode);
+    }
+    else
+    {
+      hi2c->PreviousState = ((uint32_t)((HAL_I2C_STATE_BUSY_RX & ((uint32_t)((HAL_I2C_STATE_BUSY_TX | HAL_I2C_STATE_BUSY_RX) & (~(uint32_t)HAL_I2C_STATE_READY)))) | HAL_I2C_MODE_MASTER));
+
+       
+      hi2c->Instance->CR1 |= 0x00000200U;
+    }
+
+     
+    (*hi2c->pBuffPtr++) = hi2c->Instance->DR;
+    hi2c->XferCount--;
+
+     
+    (*hi2c->pBuffPtr++) = hi2c->Instance->DR;
+    hi2c->XferCount--;
+
+     
+    ((hi2c)->Instance ->CR2 &= (~(0x00000200U | 0x00000100U)));
+
+    hi2c->State = HAL_I2C_STATE_READY;
+    
+    if(hi2c->Mode == HAL_I2C_MODE_MEM)
+    {
+      hi2c->Mode = HAL_I2C_MODE_NONE;
+
+      HAL_I2C_MemRxCpltCallback(hi2c);
+    }
+    else
+    {
+      hi2c->Mode = HAL_I2C_MODE_NONE;
+
+      HAL_I2C_MasterRxCpltCallback(hi2c);
+    }
+  }
+  else
+  {
+     
+    (*hi2c->pBuffPtr++) = hi2c->Instance->DR;
+    hi2c->XferCount--;
+  }
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+
+static HAL_StatusTypeDef I2C_Master_SB(I2C_HandleTypeDef *hi2c)
+{
+  if(hi2c->Mode == HAL_I2C_MODE_MEM)
+  {
+    if(hi2c->EventCount == 0U)
+    {
+       
+      hi2c->Instance->DR = ((uint8_t)((hi2c->Devaddress) & (~0x00000001U)));
+    }
+    else
+    {
+      hi2c->Instance->DR = ((uint8_t)((hi2c->Devaddress) | 0x00000001U));
+    }
+  }
+  else
+  {
+    if(hi2c->Init.AddressingMode == ((uint32_t)0x00004000U))
+    {
+       
+      if(hi2c->State == HAL_I2C_STATE_BUSY_TX) 
+      {
+        hi2c->Instance->DR = ((uint8_t)((hi2c->Devaddress) & (~0x00000001U)));
+      }
+      else
+      {
+        hi2c->Instance->DR = ((uint8_t)((hi2c->Devaddress) | 0x00000001U));
+      }
+    }
+    else
+    {
+      if(hi2c->EventCount == 0U)
+      {
+         
+        hi2c->Instance->DR = ((uint8_t)((uint16_t)((uint16_t)(((uint16_t)((hi2c->Devaddress) & (uint16_t)(0x0300U))) >> 7U) | (uint16_t)(0x00F0U))));
+      }
+      else if(hi2c->EventCount == 1U)
+      {
+         
+        hi2c->Instance->DR = ((uint8_t)((uint16_t)((uint16_t)(((uint16_t)((hi2c->Devaddress) & (uint16_t)(0x0300U))) >> 7U) | (uint16_t)(0x00F1U))));
+      }
+    }
+  }
+
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef I2C_Master_ADD10(I2C_HandleTypeDef *hi2c)
+{
+   
+  hi2c->Instance->DR = ((uint8_t)((uint16_t)((hi2c->Devaddress) & (uint16_t)(0x00FFU))));
+
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef I2C_Master_ADDR(I2C_HandleTypeDef *hi2c)
+{
+   
+  uint32_t CurrentMode        = hi2c->Mode;
+  uint32_t CurrentXferOptions = hi2c->XferOptions;
+  uint32_t Prev_State         = hi2c->PreviousState;
+  
+  if(hi2c->State == HAL_I2C_STATE_BUSY_RX)
+  {
+    if((hi2c->EventCount == 0U) && (CurrentMode == HAL_I2C_MODE_MEM))
+    {
+       
+      do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+    }
+    else if((hi2c->EventCount == 0U) && (hi2c->Init.AddressingMode == (0x00008000U | ((uint32_t)0x00004000U))))
+    {
+       
+      do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+      
+       
+      hi2c->Instance->CR1 |= 0x00000100U;
+      
+      hi2c->EventCount++;
+    }
+    else
+    {
+      if(hi2c->XferCount == 0U)
+      {
+         
+        do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+        
+         
+        hi2c->Instance->CR1 |= 0x00000200U;
+      }
+      else if(hi2c->XferCount == 1U)   
+      {
+         
+        if((CurrentXferOptions != ((uint32_t)0x00000004U)) && (CurrentXferOptions != ((uint32_t)0x00000008U))           && (Prev_State != ((uint32_t)((HAL_I2C_STATE_BUSY_RX & ((uint32_t)((HAL_I2C_STATE_BUSY_TX | HAL_I2C_STATE_BUSY_RX) & (~(uint32_t)HAL_I2C_STATE_READY)))) | HAL_I2C_MODE_MASTER))))
+
+        {
+          if(hi2c->XferOptions != ((uint32_t)0x00000002U))
+          {
+             
+            hi2c->Instance->CR1 &= ~0x00000400U;
+          }
+          else
+          {
+             
+            hi2c->Instance->CR1 |= 0x00000400U;
+          }
+          
+           
+          do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+        }
+        else
+        {
+           
+          hi2c->Instance->CR1 &= ~0x00000400U;
+          
+           
+          do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+          
+           
+          hi2c->Instance->CR1 |= 0x00000200U;
+        }
+      }
+      else if(hi2c->XferCount == 2U)
+      {
+        if(hi2c->XferOptions != ((uint32_t)0x00000002U))
+        {
+           
+          hi2c->Instance->CR1 &= ~0x00000400U;
+          
+           
+          hi2c->Instance->CR1 |= 0x00000800U;
+        }
+        else
+        {
+           
+          hi2c->Instance->CR1 |= 0x00000400U;
+        }
+        
+         
+        do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+      }
+      else
+      {
+         
+        hi2c->Instance->CR1 |= 0x00000400U;
+        
+         
+        do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+      }
+      
+       
+      hi2c->EventCount = 0;
+    }
+  }
+  else
+  {
+     
+    do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+  }
+
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef I2C_SlaveTransmit_TXE(I2C_HandleTypeDef *hi2c)
+{
+   
+  uint32_t tmp;
+  uint32_t CurrentState = hi2c->State;
+
+  if(hi2c->XferCount != 0U)
+  {
+     
+    hi2c->Instance->DR = (*hi2c->pBuffPtr++);
+    hi2c->XferCount--;
+
+    if((hi2c->XferCount == 0U) && (CurrentState == HAL_I2C_STATE_BUSY_TX_LISTEN))
+    {
+       
+      ((hi2c)->Instance ->CR2 &= (~(0x00000400U)));
+      
+       
+      tmp = (uint32_t)(hi2c->State) & ((uint32_t)((HAL_I2C_STATE_BUSY_TX | HAL_I2C_STATE_BUSY_RX) & (~(uint32_t)HAL_I2C_STATE_READY)));
+      hi2c->PreviousState = tmp | (uint32_t)(hi2c->Mode);
+      hi2c->State = HAL_I2C_STATE_LISTEN;
+      
+       
+      HAL_I2C_SlaveTxCpltCallback(hi2c);
+    }
+  }
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef I2C_SlaveTransmit_BTF(I2C_HandleTypeDef *hi2c)
+{
+  if(hi2c->XferCount != 0U)
+  {
+     
+    hi2c->Instance->DR = (*hi2c->pBuffPtr++);
+    hi2c->XferCount--;
+  }
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef I2C_SlaveReceive_RXNE(I2C_HandleTypeDef *hi2c)
+{
+   
+  uint32_t tmp;
+  uint32_t CurrentState = hi2c->State;
+
+  if(hi2c->XferCount != 0U)
+  {
+     
+    (*hi2c->pBuffPtr++) = hi2c->Instance->DR;
+    hi2c->XferCount--;
+
+    if((hi2c->XferCount == 0U) && (CurrentState == HAL_I2C_STATE_BUSY_RX_LISTEN))
+    {
+       
+      ((hi2c)->Instance ->CR2 &= (~(0x00000400U)));
+      
+       
+      tmp = (uint32_t)(hi2c->State) & ((uint32_t)((HAL_I2C_STATE_BUSY_TX | HAL_I2C_STATE_BUSY_RX) & (~(uint32_t)HAL_I2C_STATE_READY)));
+      hi2c->PreviousState = tmp | (uint32_t)(hi2c->Mode);
+      hi2c->State = HAL_I2C_STATE_LISTEN;
+      
+       
+      HAL_I2C_SlaveRxCpltCallback(hi2c);
+    }
+  }
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef I2C_SlaveReceive_BTF(I2C_HandleTypeDef *hi2c)
+{
+  if(hi2c->XferCount != 0U)
+  {
+     
+    (*hi2c->pBuffPtr++) = hi2c->Instance->DR;
+    hi2c->XferCount--;
+  }
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef I2C_Slave_ADDR(I2C_HandleTypeDef *hi2c)
+{
+  uint8_t TransferDirection = ((uint32_t)0x00000000U);
+  uint16_t SlaveAddrCode = 0U;
+
+   
+  if(((((uint8_t)((((uint32_t)0x00100004U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00100004U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00100004U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00100004U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00100004U)) & ((uint32_t)0x0000FFFFU)))) == RESET)
+  {
+    TransferDirection = ((uint32_t)0x00000001U);
+  }
+  
+  if(((((uint8_t)((((uint32_t)0x00100080U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00100080U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00100080U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00100080U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00100080U)) & ((uint32_t)0x0000FFFFU)))) == RESET)
+  {
+    SlaveAddrCode = hi2c->Init.OwnAddress1;
+  }
+  else
+  {
+    SlaveAddrCode = hi2c->Init.OwnAddress2;
+  }
+
+   
+  HAL_I2C_AddrCallback(hi2c, TransferDirection, SlaveAddrCode);
+
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef I2C_Slave_STOPF(I2C_HandleTypeDef *hi2c)
+{
+   
+  uint32_t CurrentState = hi2c->State;
+  
+   
+  ((hi2c)->Instance ->CR2 &= (~(0x00000200U | 0x00000400U | 0x00000100U)));
+
+   
+  do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; (hi2c)->Instance ->CR1 |= 0x00000001U; ((void)(tmpreg)); } while(0);
+
+   
+  hi2c->Instance->CR1 &= ~0x00000400U;
+
+ if((CurrentState == HAL_I2C_STATE_LISTEN ) || (CurrentState == HAL_I2C_STATE_BUSY_RX_LISTEN) ||     (CurrentState == HAL_I2C_STATE_BUSY_TX_LISTEN))
+
+  {
+    hi2c->XferOptions = ((uint32_t)0xFFFF0000U);
+    hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+    hi2c->State = HAL_I2C_STATE_READY;
+    hi2c->Mode = HAL_I2C_MODE_NONE;
+    
+     
+    HAL_I2C_ListenCpltCallback(hi2c);
+  }
+  else
+  {
+    if((hi2c->PreviousState  == ((uint32_t)((HAL_I2C_STATE_BUSY_RX & ((uint32_t)((HAL_I2C_STATE_BUSY_TX | HAL_I2C_STATE_BUSY_RX) & (~(uint32_t)HAL_I2C_STATE_READY)))) | HAL_I2C_MODE_SLAVE))) || (CurrentState == HAL_I2C_STATE_BUSY_RX))
+    {
+      hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+      hi2c->State = HAL_I2C_STATE_READY;
+      hi2c->Mode = HAL_I2C_MODE_NONE;
+      
+      HAL_I2C_SlaveRxCpltCallback(hi2c);
+    }
+  }
+
+  return HAL_OK;
+}
+
+
+
+
+
+ 
+static HAL_StatusTypeDef I2C_Slave_AF(I2C_HandleTypeDef *hi2c)
+{
+   
+  uint32_t CurrentState       = hi2c->State;
+  uint32_t CurrentXferOptions = hi2c->XferOptions;
+  uint32_t tmp;
+
+  if(((CurrentXferOptions ==  ((uint32_t)0x00000004U)) || (CurrentXferOptions == ((uint32_t)0x00000008U))) &&           (CurrentState == HAL_I2C_STATE_LISTEN))
+
+  {
+    hi2c->XferOptions = ((uint32_t)0xFFFF0000U);
+
+     
+    ((hi2c)->Instance ->CR2 &= (~(0x00000200U | 0x00000400U | 0x00000100U)));
+
+     
+    ((hi2c)->Instance ->SR1 = ~((((uint32_t)0x00010400U)) & ((uint32_t)0x0000FFFFU)));
+
+     
+    hi2c->Instance->CR1 &= ~0x00000400U;
+
+    hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+    hi2c->State = HAL_I2C_STATE_READY;
+    hi2c->Mode = HAL_I2C_MODE_NONE;
+      
+     
+    HAL_I2C_ListenCpltCallback(hi2c);
+  }
+  else if(CurrentState == HAL_I2C_STATE_BUSY_TX)
+  {
+    hi2c->XferOptions = ((uint32_t)0xFFFF0000U);
+    tmp = (uint32_t)(hi2c->State) & ((uint32_t)((HAL_I2C_STATE_BUSY_TX | HAL_I2C_STATE_BUSY_RX) & (~(uint32_t)HAL_I2C_STATE_READY)));
+    hi2c->PreviousState = tmp | (uint32_t)(hi2c->Mode);
+    hi2c->State = HAL_I2C_STATE_READY;
+    hi2c->Mode = HAL_I2C_MODE_NONE;
+    
+     
+    ((hi2c)->Instance ->CR2 &= (~(0x00000200U | 0x00000400U | 0x00000100U)));
+
+     
+    ((hi2c)->Instance ->SR1 = ~((((uint32_t)0x00010400U)) & ((uint32_t)0x0000FFFFU)));
+
+     
+    hi2c->Instance->CR1 &= ~0x00000400U;
+
+    HAL_I2C_SlaveTxCpltCallback(hi2c);
+  }
+  else
+  {
+     
+     
+    ((hi2c)->Instance ->SR1 = ~((((uint32_t)0x00010400U)) & ((uint32_t)0x0000FFFFU)));
+  }
+  
+  return HAL_OK;
+}
+
+
+
+
+
+ 
+static void I2C_ITError(I2C_HandleTypeDef *hi2c)
+{
+   
+  uint32_t CurrentState = hi2c->State;
+
+  if((CurrentState == HAL_I2C_STATE_BUSY_TX_LISTEN) || (CurrentState == HAL_I2C_STATE_BUSY_RX_LISTEN))
+  {
+     
+    hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+    hi2c->State = HAL_I2C_STATE_LISTEN;
+  }
+  else
+  {
+     
+     
+    if(hi2c->State != HAL_I2C_STATE_ABORT)
+    {
+      hi2c->State = HAL_I2C_STATE_READY;
+    }
+    hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+    hi2c->Mode = HAL_I2C_MODE_NONE;
+  }
+
+   
+  hi2c->Instance->CR1 &= ~0x00000800U;
+
+   
+  if((hi2c->Instance->CR1 & 0x00000800U) == 0x00000800U)
+  {
+    hi2c->Instance->CR2 &= ~0x00000800U;
+
+    if(hi2c->hdmatx != 0)
+    {
+      
+ 
+      hi2c->hdmatx->XferAbortCallback = I2C_DMAAbort;
+
+      if(HAL_DMA_Abort_IT(hi2c->hdmatx) != HAL_OK)
+      {
+         
+        hi2c->hdmatx->XferAbortCallback(hi2c->hdmatx);
+      }
+    }
+    else if(hi2c->hdmarx != 0)
+    {
+      
+ 
+      hi2c->hdmarx->XferAbortCallback = I2C_DMAAbort;
+
+      if(HAL_DMA_Abort_IT(hi2c->hdmarx) != HAL_OK)
+      {
+         
+        hi2c->hdmarx->XferAbortCallback(hi2c->hdmarx);
+      }
+    }
+  }
+  else if(hi2c->State == HAL_I2C_STATE_ABORT)
+  {
+    hi2c->State = HAL_I2C_STATE_READY;
+
+     
+    HAL_I2C_AbortCpltCallback(hi2c);
+  }
+  else
+  {
+     
+    HAL_I2C_ErrorCallback(hi2c);
+  }
+   
+   
+   
+  if((hi2c->State == HAL_I2C_STATE_LISTEN) && ((hi2c->ErrorCode & ((uint32_t)0x00000004U)) == ((uint32_t)0x00000004U)))
+  {
+    hi2c->XferOptions = ((uint32_t)0xFFFF0000U);
+    hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+    hi2c->State = HAL_I2C_STATE_READY;
+    hi2c->Mode = HAL_I2C_MODE_NONE;
+    
+     
+    HAL_I2C_ListenCpltCallback(hi2c);
+  }
+}
+
+
+
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef I2C_MasterRequestWrite(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint32_t Timeout, uint32_t Tickstart)
+{
+   
+  uint32_t CurrentXferOptions = hi2c->XferOptions;
+
+   
+  if((CurrentXferOptions == ((uint32_t)0x00000004U)) || (CurrentXferOptions == ((uint32_t)0x00000001U)) || (CurrentXferOptions == ((uint32_t)0xFFFF0000U)))
+  {
+     
+    hi2c->Instance->CR1 |= 0x00000100U;
+  }
+  else if(hi2c->PreviousState == ((uint32_t)((HAL_I2C_STATE_BUSY_RX & ((uint32_t)((HAL_I2C_STATE_BUSY_TX | HAL_I2C_STATE_BUSY_RX) & (~(uint32_t)HAL_I2C_STATE_READY)))) | HAL_I2C_MODE_MASTER)))
+  {
+     
+    hi2c->Instance->CR1 |= 0x00000100U;
+  }
+
+   
+  if(I2C_WaitOnFlagUntilTimeout(hi2c, ((uint32_t)0x00010001U), RESET, Timeout, Tickstart) != HAL_OK)
+  {
+    return HAL_TIMEOUT;
+  }
+
+  if(hi2c->Init.AddressingMode == ((uint32_t)0x00004000U))
+  {
+     
+    hi2c->Instance->DR = ((uint8_t)((DevAddress) & (~0x00000001U)));
+  }
+  else
+  {
+     
+    hi2c->Instance->DR = ((uint8_t)((uint16_t)((uint16_t)(((uint16_t)((DevAddress) & (uint16_t)(0x0300U))) >> 7U) | (uint16_t)(0x00F0U))));
+
+     
+    if(I2C_WaitOnMasterAddressFlagUntilTimeout(hi2c, ((uint32_t)0x00010008U), Timeout, Tickstart) != HAL_OK)
+    {
+      if(hi2c->ErrorCode == ((uint32_t)0x00000004U))
+      {
+        return HAL_ERROR;
+      }
+      else
+      {
+        return HAL_TIMEOUT;
+      }
+    }
+
+     
+    hi2c->Instance->DR = ((uint8_t)((uint16_t)((DevAddress) & (uint16_t)(0x00FFU))));
+  }
+
+   
+  if(I2C_WaitOnMasterAddressFlagUntilTimeout(hi2c, ((uint32_t)0x00010002U), Timeout, Tickstart) != HAL_OK)
+  {
+    if(hi2c->ErrorCode == ((uint32_t)0x00000004U))
+    {
+      return HAL_ERROR;
+    }
+    else
+    {
+      return HAL_TIMEOUT;
+    }
+  }
+
+  return HAL_OK;
+}
+
+
+
+
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef I2C_MasterRequestRead(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint32_t Timeout, uint32_t Tickstart)
+{
+   
+  uint32_t CurrentXferOptions = hi2c->XferOptions;
+
+   
+  if((CurrentXferOptions == ((uint32_t)0x00000004U)) || (CurrentXferOptions == ((uint32_t)0x00000001U))  || (CurrentXferOptions == ((uint32_t)0xFFFF0000U)))
+  {
+     
+    hi2c->Instance->CR1 |= 0x00000400U;
+
+     
+    hi2c->Instance->CR1 |= 0x00000100U;
+  }
+  else if(hi2c->PreviousState == ((uint32_t)((HAL_I2C_STATE_BUSY_TX & ((uint32_t)((HAL_I2C_STATE_BUSY_TX | HAL_I2C_STATE_BUSY_RX) & (~(uint32_t)HAL_I2C_STATE_READY)))) | HAL_I2C_MODE_MASTER)))
+  {
+     
+    hi2c->Instance->CR1 |= 0x00000400U;
+
+     
+    hi2c->Instance->CR1 |= 0x00000100U;
+  }
+
+   
+  if(I2C_WaitOnFlagUntilTimeout(hi2c, ((uint32_t)0x00010001U), RESET, Timeout, Tickstart) != HAL_OK)
+  {
+    return HAL_TIMEOUT;
+  }
+
+  if(hi2c->Init.AddressingMode == ((uint32_t)0x00004000U))
+  {
+     
+    hi2c->Instance->DR = ((uint8_t)((DevAddress) | 0x00000001U));
+  }
+  else
+  {
+     
+    hi2c->Instance->DR = ((uint8_t)((uint16_t)((uint16_t)(((uint16_t)((DevAddress) & (uint16_t)(0x0300U))) >> 7U) | (uint16_t)(0x00F0U))));
+
+     
+    if(I2C_WaitOnMasterAddressFlagUntilTimeout(hi2c, ((uint32_t)0x00010008U), Timeout, Tickstart) != HAL_OK)
+    {
+      if(hi2c->ErrorCode == ((uint32_t)0x00000004U))
+      {
+        return HAL_ERROR;
+      }
+      else
+      {
+        return HAL_TIMEOUT;
+      }
+    }
+
+     
+    hi2c->Instance->DR = ((uint8_t)((uint16_t)((DevAddress) & (uint16_t)(0x00FFU))));
+
+     
+    if(I2C_WaitOnMasterAddressFlagUntilTimeout(hi2c, ((uint32_t)0x00010002U), Timeout, Tickstart) != HAL_OK)
+    {
+      if(hi2c->ErrorCode == ((uint32_t)0x00000004U))
+      {
+        return HAL_ERROR;
+      }
+      else
+      {
+        return HAL_TIMEOUT;
+      }
+    }
+
+     
+    do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+
+     
+    hi2c->Instance->CR1 |= 0x00000100U;
+
+     
+    if(I2C_WaitOnFlagUntilTimeout(hi2c, ((uint32_t)0x00010001U), RESET, Timeout, Tickstart) != HAL_OK)
+    {
+      return HAL_TIMEOUT;
+    }
+
+     
+    hi2c->Instance->DR = ((uint8_t)((uint16_t)((uint16_t)(((uint16_t)((DevAddress) & (uint16_t)(0x0300U))) >> 7U) | (uint16_t)(0x00F1U))));
+  }
+
+   
+  if(I2C_WaitOnMasterAddressFlagUntilTimeout(hi2c, ((uint32_t)0x00010002U), Timeout, Tickstart) != HAL_OK)
+  {
+    if(hi2c->ErrorCode == ((uint32_t)0x00000004U))
+    {
+      return HAL_ERROR;
+    }
+    else
+    {
+      return HAL_TIMEOUT;
+    }
+  }
+
+  return HAL_OK;
+}
+
+
+
+
+
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef I2C_RequestMemoryWrite(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint16_t MemAddSize, uint32_t Timeout, uint32_t Tickstart)
+{
+   
+  hi2c->Instance->CR1 |= 0x00000100U;
+
+   
+  if(I2C_WaitOnFlagUntilTimeout(hi2c, ((uint32_t)0x00010001U), RESET, Timeout, Tickstart) != HAL_OK)
+  {
+    return HAL_TIMEOUT;
+  }
+
+   
+  hi2c->Instance->DR = ((uint8_t)((DevAddress) & (~0x00000001U)));
+
+   
+  if(I2C_WaitOnMasterAddressFlagUntilTimeout(hi2c, ((uint32_t)0x00010002U), Timeout, Tickstart) != HAL_OK)
+  {
+    if(hi2c->ErrorCode == ((uint32_t)0x00000004U))
+    {
+      return HAL_ERROR;
+    }
+    else
+    {
+      return HAL_TIMEOUT;
+    }
+  }
+
+   
+  do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+
+   
+  if(I2C_WaitOnTXEFlagUntilTimeout(hi2c, Timeout, Tickstart) != HAL_OK)
+  {
+    if(hi2c->ErrorCode == ((uint32_t)0x00000004U))
+    {
+       
+      hi2c->Instance->CR1 |= 0x00000200U;
+      return HAL_ERROR;
+    }
+    else
+    {
+      return HAL_TIMEOUT;
+    }
+  }
+
+   
+  if(MemAddSize == ((uint32_t)0x00000001U))
+  {
+     
+    hi2c->Instance->DR = ((uint8_t)((uint16_t)((MemAddress) & (uint16_t)(0x00FFU))));
+  }
+   
+  else
+  {
+     
+    hi2c->Instance->DR = ((uint8_t)((uint16_t)(((uint16_t)((MemAddress) & (uint16_t)(0xFF00U))) >> 8U)));
+
+     
+    if(I2C_WaitOnTXEFlagUntilTimeout(hi2c, Timeout, Tickstart) != HAL_OK)
+    {
+      if(hi2c->ErrorCode == ((uint32_t)0x00000004U))
+      {
+         
+        hi2c->Instance->CR1 |= 0x00000200U;
+        return HAL_ERROR;
+      }
+      else
+      {
+        return HAL_TIMEOUT;
+      }
+    }
+
+     
+    hi2c->Instance->DR = ((uint8_t)((uint16_t)((MemAddress) & (uint16_t)(0x00FFU))));
+  }
+
+  return HAL_OK;
+}
+
+
+
+
+
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef I2C_RequestMemoryRead(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint16_t MemAddSize, uint32_t Timeout, uint32_t Tickstart)
+{
+   
+  hi2c->Instance->CR1 |= 0x00000400U;
+
+   
+  hi2c->Instance->CR1 |= 0x00000100U;
+
+   
+  if(I2C_WaitOnFlagUntilTimeout(hi2c, ((uint32_t)0x00010001U), RESET, Timeout, Tickstart) != HAL_OK)
+  {
+    return HAL_TIMEOUT;
+  }
+
+   
+  hi2c->Instance->DR = ((uint8_t)((DevAddress) & (~0x00000001U)));
+
+   
+  if(I2C_WaitOnMasterAddressFlagUntilTimeout(hi2c, ((uint32_t)0x00010002U), Timeout, Tickstart) != HAL_OK)
+  {
+    if(hi2c->ErrorCode == ((uint32_t)0x00000004U))
+    {
+      return HAL_ERROR;
+    }
+    else
+    {
+      return HAL_TIMEOUT;
+    }
+  }
+
+   
+  do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (hi2c)->Instance ->SR1; tmpreg = (hi2c)->Instance ->SR2; ((void)(tmpreg)); } while(0);
+
+   
+  if(I2C_WaitOnTXEFlagUntilTimeout(hi2c, Timeout, Tickstart) != HAL_OK)
+  {
+    if(hi2c->ErrorCode == ((uint32_t)0x00000004U))
+    {
+       
+      hi2c->Instance->CR1 |= 0x00000200U;
+      return HAL_ERROR;
+    }
+    else
+    {
+      return HAL_TIMEOUT;
+    }
+  }
+
+   
+  if(MemAddSize == ((uint32_t)0x00000001U))
+  {
+     
+    hi2c->Instance->DR = ((uint8_t)((uint16_t)((MemAddress) & (uint16_t)(0x00FFU))));
+  }
+   
+  else
+  {
+     
+    hi2c->Instance->DR = ((uint8_t)((uint16_t)(((uint16_t)((MemAddress) & (uint16_t)(0xFF00U))) >> 8U)));
+
+     
+    if(I2C_WaitOnTXEFlagUntilTimeout(hi2c, Timeout, Tickstart) != HAL_OK)
+    {
+      if(hi2c->ErrorCode == ((uint32_t)0x00000004U))
+      {
+         
+        hi2c->Instance->CR1 |= 0x00000200U;
+        return HAL_ERROR;
+      }
+      else
+      {
+        return HAL_TIMEOUT;
+      }
+    }
+
+     
+    hi2c->Instance->DR = ((uint8_t)((uint16_t)((MemAddress) & (uint16_t)(0x00FFU))));
+  }
+
+   
+  if(I2C_WaitOnTXEFlagUntilTimeout(hi2c, Timeout, Tickstart) != HAL_OK)
+  {
+    if(hi2c->ErrorCode == ((uint32_t)0x00000004U))
+    {
+       
+      hi2c->Instance->CR1 |= 0x00000200U;
+      return HAL_ERROR;
+    }
+    else
+    {
+      return HAL_TIMEOUT;
+    }
+  }
+
+   
+  hi2c->Instance->CR1 |= 0x00000100U;
+
+   
+  if(I2C_WaitOnFlagUntilTimeout(hi2c, ((uint32_t)0x00010001U), RESET, Timeout, Tickstart) != HAL_OK)
+  {
+    return HAL_TIMEOUT;
+  }
+
+   
+  hi2c->Instance->DR = ((uint8_t)((DevAddress) | 0x00000001U));
+
+   
+  if(I2C_WaitOnMasterAddressFlagUntilTimeout(hi2c, ((uint32_t)0x00010002U), Timeout, Tickstart) != HAL_OK)
+  {
+    if(hi2c->ErrorCode == ((uint32_t)0x00000004U))
+    {
+      return HAL_ERROR;
+    }
+    else
+    {
+      return HAL_TIMEOUT;
+    }
+  }
+
+  return HAL_OK;
+}
+
+
+
+
+
+ 
+static void I2C_DMAXferCplt(DMA_HandleTypeDef *hdma)
+{
+  I2C_HandleTypeDef* hi2c = (I2C_HandleTypeDef*)((DMA_HandleTypeDef*)hdma)->Parent;
+  
+   
+  uint32_t CurrentState = hi2c->State;
+  uint32_t CurrentMode  = hi2c->Mode;
+
+  if((CurrentState == HAL_I2C_STATE_BUSY_TX) || ((CurrentState == HAL_I2C_STATE_BUSY_RX) && (CurrentMode == HAL_I2C_MODE_SLAVE))) 
+  {
+     
+    hi2c->Instance->CR2 &= ~0x00000800U;
+    
+    hi2c->XferCount = 0U;
+    
+     
+    ((hi2c)->Instance ->CR2 |= (0x00000200U | 0x00000100U));
+  }
+  else
+  {
+     
+    hi2c->Instance->CR1 &= ~0x00000400U;
+    
+     
+    hi2c->Instance->CR1 |= 0x00000200U;
+    
+     
+    hi2c->Instance->CR2 &= ~0x00001000U;
+    
+     
+    hi2c->Instance->CR2 &= ~0x00000800U;
+    
+    hi2c->XferCount = 0U;
+
+     
+    if(hi2c->ErrorCode != ((uint32_t)0x00000000U))
+    {
+      HAL_I2C_ErrorCallback(hi2c);
+    }
+    else
+    {
+      hi2c->State = HAL_I2C_STATE_READY;
+
+      if(hi2c->Mode == HAL_I2C_MODE_MEM)
+      {
+        hi2c->Mode = HAL_I2C_MODE_NONE;
+
+        HAL_I2C_MemRxCpltCallback(hi2c);
+      }
+      else
+      {
+        hi2c->Mode = HAL_I2C_MODE_NONE;
+
+        HAL_I2C_MasterRxCpltCallback(hi2c);
+      }
+    }
+  }
+}
+
+
+
+
+
+ 
+static void I2C_DMAError(DMA_HandleTypeDef *hdma)
+{
+  I2C_HandleTypeDef* hi2c = (I2C_HandleTypeDef*)((DMA_HandleTypeDef*)hdma)->Parent;
+
+   
+  hi2c->Instance->CR1 &= ~0x00000400U;
+
+  hi2c->XferCount = 0U;
+
+  hi2c->State = HAL_I2C_STATE_READY;
+  hi2c->Mode = HAL_I2C_MODE_NONE;
+
+  hi2c->ErrorCode |= ((uint32_t)0x00000010U);
+
+  HAL_I2C_ErrorCallback(hi2c);
+}
+
+
+
+
+
+
+ 
+static void I2C_DMAAbort(DMA_HandleTypeDef *hdma)
+{
+  I2C_HandleTypeDef* hi2c = ( I2C_HandleTypeDef* )((DMA_HandleTypeDef* )hdma)->Parent;
+  
+   
+  hi2c->Instance->CR1 &= ~0x00000400U;
+
+  hi2c->XferCount = 0U;
+
+   
+  hi2c->hdmatx->XferAbortCallback = 0;
+  hi2c->hdmarx->XferAbortCallback = 0;
+
+   
+  if(hi2c->State == HAL_I2C_STATE_ABORT)
+  {
+    hi2c->State = HAL_I2C_STATE_READY;
+    hi2c->Mode = HAL_I2C_MODE_NONE;
+
+     
+    HAL_I2C_AbortCpltCallback(hi2c);
+  }
+  else
+  {
+    hi2c->State = HAL_I2C_STATE_READY;
+    hi2c->Mode = HAL_I2C_MODE_NONE;
+
+     
+    HAL_I2C_ErrorCallback(hi2c);
+  }
+}
+
+
+
+
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef I2C_WaitOnFlagUntilTimeout(I2C_HandleTypeDef *hi2c, uint32_t Flag, FlagStatus Status, uint32_t Timeout, uint32_t Tickstart)
+{
+   
+  while((((((uint8_t)((Flag) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((Flag) & ((uint32_t)0x0000FFFFU))) == ((Flag) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((Flag) & ((uint32_t)0x0000FFFFU))) == ((Flag) & ((uint32_t)0x0000FFFFU)))) ? SET : RESET) == Status) 
+  {
+     
+    if(Timeout != 0xFFFFFFFFU)
+    {
+      if((Timeout == 0U)||((HAL_GetTick() - Tickstart ) > Timeout))
+      {
+        hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+        hi2c->State= HAL_I2C_STATE_READY;
+        
+         
+        do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+        
+        return HAL_TIMEOUT;
+      }
+    }
+  }
+  
+  return HAL_OK;
+}
+
+
+
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef I2C_WaitOnMasterAddressFlagUntilTimeout(I2C_HandleTypeDef *hi2c, uint32_t Flag, uint32_t Timeout, uint32_t Tickstart)
+{
+  while(((((uint8_t)((Flag) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((Flag) & ((uint32_t)0x0000FFFFU))) == ((Flag) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((Flag) & ((uint32_t)0x0000FFFFU))) == ((Flag) & ((uint32_t)0x0000FFFFU)))) == RESET)
+  {
+    if(((((uint8_t)((((uint32_t)0x00010400U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00010400U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010400U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00010400U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010400U)) & ((uint32_t)0x0000FFFFU)))) == SET)
+    {
+       
+      hi2c->Instance->CR1 |= 0x00000200U;
+
+       
+      ((hi2c)->Instance ->SR1 = ~((((uint32_t)0x00010400U)) & ((uint32_t)0x0000FFFFU)));
+
+      hi2c->ErrorCode = ((uint32_t)0x00000004U);
+      hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+      hi2c->State= HAL_I2C_STATE_READY;
+
+       
+      do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+      return HAL_ERROR;
+    }
+
+     
+    if(Timeout != 0xFFFFFFFFU)
+    {
+      if((Timeout == 0U)||((HAL_GetTick() - Tickstart ) > Timeout))
+      {
+        hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+        hi2c->State= HAL_I2C_STATE_READY;
+
+         
+        do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+        return HAL_TIMEOUT;
+      }
+    }
+  }
+  return HAL_OK;
+}
+
+
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef I2C_WaitOnTXEFlagUntilTimeout(I2C_HandleTypeDef *hi2c, uint32_t Timeout, uint32_t Tickstart)
+{    
+  while(((((uint8_t)((((uint32_t)0x00010080U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00010080U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010080U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00010080U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010080U)) & ((uint32_t)0x0000FFFFU)))) == RESET)
+  {
+     
+    if(I2C_IsAcknowledgeFailed(hi2c) != HAL_OK)
+    {
+      return HAL_ERROR;
+    }
+		
+     
+    if(Timeout != 0xFFFFFFFFU)
+    {
+      if((Timeout == 0U) || ((HAL_GetTick()-Tickstart) > Timeout))
+      {
+        hi2c->ErrorCode |= ((uint32_t)0x00000020U);
+        hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+        hi2c->State= HAL_I2C_STATE_READY;
+
+         
+        do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+        return HAL_TIMEOUT;
+      }
+    }
+  }
+  return HAL_OK;      
+}
+
+
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef I2C_WaitOnBTFFlagUntilTimeout(I2C_HandleTypeDef *hi2c, uint32_t Timeout, uint32_t Tickstart)
+{  
+  while(((((uint8_t)((((uint32_t)0x00010004U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00010004U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010004U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00010004U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010004U)) & ((uint32_t)0x0000FFFFU)))) == RESET)
+  {
+     
+    if(I2C_IsAcknowledgeFailed(hi2c) != HAL_OK)
+    {
+      return HAL_ERROR;
+    }
+
+     
+    if(Timeout != 0xFFFFFFFFU)
+    {
+      if((Timeout == 0U) || ((HAL_GetTick()-Tickstart) > Timeout))
+      {
+        hi2c->ErrorCode |= ((uint32_t)0x00000020U);
+        hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+        hi2c->State= HAL_I2C_STATE_READY;
+
+         
+        do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+        return HAL_TIMEOUT;
+      }
+    }
+  }
+  return HAL_OK;
+}
+
+
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef I2C_WaitOnSTOPFlagUntilTimeout(I2C_HandleTypeDef *hi2c, uint32_t Timeout, uint32_t Tickstart)
+{  
+  while(((((uint8_t)((((uint32_t)0x00010010U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00010010U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010010U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00010010U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010010U)) & ((uint32_t)0x0000FFFFU)))) == RESET)
+  {
+     
+    if(I2C_IsAcknowledgeFailed(hi2c) != HAL_OK)
+    {
+      return HAL_ERROR;
+    }
+
+     
+    if((Timeout == 0U) || ((HAL_GetTick()-Tickstart) > Timeout))
+    {
+      hi2c->ErrorCode |= ((uint32_t)0x00000020U);
+      hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+      hi2c->State= HAL_I2C_STATE_READY;
+
+       
+      do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+      return HAL_TIMEOUT;
+    }
+  }
+  return HAL_OK;
+}
+
+
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef I2C_WaitOnRXNEFlagUntilTimeout(I2C_HandleTypeDef *hi2c, uint32_t Timeout, uint32_t Tickstart)
+{  
+
+  while(((((uint8_t)((((uint32_t)0x00010040U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00010040U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010040U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00010040U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010040U)) & ((uint32_t)0x0000FFFFU)))) == RESET)
+  {
+     
+    if(((((uint8_t)((((uint32_t)0x00010010U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00010010U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010010U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00010010U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010010U)) & ((uint32_t)0x0000FFFFU)))) == SET)
+    {
+       
+      ((hi2c)->Instance ->SR1 = ~((((uint32_t)0x00010010U)) & ((uint32_t)0x0000FFFFU)));
+
+      hi2c->ErrorCode = ((uint32_t)0x00000000U);
+      hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+      hi2c->State= HAL_I2C_STATE_READY;
+
+       
+      do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+      return HAL_ERROR;
+    }
+
+     
+    if((Timeout == 0U) || ((HAL_GetTick()-Tickstart) > Timeout))
+    {
+      hi2c->ErrorCode |= ((uint32_t)0x00000020U);
+      hi2c->State= HAL_I2C_STATE_READY;
+
+       
+      do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+      return HAL_TIMEOUT;
+    }
+  }
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef I2C_IsAcknowledgeFailed(I2C_HandleTypeDef *hi2c)
+{
+  if(((((uint8_t)((((uint32_t)0x00010400U)) >> 16U)) == 0x01U)?((((hi2c)->Instance ->SR1) & ((((uint32_t)0x00010400U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010400U)) & ((uint32_t)0x0000FFFFU))): ((((hi2c)->Instance ->SR2) & ((((uint32_t)0x00010400U)) & ((uint32_t)0x0000FFFFU))) == ((((uint32_t)0x00010400U)) & ((uint32_t)0x0000FFFFU)))) == SET)
+  {
+     
+    ((hi2c)->Instance ->SR1 = ~((((uint32_t)0x00010400U)) & ((uint32_t)0x0000FFFFU)));
+
+    hi2c->ErrorCode = ((uint32_t)0x00000004U);
+    hi2c->PreviousState = ((uint32_t)(HAL_I2C_MODE_NONE));
+    hi2c->State= HAL_I2C_STATE_READY;
+
+     
+    do{ (hi2c)->Lock = HAL_UNLOCKED; }while (0);
+
+    return HAL_ERROR;
+  }
+  return HAL_OK;
+}
+
+
+ 
+
+
+
+
+
+ 
+
+
+
+ 
+
+ 

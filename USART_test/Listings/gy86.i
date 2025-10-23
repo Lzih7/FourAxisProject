@@ -1,4 +1,4 @@
-#line 1 "MyLib\\Delay.c"
+#line 1 "MyLib\\GY86.c"
 #line 1 ".\\Inc\\main.h"
 
 
@@ -27761,31 +27761,187 @@ void HAL_DisableCompensationCell(void);
 void SystemClock_Config(void);
 void Error_Handler(void);
 
-#line 2 "MyLib\\Delay.c"
+#line 2 "MyLib\\GY86.c"
+#line 1 "MyLib\\MyI2C.h"
 
-static uint8_t timer_initialized = 0;
-static TIM_HandleTypeDef htim2;
 
-void Timer_Delay_us(uint8_t xus) {
-	if(!timer_initialized) {
-		do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x00000001U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x00000001U)); ((void)(tmpreg)); } while(0);
-		timer_initialized = 1;
 
-		htim2.Instance = ((TIM_TypeDef *) (0x40000000U + 0x0000U));
-		htim2.Init.Prescaler = 84 - 1;
-		htim2.Init.Period = 0xFFFFFFFF;
-		htim2.Init.CounterMode = ((uint32_t)0x00000000U);
-		htim2.Init.ClockDivision = ((uint32_t)0x00000000U);
-		if(HAL_TIM_Base_Init(&htim2) != HAL_OK) {
-			Error_Handler();
-		}
-	}
-	((&htim2)->Instance ->CNT = (0));
-	if(HAL_TIM_Base_Start(&htim2) != HAL_OK) {
-		Error_Handler();
-	}
-	while(((&htim2)->Instance ->CNT) < xus) {
-		
-	}
-	HAL_TIM_Base_Stop(&htim2);
+void MyI2C_W_SCL(uint8_t BitValue);
+void MyI2C_W_SDA(uint8_t BitValue);
+uint8_t MyI2C_R_SDA(void);
+void MyI2C_Init(void); 
+void MyI2C_Start(void);
+void MyI2C_Stop(void);
+void MyI2C_SendByte(uint8_t Byte);
+uint8_t MyI2C_ReceiveByte(void);
+void MyI2C_SendAck(uint8_t AckBit);
+uint8_t MyI2C_ReceiveAck(void);
+#line 3 "MyLib\\GY86.c"
+#line 1 "MyLib\\GY86.h"
+
+
+
+extern uint8_t already_init;
+
+
+
+
+
+
+#line 25 "MyLib\\GY86.h"
+
+
+
+
+
+void MPU6050_WriteReg(uint8_t RegAddr, uint8_t data);
+void MPU6050_Init(void);
+uint8_t MPU6050_ReadReg(uint8_t RegAddr);
+void MPU6050_GetData(int16_t* AccX, int16_t* AccY, int16_t* AccZ, int16_t* GyroX, int16_t* GyroY, int16_t* GyroZ);
+uint8_t MPU6050_GetId(void);
+
+#line 50 "MyLib\\GY86.h"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#line 4 "MyLib\\GY86.c"
+
+
+ 
+uint8_t already_init = 0;
+
+
+
+ 
+void MPU6050_WriteReg(uint8_t RegAddr, uint8_t data) {
+	MyI2C_Start();
+	MyI2C_SendByte(0xD0);
+	MyI2C_ReceiveAck();
+	MyI2C_SendByte(RegAddr);
+	MyI2C_ReceiveAck();
+	MyI2C_SendByte(data);
+	MyI2C_ReceiveAck();
+	MyI2C_Stop();
 }
+
+void MPU6050_Init(void) {
+	if(!already_init){
+		MyI2C_Init();
+		already_init = 1;
+	}
+	MPU6050_WriteReg(0x6B,0x01);
+	MPU6050_WriteReg(0x6C,0x00);
+	MPU6050_WriteReg(0x19,0x09);
+	MPU6050_WriteReg(0x1A,0x02);
+	MPU6050_WriteReg(0x1B,0x18);
+	MPU6050_WriteReg(0x1C,0x18);
+}
+
+uint8_t MPU6050_ReadReg(uint8_t RegAddr) {
+	uint8_t RecByte;
+	MyI2C_Start();
+	MyI2C_SendByte(0xD0);
+	MyI2C_ReceiveAck();
+	MyI2C_SendByte(RegAddr);
+	MyI2C_ReceiveAck();
+	
+	MyI2C_Start();
+	MyI2C_SendByte(0xD0 | 0x01);
+	MyI2C_ReceiveAck();
+	RecByte = MyI2C_ReceiveByte();
+	MyI2C_SendAck(1);
+	MyI2C_Stop();
+	return RecByte;
+}
+
+void MPU6050_GetData(int16_t* AccX, int16_t* AccY, int16_t* AccZ, int16_t* GyroX, int16_t* GyroY, int16_t* GyroZ) {
+	uint8_t High, Low;
+	High = MPU6050_ReadReg(0x3B);
+	Low = MPU6050_ReadReg(0x3C);
+	*AccX = Low | (High << 8);
+	High = MPU6050_ReadReg(0x3D);
+	Low = MPU6050_ReadReg(0x3E);
+	*AccY = Low | (High << 8);
+	High = MPU6050_ReadReg(0x3F);
+	Low = MPU6050_ReadReg(0x40);
+	*AccZ = Low | (High << 8);
+	High = MPU6050_ReadReg(0x43);
+	Low = MPU6050_ReadReg(0x44);
+	*GyroX = Low | (High << 8);
+	High = MPU6050_ReadReg(0x45);
+	Low = MPU6050_ReadReg(0x46);
+	*GyroY = Low | (High << 8);	
+	High = MPU6050_ReadReg(0x47);
+	Low = MPU6050_ReadReg(0x48);
+	*GyroZ = Low | (High << 8);
+}
+
+uint8_t MPU6050_GetId(void) {
+	return MPU6050_ReadReg(0x75);
+}
+
+
+
+ 
+void HMC5883L_WriteReg(uint8_t RegAddr, uint8_t data) {
+	MyI2C_Start();
+	MyI2C_SendByte(0x3C);
+	MyI2C_ReceiveAck();
+	MyI2C_SendByte(RegAddr);
+	MyI2C_ReceiveAck();
+	MyI2C_SendByte(data);
+	MyI2C_ReceiveAck();
+	MyI2C_Stop();
+}
+void HMC5883L_Init(void) {
+	if(!already_init){
+		MyI2C_Init();
+		already_init = 1;
+	}
+	HMC5883L_WriteReg(0x00,0x18);
+	HMC5883L_WriteReg(0x01,0x20);
+	HMC5883L_WriteReg(0x02,0x00);
+}
+
+uint8_t HMC5883L_ReadReg(uint8_t RegAddr) {
+	uint8_t RecByte;
+	MyI2C_Start();
+	MyI2C_SendByte(0x3C);
+	MyI2C_ReceiveAck();
+	MyI2C_SendByte(RegAddr);
+	MyI2C_ReceiveAck();
+
+	MyI2C_Start();
+	MyI2C_SendByte(0x3C | 0x01);
+	MyI2C_ReceiveAck();
+	RecByte = MyI2C_ReceiveByte();
+	MyI2C_SendAck(1);
+	MyI2C_Stop();
+	return RecByte;
+}
+
+void HMC5883L_GetData(int16_t* X, int16_t* Y, int16_t* Z) {
+	uint8_t High, Low;
+	High = HMC5883L_ReadReg(0x03);
+	Low = HMC5883L_ReadReg(0x04);
+	*X = Low | (High << 8);
+	High = HMC5883L_ReadReg(0x07);
+	Low = HMC5883L_ReadReg(0x08);
+	*Y = Low | (High << 8);
+	High = HMC5883L_ReadReg(0x05);
+	Low = HMC5883L_ReadReg(0x06);
+	*Z = Low | (High << 8);
+}
+

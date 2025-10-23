@@ -1,8 +1,120 @@
-#line 1 "MyLib\\Delay.c"
-#line 1 ".\\Inc\\main.h"
+#line 1 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_adc_ex.c"
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+ 
 #line 1 ".\\Drivers\\STM32F4xx_HAL_Driver\\Inc\\stm32f4xx_hal.h"
 
 
@@ -27756,36 +27868,956 @@ void HAL_DisableCompensationCell(void);
 
 
  
-#line 5 ".\\Inc\\main.h"
+#line 118 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_adc_ex.c"
 
-void SystemClock_Config(void);
-void Error_Handler(void);
 
-#line 2 "MyLib\\Delay.c"
 
-static uint8_t timer_initialized = 0;
-static TIM_HandleTypeDef htim2;
+ 
 
-void Timer_Delay_us(uint8_t xus) {
-	if(!timer_initialized) {
-		do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x00000001U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x00000001U)); ((void)(tmpreg)); } while(0);
-		timer_initialized = 1;
 
-		htim2.Instance = ((TIM_TypeDef *) (0x40000000U + 0x0000U));
-		htim2.Init.Prescaler = 84 - 1;
-		htim2.Init.Period = 0xFFFFFFFF;
-		htim2.Init.CounterMode = ((uint32_t)0x00000000U);
-		htim2.Init.ClockDivision = ((uint32_t)0x00000000U);
-		if(HAL_TIM_Base_Init(&htim2) != HAL_OK) {
-			Error_Handler();
-		}
-	}
-	((&htim2)->Instance ->CNT = (0));
-	if(HAL_TIM_Base_Start(&htim2) != HAL_OK) {
-		Error_Handler();
-	}
-	while(((&htim2)->Instance ->CNT) < xus) {
-		
-	}
-	HAL_TIM_Base_Stop(&htim2);
+
+
+  
+
+
+    
+ 
+  
+ 
+ 
+
+
+ 
+ 
+static void ADC_MultiModeDMAConvCplt(DMA_HandleTypeDef *hdma);
+static void ADC_MultiModeDMAError(DMA_HandleTypeDef *hdma);
+static void ADC_MultiModeDMAHalfConvCplt(DMA_HandleTypeDef *hdma); 
+
+
+ 
+
+ 
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_ADCEx_InjectedStart(ADC_HandleTypeDef* hadc)
+{
+  volatile uint32_t counter = 0U;
+  uint32_t tmp1 = 0U, tmp2 = 0U;
+  
+   
+  do{ if((hadc)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hadc)->Lock = HAL_LOCKED; } }while (0);
+  
+   
+  
+  
+ 
+  if((hadc->Instance->CR2 & 0x00000001U) != 0x00000001U)
+  {  
+     
+    ((hadc)->Instance ->CR2 |= 0x00000001U);
+    
+     
+     
+    counter = (((uint32_t) 3U) * (SystemCoreClock / 1000000U));
+    while(counter != 0U)
+    {
+      counter--;
+    }
+  }
+  
+   
+  if((((hadc->Instance ->CR2) & (0x00000001U)) != RESET))
+  {
+     
+     
+     
+    (((hadc->State)) = ((((((hadc->State))) & (~(((uint32_t)0x00000001U) | ((uint32_t)0x00002000U)))) | (((uint32_t)0x00001000U)))));
+
+
+    
+     
+     
+     
+     
+    if ((((hadc->State) & (((uint32_t)0x00000100U))) == RESET))
+    {
+       
+      ((hadc)->ErrorCode = ((uint32_t)0x00U));
+    }
+    
+     
+     
+     
+    do{ (hadc)->Lock = HAL_UNLOCKED; }while (0);
+    
+     
+     
+    (((hadc)->Instance ->SR) = ~(((uint32_t)0x00000004U)));
+    
+     
+    if((((((ADC_Common_TypeDef *) ((0x40000000U + 0x00010000U) + 0x2300U))->CCR) & (0x0000001FU)) == RESET))
+    {
+      tmp1 = (((hadc->Instance ->CR2) & (0x00300000U)) == RESET);
+      tmp2 = (((hadc->Instance ->CR1) & (0x00000400U)) == RESET);
+      if(tmp1 && tmp2)
+      {
+         
+        hadc->Instance->CR2 |= 0x00400000U;
+      }
+    }
+    else
+    {
+      tmp1 = (((hadc->Instance ->CR2) & (0x00300000U)) == RESET);
+      tmp2 = (((hadc->Instance ->CR1) & (0x00000400U)) == RESET);
+      if((hadc->Instance == ((ADC_TypeDef *) ((0x40000000U + 0x00010000U) + 0x2000U))) && tmp1 && tmp2)  
+      {
+         
+        hadc->Instance->CR2 |= 0x00400000U;
+      }
+    }
+  }
+  
+   
+  return HAL_OK;
 }
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_ADCEx_InjectedStart_IT(ADC_HandleTypeDef* hadc)
+{
+  volatile uint32_t counter = 0U;
+  uint32_t tmp1 = 0U, tmp2 = 0U;
+  
+   
+  do{ if((hadc)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hadc)->Lock = HAL_LOCKED; } }while (0);
+  
+   
+  
+  
+ 
+  if((hadc->Instance->CR2 & 0x00000001U) != 0x00000001U)
+  {  
+     
+    ((hadc)->Instance ->CR2 |= 0x00000001U);
+    
+     
+     
+    counter = (((uint32_t) 3U) * (SystemCoreClock / 1000000U));
+    while(counter != 0U)
+    {
+      counter--;
+    }
+  }
+  
+   
+  if((((hadc->Instance ->CR2) & (0x00000001U)) != RESET))
+  {
+     
+     
+     
+    (((hadc->State)) = ((((((hadc->State))) & (~(((uint32_t)0x00000001U) | ((uint32_t)0x00002000U)))) | (((uint32_t)0x00001000U)))));
+
+
+    
+     
+     
+     
+     
+    if ((((hadc->State) & (((uint32_t)0x00000100U))) == RESET))
+    {
+       
+      ((hadc)->ErrorCode = ((uint32_t)0x00U));
+    }
+    
+     
+     
+     
+    do{ (hadc)->Lock = HAL_UNLOCKED; }while (0);
+    
+     
+     
+    (((hadc)->Instance ->SR) = ~(((uint32_t)0x00000004U)));
+    
+     
+    (((hadc)->Instance ->CR1) |= (((uint32_t)0x00000080U)));
+    
+     
+    if((((((ADC_Common_TypeDef *) ((0x40000000U + 0x00010000U) + 0x2300U))->CCR) & (0x0000001FU)) == RESET))
+    {
+      tmp1 = (((hadc->Instance ->CR2) & (0x00300000U)) == RESET);
+      tmp2 = (((hadc->Instance ->CR1) & (0x00000400U)) == RESET);
+      if(tmp1 && tmp2)
+      {
+         
+        hadc->Instance->CR2 |= 0x00400000U;
+      }
+    }
+    else
+    {
+      tmp1 = (((hadc->Instance ->CR2) & (0x00300000U)) == RESET);
+      tmp2 = (((hadc->Instance ->CR1) & (0x00000400U)) == RESET);
+      if((hadc->Instance == ((ADC_TypeDef *) ((0x40000000U + 0x00010000U) + 0x2000U))) && tmp1 && tmp2)  
+      {
+         
+        hadc->Instance->CR2 |= 0x00400000U;
+      }
+    }
+  }
+  
+   
+  return HAL_OK;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_ADCEx_InjectedStop(ADC_HandleTypeDef* hadc)
+{
+  HAL_StatusTypeDef tmp_hal_status = HAL_OK;
+  
+   
+  ((void)0);
+
+   
+  do{ if((hadc)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hadc)->Lock = HAL_LOCKED; } }while (0);
+    
+   
+   
+   
+   
+   
+   
+  if(((hadc->State & ((uint32_t)0x00000100U)) == RESET)  &&
+     (((hadc->Instance ->CR1) & (0x00000400U)) == RESET)   )
+  {
+     
+     
+    ((hadc)->Instance ->CR2 &= ~0x00000001U);
+    
+     
+    if((((hadc->Instance ->CR2) & (0x00000001U)) == RESET))
+    {
+       
+      (((hadc->State)) = ((((((hadc->State))) & (~(((uint32_t)0x00000100U) | ((uint32_t)0x00001000U)))) | (((uint32_t)0x00000001U)))));
+
+
+    }
+  }
+  else
+  {
+     
+    ((hadc->State) |= (((uint32_t)0x00000020U)));
+      
+    tmp_hal_status = HAL_ERROR;
+  }
+  
+   
+  do{ (hadc)->Lock = HAL_UNLOCKED; }while (0);
+  
+   
+  return tmp_hal_status;
+}
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_ADCEx_InjectedPollForConversion(ADC_HandleTypeDef* hadc, uint32_t Timeout)
+{
+  uint32_t tickstart = 0U;
+
+    
+  tickstart = HAL_GetTick();
+
+   
+  while(!(((((hadc)->Instance ->SR) & (((uint32_t)0x00000004U))) == (((uint32_t)0x00000004U)))))
+  {
+     
+    if(Timeout != 0xFFFFFFFFU)
+    {
+      if((Timeout == 0U)||((HAL_GetTick() - tickstart ) > Timeout))
+      {
+        hadc->State= ((uint32_t)0x00000004U);
+         
+        do{ (hadc)->Lock = HAL_UNLOCKED; }while (0);
+        return HAL_TIMEOUT;
+      }
+    }
+  }
+  
+   
+  (((hadc)->Instance ->SR) = ~(((uint32_t)0x00000008U) | ((uint32_t)0x00000004U)));
+    
+   
+  ((hadc->State) |= (((uint32_t)0x00002000U)));
+  
+   
+   
+   
+   
+   
+   
+  if((((hadc)->Instance ->CR2 & 0x00300000U) == RESET)                    &&
+     ((((hadc->Instance ->JSQR) & (0x00300000U)) == RESET)  ||
+      (((hadc->Instance ->CR2) & (0x00000400U)) == RESET)    ) &&
+     ((((hadc->Instance ->CR1) & (0x00000400U)) == RESET) &&
+      ((((hadc)->Instance ->CR2 & 0x30000000U) == RESET)       &&
+      (hadc->Init.ContinuousConvMode == DISABLE)   )       )   )
+  {
+     
+    ((hadc->State) &= ~(((uint32_t)0x00001000U)));
+    
+    if ((((hadc->State) & (((uint32_t)0x00000100U))) == RESET))
+    { 
+      ((hadc->State) |= (((uint32_t)0x00000001U)));
+    }
+  }
+  
+   
+  return HAL_OK;
+}      
+  
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_ADCEx_InjectedStop_IT(ADC_HandleTypeDef* hadc)
+{
+  HAL_StatusTypeDef tmp_hal_status = HAL_OK;
+  
+   
+  ((void)0);
+
+   
+  do{ if((hadc)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hadc)->Lock = HAL_LOCKED; } }while (0);
+    
+   
+   
+   
+   
+   
+    
+  if(((hadc->State & ((uint32_t)0x00000100U)) == RESET)  &&
+     (((hadc->Instance ->CR1) & (0x00000400U)) == RESET)   )
+  {
+     
+     
+    ((hadc)->Instance ->CR2 &= ~0x00000001U);
+    
+     
+    if((((hadc->Instance ->CR2) & (0x00000001U)) == RESET))
+    {
+       
+      (((hadc)->Instance ->CR1) &= ~(((uint32_t)0x00000080U)));
+      
+       
+      (((hadc->State)) = ((((((hadc->State))) & (~(((uint32_t)0x00000100U) | ((uint32_t)0x00001000U)))) | (((uint32_t)0x00000001U)))));
+
+
+    }
+  }
+  else
+  {
+     
+    ((hadc->State) |= (((uint32_t)0x00000020U)));
+      
+    tmp_hal_status = HAL_ERROR;
+  }
+  
+   
+  do{ (hadc)->Lock = HAL_UNLOCKED; }while (0);
+  
+   
+  return tmp_hal_status;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+uint32_t HAL_ADCEx_InjectedGetValue(ADC_HandleTypeDef* hadc, uint32_t InjectedRank)
+{
+  volatile uint32_t tmp = 0U;
+  
+   
+  ((void)0);
+  
+   
+   
+  (((hadc)->Instance ->SR) = ~(((uint32_t)0x00000004U)));
+  
+    
+  switch(InjectedRank)
+  {  
+    case ((uint32_t)0x00000004U):
+    {
+      tmp =  hadc->Instance->JDR4;
+    }  
+    break;
+    case ((uint32_t)0x00000003U): 
+    {  
+      tmp =  hadc->Instance->JDR3;
+    }  
+    break;
+    case ((uint32_t)0x00000002U): 
+    {  
+      tmp =  hadc->Instance->JDR2;
+    }
+    break;
+    case ((uint32_t)0x00000001U):
+    {
+      tmp =  hadc->Instance->JDR1;
+    }
+    break;
+    default:
+    break;  
+  }
+  return tmp;
+}
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_ADCEx_MultiModeStart_DMA(ADC_HandleTypeDef* hadc, uint32_t* pData, uint32_t Length)
+{
+  volatile uint32_t counter = 0U;
+  
+   
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  
+   
+  do{ if((hadc)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hadc)->Lock = HAL_LOCKED; } }while (0);
+  
+  
+ 
+  if((hadc->Instance->CR2 & 0x00000001U) != 0x00000001U)
+  {  
+     
+    ((hadc)->Instance ->CR2 |= 0x00000001U);
+    
+     
+     
+    counter = (((uint32_t) 3U) * (SystemCoreClock / 1000000U));
+    while(counter != 0U)
+    {
+      counter--;
+    }
+  }
+  
+   
+  if((((hadc->Instance ->CR2) & (0x00000001U)) != RESET))
+  {
+     
+     
+     
+    (((hadc->State)) = ((((((hadc->State))) & (~(((uint32_t)0x00000001U) | ((uint32_t)0x00000200U) | ((uint32_t)0x00000400U)))) | (((uint32_t)0x00000100U)))));
+
+
+    
+     
+     
+    if (((hadc->Instance ->CR1) & (0x00000400U)) != RESET)
+    {
+      (((hadc->State)) = ((((((hadc->State))) & (~(((uint32_t)0x00002000U)))) | (((uint32_t)0x00001000U)))));  
+    }
+    
+     
+    if ((((hadc->State) & (((uint32_t)0x00001000U))) != RESET))
+    {
+       
+      ((hadc->ErrorCode) &= ~((((uint32_t)0x02U) | ((uint32_t)0x04U))));         
+    }
+    else
+    {
+       
+      ((hadc)->ErrorCode = ((uint32_t)0x00U));
+    }
+    
+     
+     
+     
+    do{ (hadc)->Lock = HAL_UNLOCKED; }while (0);
+    
+     
+    hadc->DMA_Handle->XferCpltCallback = ADC_MultiModeDMAConvCplt;
+    
+     
+    hadc->DMA_Handle->XferHalfCpltCallback = ADC_MultiModeDMAHalfConvCplt;
+    
+     
+    hadc->DMA_Handle->XferErrorCallback = ADC_MultiModeDMAError ;
+    
+     
+     
+    
+     
+     
+    (((hadc)->Instance ->SR) = ~(((uint32_t)0x00000002U)));
+
+     
+    (((hadc)->Instance ->CR1) |= (((uint32_t)0x04000000U)));
+    
+    if (hadc->Init.DMAContinuousRequests != DISABLE)
+    {
+       
+      ((ADC_Common_TypeDef *) ((0x40000000U + 0x00010000U) + 0x2300U))->CCR |= 0x00002000U;
+    }
+    else
+    {
+       
+      ((ADC_Common_TypeDef *) ((0x40000000U + 0x00010000U) + 0x2300U))->CCR &= ~0x00002000U;
+    }
+    
+     
+    HAL_DMA_Start_IT(hadc->DMA_Handle, (uint32_t)&((ADC_Common_TypeDef *) ((0x40000000U + 0x00010000U) + 0x2300U))->CDR, (uint32_t)pData, Length);
+    
+     
+    if((hadc->Instance->CR2 & 0x30000000U) == RESET) 
+    {
+       
+      hadc->Instance->CR2 |= (uint32_t)0x40000000U;
+    }
+  }
+  
+   
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_ADCEx_MultiModeStop_DMA(ADC_HandleTypeDef* hadc)
+{
+  HAL_StatusTypeDef tmp_hal_status = HAL_OK;
+  
+   
+  ((void)0);
+  
+   
+  do{ if((hadc)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hadc)->Lock = HAL_LOCKED; } }while (0);
+  
+   
+   
+  ((hadc)->Instance ->CR2 &= ~0x00000001U);
+  
+   
+  if((((hadc->Instance ->CR2) & (0x00000001U)) == RESET))
+  {
+     
+    ((ADC_Common_TypeDef *) ((0x40000000U + 0x00010000U) + 0x2300U))->CCR &= ~0x00002000U;
+    
+     
+     
+    tmp_hal_status = HAL_DMA_Abort(hadc->DMA_Handle);
+    
+     
+    (((hadc)->Instance ->CR1) &= ~(((uint32_t)0x04000000U)));
+    
+     
+    (((hadc->State)) = ((((((hadc->State))) & (~(((uint32_t)0x00000100U) | ((uint32_t)0x00001000U)))) | (((uint32_t)0x00000001U)))));
+
+
+  }
+  
+   
+  do{ (hadc)->Lock = HAL_UNLOCKED; }while (0);
+  
+   
+  return tmp_hal_status;
+}
+
+
+
+
+
+
+
+ 
+uint32_t HAL_ADCEx_MultiModeGetValue(ADC_HandleTypeDef* hadc)
+{
+   
+  return ((ADC_Common_TypeDef *) ((0x40000000U + 0x00010000U) + 0x2300U))->CDR;
+}
+
+
+
+
+
+
+ 
+__weak void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef* hadc)
+{
+   
+  ((void)(hadc));
+  
+
+ 
+}
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_ADCEx_InjectedConfigChannel(ADC_HandleTypeDef* hadc, ADC_InjectionConfTypeDef* sConfigInjected)
+{
+  
+
+
+
+  
+   
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+
+
+
+
+
+
+  if(sConfigInjected->ExternalTrigInjecConvEdge != ((uint32_t)0x000F0000U + 1U))
+  {
+    ((void)0);
+  }
+
+   
+  do{ if((hadc)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hadc)->Lock = HAL_LOCKED; } }while (0);
+  
+   
+  if (sConfigInjected->InjectedChannel > ((uint32_t)(0x00000008U | 0x00000001U)))
+  {
+     
+    hadc->Instance->SMPR1 &= ~((0x00000007U) << (3U * (((uint32_t)((uint16_t)(sConfigInjected->InjectedChannel))) - 10U)));
+    
+     
+    hadc->Instance->SMPR1 |= ((sConfigInjected->InjectedSamplingTime) << (3U * (((uint32_t)((uint16_t)(sConfigInjected->InjectedChannel))) - 10U)));
+  }
+  else  
+  {
+     
+    hadc->Instance->SMPR2 &= ~((0x00000007U) << (3U * ((uint32_t)((uint16_t)(sConfigInjected->InjectedChannel)))));
+    
+     
+    hadc->Instance->SMPR2 |= ((sConfigInjected->InjectedSamplingTime) << (3U * ((uint32_t)((uint16_t)(sConfigInjected->InjectedChannel)))));
+  }
+  
+   
+  hadc->Instance->JSQR &= ~(0x00300000U);
+  hadc->Instance->JSQR |=  (((sConfigInjected->InjectedNbrOfConversion) - (uint8_t)1U) << 20U);
+  
+   
+  
+   
+  hadc->Instance->JSQR &= ~(((uint32_t)((uint16_t)(0x0000001FU))) << (5U * (uint8_t)(((sConfigInjected->InjectedRank) + 3U) - (sConfigInjected->InjectedNbrOfConversion))));
+   
+   
+  hadc->Instance->JSQR |= (((uint32_t)((uint16_t)(sConfigInjected->InjectedChannel))) << (5U * (uint8_t)(((sConfigInjected->InjectedRank) + 3U) - (sConfigInjected->InjectedNbrOfConversion))));
+
+   
+   
+   
+   
+    
+  if(sConfigInjected->ExternalTrigInjecConv != ((uint32_t)0x000F0000U + 1U))
+  {  
+     
+    hadc->Instance->CR2 &= ~(0x000F0000U);
+    hadc->Instance->CR2 |=  sConfigInjected->ExternalTrigInjecConv;
+    
+     
+    hadc->Instance->CR2 &= ~(0x00300000U);
+    hadc->Instance->CR2 |= sConfigInjected->ExternalTrigInjecConvEdge;
+  }
+  else
+  {
+     
+    hadc->Instance->CR2 &= ~(0x000F0000U);
+    hadc->Instance->CR2 &= ~(0x00300000U);  
+  }
+  
+  if (sConfigInjected->AutoInjectedConv != DISABLE)
+  {
+     
+    hadc->Instance->CR1 |= 0x00000400U;
+  }
+  else
+  {
+     
+    hadc->Instance->CR1 &= ~(0x00000400U);
+  }
+  
+  if (sConfigInjected->InjectedDiscontinuousConvMode != DISABLE)
+  {
+     
+    hadc->Instance->CR1 |= 0x00001000U;
+  }
+  else
+  {
+     
+    hadc->Instance->CR1 &= ~(0x00001000U);
+  }
+  
+  switch(sConfigInjected->InjectedRank)
+  {
+    case 1U:
+       
+      hadc->Instance->JOFR1 &= ~(0x0FFFU);
+      hadc->Instance->JOFR1 |= sConfigInjected->InjectedOffset;
+      break;
+    case 2U:
+       
+      hadc->Instance->JOFR2 &= ~(0x0FFFU);
+      hadc->Instance->JOFR2 |= sConfigInjected->InjectedOffset;
+      break;
+    case 3U:
+       
+      hadc->Instance->JOFR3 &= ~(0x0FFFU);
+      hadc->Instance->JOFR3 |= sConfigInjected->InjectedOffset;
+      break;
+    default:
+       
+      hadc->Instance->JOFR4 &= ~(0x0FFFU);
+      hadc->Instance->JOFR4 |= sConfigInjected->InjectedOffset;
+      break;
+  }
+  
+   
+  if ((hadc->Instance == ((ADC_TypeDef *) ((0x40000000U + 0x00010000U) + 0x2000U))) && (sConfigInjected->InjectedChannel == ((uint32_t)((uint32_t)(0x00000010U | 0x00000002U)))))
+  {
+     
+    ((ADC_Common_TypeDef *) ((0x40000000U + 0x00010000U) + 0x2300U))->CCR |= 0x00400000U;
+  }
+  
+   
+  if ((hadc->Instance == ((ADC_TypeDef *) ((0x40000000U + 0x00010000U) + 0x2000U))) && ((sConfigInjected->InjectedChannel == ((uint32_t)((uint32_t)0x00000010U))) || (sConfigInjected->InjectedChannel == ((uint32_t)((uint32_t)(0x00000010U | 0x00000001U))))))
+  {
+     
+    ((ADC_Common_TypeDef *) ((0x40000000U + 0x00010000U) + 0x2300U))->CCR |= 0x00800000U;
+  }
+  
+   
+  do{ (hadc)->Lock = HAL_UNLOCKED; }while (0);
+  
+   
+  return HAL_OK;
+}
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_ADCEx_MultiModeConfigChannel(ADC_HandleTypeDef* hadc, ADC_MultiModeTypeDef* multimode)
+{
+   
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  
+   
+  do{ if((hadc)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hadc)->Lock = HAL_LOCKED; } }while (0);
+  
+   
+  ((ADC_Common_TypeDef *) ((0x40000000U + 0x00010000U) + 0x2300U))->CCR &= ~(0x0000001FU);
+  ((ADC_Common_TypeDef *) ((0x40000000U + 0x00010000U) + 0x2300U))->CCR |= multimode->Mode;
+  
+   
+  ((ADC_Common_TypeDef *) ((0x40000000U + 0x00010000U) + 0x2300U))->CCR &= ~(0x0000C000U);
+  ((ADC_Common_TypeDef *) ((0x40000000U + 0x00010000U) + 0x2300U))->CCR |= multimode->DMAAccessMode;
+  
+   
+  ((ADC_Common_TypeDef *) ((0x40000000U + 0x00010000U) + 0x2300U))->CCR &= ~(0x00000F00U);
+  ((ADC_Common_TypeDef *) ((0x40000000U + 0x00010000U) + 0x2300U))->CCR |= multimode->TwoSamplingDelay;
+  
+   
+  do{ (hadc)->Lock = HAL_UNLOCKED; }while (0);
+  
+   
+  return HAL_OK;
+}
+
+
+
+ 
+
+
+
+
+
+
+ 
+static void ADC_MultiModeDMAConvCplt(DMA_HandleTypeDef *hdma)   
+{
+   
+  ADC_HandleTypeDef* hadc = ( ADC_HandleTypeDef* )((DMA_HandleTypeDef* )hdma)->Parent;
+  
+   
+  if ((((hadc->State) & (((uint32_t)0x00000010U) | ((uint32_t)0x00000040U))) == RESET))
+  {
+     
+    ((hadc->State) |= (((uint32_t)0x00000200U)));
+    
+     
+     
+     
+     
+     
+     
+    if((((hadc)->Instance ->CR2 & 0x30000000U) == RESET)                   &&
+       (hadc->Init.ContinuousConvMode == DISABLE)            &&
+       ((((hadc->Instance ->SQR1) & (0x00F00000U)) == RESET) || 
+        (((hadc->Instance ->CR2) & (0x00000400U)) == RESET)  )   )
+    {
+       
+       
+       
+       
+      (((hadc)->Instance ->CR1) &= ~(((uint32_t)0x00000020U)));
+      
+       
+      ((hadc->State) &= ~(((uint32_t)0x00000100U)));   
+      
+      if ((((hadc->State) & (((uint32_t)0x00001000U))) == RESET))
+      {
+        ((hadc->State) |= (((uint32_t)0x00000001U)));
+      }
+    }
+    
+     
+    HAL_ADC_ConvCpltCallback(hadc);
+  }
+  else
+  {
+     
+    hadc->DMA_Handle->XferErrorCallback(hdma);
+  }
+}
+
+
+
+
+
+
+ 
+static void ADC_MultiModeDMAHalfConvCplt(DMA_HandleTypeDef *hdma)   
+{
+    ADC_HandleTypeDef* hadc = ( ADC_HandleTypeDef* )((DMA_HandleTypeDef* )hdma)->Parent;
+     
+    HAL_ADC_ConvHalfCpltCallback(hadc); 
+}
+
+
+
+
+
+
+ 
+static void ADC_MultiModeDMAError(DMA_HandleTypeDef *hdma)   
+{
+    ADC_HandleTypeDef* hadc = ( ADC_HandleTypeDef* )((DMA_HandleTypeDef* )hdma)->Parent;
+    hadc->State= ((uint32_t)0x00000040U);
+     
+    hadc->ErrorCode |= ((uint32_t)0x04U);
+    HAL_ADC_ErrorCallback(hadc); 
+}
+
+
+
+ 
+
+
+
+
+  
+
+
+
+  
+
+ 

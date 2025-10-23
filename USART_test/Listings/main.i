@@ -1,4 +1,4 @@
-#line 1 "MyLib\\Delay.c"
+#line 1 "Src\\main.c"
 #line 1 ".\\Inc\\main.h"
 
 
@@ -27761,31 +27761,117 @@ void HAL_DisableCompensationCell(void);
 void SystemClock_Config(void);
 void Error_Handler(void);
 
-#line 2 "MyLib\\Delay.c"
+#line 2 "Src\\main.c"
+#line 1 ".\\MyLib\\GPIO_Set.h"
 
-static uint8_t timer_initialized = 0;
-static TIM_HandleTypeDef htim2;
 
-void Timer_Delay_us(uint8_t xus) {
-	if(!timer_initialized) {
-		do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x00000001U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x00000001U)); ((void)(tmpreg)); } while(0);
-		timer_initialized = 1;
 
-		htim2.Instance = ((TIM_TypeDef *) (0x40000000U + 0x0000U));
-		htim2.Init.Prescaler = 84 - 1;
-		htim2.Init.Period = 0xFFFFFFFF;
-		htim2.Init.CounterMode = ((uint32_t)0x00000000U);
-		htim2.Init.ClockDivision = ((uint32_t)0x00000000U);
-		if(HAL_TIM_Base_Init(&htim2) != HAL_OK) {
-			Error_Handler();
-		}
-	}
-	((&htim2)->Instance ->CNT = (0));
-	if(HAL_TIM_Base_Start(&htim2) != HAL_OK) {
-		Error_Handler();
-	}
-	while(((&htim2)->Instance ->CNT) < xus) {
-		
-	}
-	HAL_TIM_Base_Stop(&htim2);
+
+#line 6 ".\\MyLib\\GPIO_Set.h"
+
+#line 16 ".\\MyLib\\GPIO_Set.h"
+
+#line 27 ".\\MyLib\\GPIO_Set.h"
+
+#line 3 "Src\\main.c"
+#line 1 ".\\MyLib\\OLED.h"
+
+
+
+void OLED_Init(void);
+void OLED_Clear(void);
+void OLED_ShowChar(uint8_t Line, uint8_t Column, char Char);
+void OLED_ShowString(uint8_t Line, uint8_t Column, char *String);
+void OLED_ShowNum(uint8_t Line, uint8_t Column, uint32_t Number, uint8_t Length);
+void OLED_ShowSignedNum(uint8_t Line, uint8_t Column, int32_t Number, uint8_t Length);
+void OLED_ShowHexNum(uint8_t Line, uint8_t Column, uint32_t Number, uint8_t Length);
+void OLED_ShowBinNum(uint8_t Line, uint8_t Column, uint32_t Number, uint8_t Length);
+
+#line 4 "Src\\main.c"
+
+
+
+#line 1 ".\\MyLib\\USART_Set.h"
+
+
+
+#line 5 ".\\MyLib\\USART_Set.h"
+
+extern USART_HandleTypeDef husart;
+ 
+ 
+ 
+#line 23 ".\\MyLib\\USART_Set.h"
+
+#line 8 "Src\\main.c"
+
+USART_HandleTypeDef husart;
+
+
+void SystemClock_Config(void)
+{
+    RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+    RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+
+    
+    RCC_OscInitStruct.OscillatorType = ((uint32_t)0x00000001U);
+    RCC_OscInitStruct.HSEState = ((uint8_t)0x01U);
+    RCC_OscInitStruct.PLL.PLLState = ((uint8_t)0x02U);
+    RCC_OscInitStruct.PLL.PLLSource = 0x00400000U;
+    RCC_OscInitStruct.PLL.PLLM = 8;   
+    RCC_OscInitStruct.PLL.PLLN = 336; 
+    RCC_OscInitStruct.PLL.PLLP = ((uint32_t)0x00000004U); 
+    RCC_OscInitStruct.PLL.PLLQ = 7;   
+
+    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+    {
+        Error_Handler();
+    }
+
+    
+    RCC_ClkInitStruct.ClockType = ((uint32_t)0x00000002U) | ((uint32_t)0x00000001U) | ((uint32_t)0x00000004U) | ((uint32_t)0x00000008U);
+    RCC_ClkInitStruct.SYSCLKSource = 0x00000002U;
+    RCC_ClkInitStruct.AHBCLKDivider = 0x00000000U;   
+    RCC_ClkInitStruct.APB1CLKDivider = 0x00001000U;    
+    RCC_ClkInitStruct.APB2CLKDivider = 0x00000000U;    
+
+    if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, 0x00000002U) != HAL_OK)
+    {
+        Error_Handler();
+    }
+}
+
+int main(void)
+{
+    HAL_Init();
+    SystemClock_Config();
+	OLED_Init();
+	
+	do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1ENR) |= (0x00000001U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1ENR) & (0x00000001U)); ((void)(tmpreg)); } while(0);
+    do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB2ENR) |= (0x00000010U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB2ENR) & (0x00000010U)); ((void)(tmpreg)); } while(0);
+	
+	do { GPIO_InitTypeDef GPIO_InitStructure = {0}; GPIO_InitStructure . Pin = ((uint16_t)0x0200U); GPIO_InitStructure . Mode = ((uint32_t)0x00000002U); GPIO_InitStructure . Speed = ((uint32_t)0x00000002U); GPIO_InitStructure . Pull = ((uint32_t)0x00000000U); GPIO_InitStructure . Alternate = ((uint8_t)0x07U); HAL_GPIO_Init(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0000U)), &GPIO_InitStructure); } while(0);
+    do { GPIO_InitTypeDef GPIO_InitStructure = {0}; GPIO_InitStructure . Pin = ((uint16_t)0x0400U); GPIO_InitStructure . Mode = ((uint32_t)0x00000000U); GPIO_InitStructure . Speed = ((uint32_t)0x00000002U); GPIO_InitStructure . Pull = ((uint32_t)0x00000001U); HAL_GPIO_Init(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0000U)), &GPIO_InitStructure); } while(0);
+	do { USART_InitTypeDef USART_InitStructure; USART_InitStructure . BaudRate = 115200; USART_InitStructure . WordLength = ((uint32_t)0x1000U); USART_InitStructure . StopBits = ((uint32_t)0x00000000U); USART_InitStructure . Parity = ((uint32_t)0x0400U); USART_InitStructure . Mode = ((uint32_t)(0x0008U |0x0004U)); husart . Init = USART_InitStructure; husart . Instance = ((USART_TypeDef *) ((0x40000000U + 0x00010000U) + 0x1000U)); if(HAL_USART_Init(&husart) != HAL_OK) { Error_Handler(); } } while(0);
+
+    uint8_t TxData[2];
+    TxData[0] = 0x0;
+    TxData[1] = 0x1;
+
+    HAL_USART_Transmit(&husart, TxData, sizeof(TxData), 0xFFFFFFFFU);
+    OLED_ShowString(1, 1, "Transmit succeed");
+    OLED_ShowNum(2, 1, (uint32_t)TxData[0], 2);
+    OLED_ShowNum(2, 4, (uint32_t)TxData[1], 2);
+    while(1) {
+        
+    }
+}
+
+void Error_Handler(void)
+{
+     
+    __disable_irq();
+    while (1)
+    {
+    }
 }

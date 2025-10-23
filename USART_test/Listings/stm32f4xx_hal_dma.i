@@ -1,8 +1,118 @@
-#line 1 "MyLib\\Delay.c"
-#line 1 ".\\Inc\\main.h"
+#line 1 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_dma.c"
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+ 
 #line 1 ".\\Drivers\\STM32F4xx_HAL_Driver\\Inc\\stm32f4xx_hal.h"
 
 
@@ -27756,36 +27866,1194 @@ void HAL_DisableCompensationCell(void);
 
 
  
-#line 5 ".\\Inc\\main.h"
+#line 116 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_dma.c"
 
-void SystemClock_Config(void);
-void Error_Handler(void);
 
-#line 2 "MyLib\\Delay.c"
 
-static uint8_t timer_initialized = 0;
-static TIM_HandleTypeDef htim2;
+ 
 
-void Timer_Delay_us(uint8_t xus) {
-	if(!timer_initialized) {
-		do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x00000001U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x00000001U)); ((void)(tmpreg)); } while(0);
-		timer_initialized = 1;
 
-		htim2.Instance = ((TIM_TypeDef *) (0x40000000U + 0x0000U));
-		htim2.Init.Prescaler = 84 - 1;
-		htim2.Init.Period = 0xFFFFFFFF;
-		htim2.Init.CounterMode = ((uint32_t)0x00000000U);
-		htim2.Init.ClockDivision = ((uint32_t)0x00000000U);
-		if(HAL_TIM_Base_Init(&htim2) != HAL_OK) {
-			Error_Handler();
-		}
-	}
-	((&htim2)->Instance ->CNT = (0));
-	if(HAL_TIM_Base_Start(&htim2) != HAL_OK) {
-		Error_Handler();
-	}
-	while(((&htim2)->Instance ->CNT) < xus) {
-		
-	}
-	HAL_TIM_Base_Stop(&htim2);
+
+
+ 
+
+
+
+ 
+typedef struct
+{
+  volatile uint32_t ISR;    
+  volatile uint32_t Reserved0;
+  volatile uint32_t IFCR;   
+} DMA_Base_Registers;
+
+ 
+ 
+
+
+ 
+
+
+
+ 
+ 
+ 
+
+
+ 
+static void DMA_SetConfig(DMA_HandleTypeDef *hdma, uint32_t SrcAddress, uint32_t DstAddress, uint32_t DataLength);
+static uint32_t DMA_CalcBaseAndBitshift(DMA_HandleTypeDef *hdma);
+static HAL_StatusTypeDef DMA_CheckFifoParam(DMA_HandleTypeDef *hdma);
+
+
+
+   
+  
+ 
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+  
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_DMA_Init(DMA_HandleTypeDef *hdma)
+{
+  uint32_t tmp = 0U;
+  uint32_t tickstart = HAL_GetTick();
+  DMA_Base_Registers *regs;
+
+   
+  if(hdma == 0)
+  {
+    return HAL_ERROR;
+  }
+
+   
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  
+ 
+  if(hdma->Init.FIFOMode != ((uint32_t)0x00000000U))
+  {
+    ((void)0);
+    ((void)0);
+    ((void)0);
+  }
+  
+   
+  do{ (hdma)->Lock = HAL_UNLOCKED; }while (0);
+
+   
+  hdma->State = HAL_DMA_STATE_BUSY;
+  
+   
+  ((hdma)->Instance ->CR &= ~0x00000001U);
+  
+   
+  while((hdma->Instance->CR & 0x00000001U) != RESET)
+  {
+     
+    if((HAL_GetTick() - tickstart ) > ((uint32_t)5))
+    {
+       
+      hdma->ErrorCode = ((uint32_t)0x00000020U);
+      
+       
+      hdma->State = HAL_DMA_STATE_TIMEOUT;
+      
+      return HAL_TIMEOUT;
+    }
+  }
+  
+   
+  tmp = hdma->Instance->CR;
+
+   
+  tmp &= ((uint32_t)~(0x0E000000U | 0x01800000U | 0x00600000U |                       0x00030000U    | 0x00006000U  | 0x00001800U  |                       0x00000400U  | 0x00000200U   | 0x00000100U   |                       0x000000C0U   | 0x00080000U     | 0x00040000U));
+
+
+
+
+   
+  tmp |=  hdma->Init.Channel             | hdma->Init.Direction        |
+          hdma->Init.PeriphInc           | hdma->Init.MemInc           |
+          hdma->Init.PeriphDataAlignment | hdma->Init.MemDataAlignment |
+          hdma->Init.Mode                | hdma->Init.Priority;
+
+   
+  if(hdma->Init.FIFOMode == ((uint32_t)0x00000004U))
+  {
+     
+    tmp |=  hdma->Init.MemBurst | hdma->Init.PeriphBurst;
+  }
+  
+   
+  hdma->Instance->CR = tmp;  
+
+   
+  tmp = hdma->Instance->FCR;
+
+   
+  tmp &= (uint32_t)~(0x00000004U | 0x00000003U);
+
+   
+  tmp |= hdma->Init.FIFOMode;
+
+   
+  if(hdma->Init.FIFOMode == ((uint32_t)0x00000004U))
+  {
+     
+    tmp |= hdma->Init.FIFOThreshold;
+    
+    if(DMA_CheckFifoParam(hdma) != HAL_OK)
+    {
+       
+      hdma->ErrorCode = ((uint32_t)0x00000040U);
+      
+       
+      hdma->State = HAL_DMA_STATE_READY;
+      
+      return HAL_ERROR; 
+    }
+  }
+  
+   
+  hdma->Instance->FCR = tmp;
+
+  
+ 
+  regs = (DMA_Base_Registers *)DMA_CalcBaseAndBitshift(hdma);
+  
+   
+  regs->IFCR = 0x3FU << hdma->StreamIndex;
+
+   
+  hdma->ErrorCode = ((uint32_t)0x00000000U);
+                                                                                     
+   
+  hdma->State = HAL_DMA_STATE_READY;
+
+  return HAL_OK;
 }
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_DMA_DeInit(DMA_HandleTypeDef *hdma)
+{
+  DMA_Base_Registers *regs;
+
+   
+  if(hdma == 0)
+  {
+    return HAL_ERROR;
+  }
+  
+   
+  if(hdma->State == HAL_DMA_STATE_BUSY)
+  {
+     
+    return HAL_BUSY;
+  }
+
+   
+  ((hdma)->Instance ->CR &= ~0x00000001U);
+
+   
+  hdma->Instance->CR   = 0U;
+
+   
+  hdma->Instance->NDTR = 0U;
+
+   
+  hdma->Instance->PAR  = 0U;
+
+   
+  hdma->Instance->M0AR = 0U;
+  
+   
+  hdma->Instance->M1AR = 0U;
+  
+   
+  hdma->Instance->FCR  = (uint32_t)0x00000021U;
+  
+     
+  regs = (DMA_Base_Registers *)DMA_CalcBaseAndBitshift(hdma);
+  
+   
+  regs->IFCR = 0x3FU << hdma->StreamIndex;
+
+   
+  hdma->ErrorCode = ((uint32_t)0x00000000U);
+
+   
+  hdma->State = HAL_DMA_STATE_RESET;
+
+   
+  do{ (hdma)->Lock = HAL_UNLOCKED; }while (0);
+
+  return HAL_OK;
+}
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_DMA_Start(DMA_HandleTypeDef *hdma, uint32_t SrcAddress, uint32_t DstAddress, uint32_t DataLength)
+{
+  HAL_StatusTypeDef status = HAL_OK;
+  
+   
+  ((void)0);
+
+   
+  do{ if((hdma)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hdma)->Lock = HAL_LOCKED; } }while (0);
+
+  if(HAL_DMA_STATE_READY == hdma->State)
+  {
+     
+    hdma->State = HAL_DMA_STATE_BUSY;
+    
+     
+    hdma->ErrorCode = ((uint32_t)0x00000000U);
+    
+     
+    DMA_SetConfig(hdma, SrcAddress, DstAddress, DataLength);
+
+     
+    ((hdma)->Instance ->CR |= 0x00000001U);
+  }
+  else
+  {
+     
+    do{ (hdma)->Lock = HAL_UNLOCKED; }while (0);
+    
+     
+    status = HAL_BUSY;
+  } 
+  return status; 
+}
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_DMA_Start_IT(DMA_HandleTypeDef *hdma, uint32_t SrcAddress, uint32_t DstAddress, uint32_t DataLength)
+{
+  HAL_StatusTypeDef status = HAL_OK;
+
+   
+  DMA_Base_Registers *regs = (DMA_Base_Registers *)hdma->StreamBaseAddress;
+  
+   
+  ((void)0);
+ 
+   
+  do{ if((hdma)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hdma)->Lock = HAL_LOCKED; } }while (0);
+  
+  if(HAL_DMA_STATE_READY == hdma->State)
+  {
+     
+    hdma->State = HAL_DMA_STATE_BUSY;
+    
+     
+    hdma->ErrorCode = ((uint32_t)0x00000000U);
+    
+     
+    DMA_SetConfig(hdma, SrcAddress, DstAddress, DataLength);
+    
+     
+    regs->IFCR = 0x3FU << hdma->StreamIndex;
+    
+     
+    hdma->Instance->CR  |= ((uint32_t)0x00000010U) | ((uint32_t)0x00000004U) | ((uint32_t)0x00000002U);
+    hdma->Instance->FCR |= ((uint32_t)0x00000080U);
+    
+    if(hdma->XferHalfCpltCallback != 0)
+    {
+      hdma->Instance->CR  |= ((uint32_t)0x00000008U);
+    }
+    
+     
+    ((hdma)->Instance ->CR |= 0x00000001U);
+  }
+  else
+  {
+     
+    do{ (hdma)->Lock = HAL_UNLOCKED; }while (0);	  
+    
+     
+    status = HAL_BUSY;
+  }
+  
+  return status;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_DMA_Abort(DMA_HandleTypeDef *hdma)
+{
+   
+  DMA_Base_Registers *regs = (DMA_Base_Registers *)hdma->StreamBaseAddress;
+  
+  uint32_t tickstart = HAL_GetTick();
+  
+  if(hdma->State != HAL_DMA_STATE_BUSY)
+  {
+    hdma->ErrorCode = ((uint32_t)0x00000080U);
+    
+     
+    do{ (hdma)->Lock = HAL_UNLOCKED; }while (0);
+    
+    return HAL_ERROR;
+  }
+  else
+  {
+     
+    hdma->Instance->CR  &= ~(((uint32_t)0x00000010U) | ((uint32_t)0x00000004U) | ((uint32_t)0x00000002U));
+    hdma->Instance->FCR &= ~(((uint32_t)0x00000080U));
+    
+    if((hdma->XferHalfCpltCallback != 0) || (hdma->XferM1HalfCpltCallback != 0))
+    {
+      hdma->Instance->CR  &= ~(((uint32_t)0x00000008U));
+    }
+    
+     
+    ((hdma)->Instance ->CR &= ~0x00000001U);
+    
+     
+    while((hdma->Instance->CR & 0x00000001U) != RESET)
+    {
+       
+      if((HAL_GetTick() - tickstart ) > ((uint32_t)5))
+      {
+         
+        hdma->ErrorCode = ((uint32_t)0x00000020U);
+        
+         
+        do{ (hdma)->Lock = HAL_UNLOCKED; }while (0);
+        
+         
+        hdma->State = HAL_DMA_STATE_TIMEOUT;
+        
+        return HAL_TIMEOUT;
+      }
+    }
+    
+     
+    regs->IFCR = 0x3FU << hdma->StreamIndex;
+    
+     
+    do{ (hdma)->Lock = HAL_UNLOCKED; }while (0);
+    
+     
+    hdma->State = HAL_DMA_STATE_READY;
+  }
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_DMA_Abort_IT(DMA_HandleTypeDef *hdma)
+{
+  if(hdma->State != HAL_DMA_STATE_BUSY)
+  {
+    hdma->ErrorCode = ((uint32_t)0x00000080U);
+    return HAL_ERROR;
+  }
+  else
+  {
+     
+    hdma->State = HAL_DMA_STATE_ABORT;
+    
+     
+    ((hdma)->Instance ->CR &= ~0x00000001U);
+  }
+
+  return HAL_OK;
+}
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_DMA_PollForTransfer(DMA_HandleTypeDef *hdma, HAL_DMA_LevelCompleteTypeDef CompleteLevel, uint32_t Timeout)
+{
+  HAL_StatusTypeDef status = HAL_OK; 
+  uint32_t temp;
+  uint32_t tickstart = HAL_GetTick(); 
+  uint32_t tmpisr;
+  
+   
+  DMA_Base_Registers *regs;
+  
+   
+  if ((hdma->Instance->CR & 0x00000100U) != RESET)
+  {
+    hdma->ErrorCode = ((uint32_t)0x00000100U);
+    return HAL_ERROR;
+  }
+  
+   
+  if(CompleteLevel == HAL_DMA_FULL_TRANSFER)
+  {
+     
+    temp = ((uint32_t)0x00000020U) << hdma->StreamIndex;
+  }
+  else
+  {
+     
+    temp = ((uint32_t)0x00000010U) << hdma->StreamIndex;
+  }
+  
+  regs = (DMA_Base_Registers *)hdma->StreamBaseAddress;
+  tmpisr = regs->ISR;
+  
+  while((tmpisr & temp) == RESET )
+  {
+     
+    if(Timeout != 0xFFFFFFFFU)
+    {
+      if((Timeout == 0)||((HAL_GetTick() - tickstart ) > Timeout))
+      {
+         
+        hdma->ErrorCode = ((uint32_t)0x00000020U);
+
+         
+        do{ (hdma)->Lock = HAL_UNLOCKED; }while (0);
+        
+         
+        hdma->State = HAL_DMA_STATE_READY;
+        
+        return HAL_TIMEOUT;
+      }
+    }
+    
+    if((tmpisr & (((uint32_t)0x00000008U) << hdma->StreamIndex)) != RESET)
+    {
+       
+      hdma->ErrorCode |= ((uint32_t)0x00000001U);
+      
+       
+      regs->IFCR = ((uint32_t)0x00000008U) << hdma->StreamIndex;
+    }
+    
+    if((tmpisr & (((uint32_t)0x00800001U) << hdma->StreamIndex)) != RESET)
+    {
+       
+      hdma->ErrorCode |= ((uint32_t)0x00000002U);
+      
+       
+      regs->IFCR = ((uint32_t)0x00800001U) << hdma->StreamIndex;
+    }
+    
+    if((tmpisr & (((uint32_t)0x00800004U) << hdma->StreamIndex)) != RESET)
+    {
+       
+      hdma->ErrorCode |= ((uint32_t)0x00000004U);
+      
+       
+      regs->IFCR = ((uint32_t)0x00800004U) << hdma->StreamIndex;
+    }
+  }
+  
+  if(hdma->ErrorCode != ((uint32_t)0x00000000U))
+  {
+    if((hdma->ErrorCode & ((uint32_t)0x00000001U)) != RESET)
+    {
+      HAL_DMA_Abort(hdma);
+    
+       
+      regs->IFCR = (((uint32_t)0x00000010U) | ((uint32_t)0x00000020U)) << hdma->StreamIndex;
+    
+       
+      do{ (hdma)->Lock = HAL_UNLOCKED; }while (0);
+
+       
+      hdma->State= HAL_DMA_STATE_READY;
+
+      return HAL_ERROR;
+   }
+
+   status = HAL_ERROR;
+  }
+  
+   
+  if(CompleteLevel == HAL_DMA_FULL_TRANSFER)
+  {
+     
+    regs->IFCR = (((uint32_t)0x00000010U) | ((uint32_t)0x00000020U)) << hdma->StreamIndex;
+    
+     
+    do{ (hdma)->Lock = HAL_UNLOCKED; }while (0);
+
+    hdma->State = HAL_DMA_STATE_READY;
+  }
+  else
+  {
+     
+    regs->IFCR = (((uint32_t)0x00000010U)) << hdma->StreamIndex;
+  }
+  
+  return status;
+}
+
+
+
+
+
+
+ 
+void HAL_DMA_IRQHandler(DMA_HandleTypeDef *hdma)
+{
+  uint32_t tmpisr;
+  volatile uint32_t count = 0;
+  uint32_t timeout = SystemCoreClock / 9600;
+
+   
+  DMA_Base_Registers *regs = (DMA_Base_Registers *)hdma->StreamBaseAddress;
+
+  tmpisr = regs->ISR;
+
+   
+  if ((tmpisr & (((uint32_t)0x00000008U) << hdma->StreamIndex)) != RESET)
+  {
+    if((((((uint32_t)0x00000004U)) != ((uint32_t)0x00000080U))? ((hdma)->Instance ->CR & (((uint32_t)0x00000004U))) : ((hdma)->Instance ->FCR & (((uint32_t)0x00000004U)))) != RESET)
+    {
+       
+      hdma->Instance->CR  &= ~(((uint32_t)0x00000004U));
+      
+       
+      regs->IFCR = ((uint32_t)0x00000008U) << hdma->StreamIndex;
+      
+       
+      hdma->ErrorCode |= ((uint32_t)0x00000001U);
+    }
+  }
+   
+  if ((tmpisr & (((uint32_t)0x00800001U) << hdma->StreamIndex)) != RESET)
+  {
+    if((((((uint32_t)0x00000080U)) != ((uint32_t)0x00000080U))? ((hdma)->Instance ->CR & (((uint32_t)0x00000080U))) : ((hdma)->Instance ->FCR & (((uint32_t)0x00000080U)))) != RESET)
+    {
+       
+      regs->IFCR = ((uint32_t)0x00800001U) << hdma->StreamIndex;
+
+       
+      hdma->ErrorCode |= ((uint32_t)0x00000002U);
+    }
+  }
+   
+  if ((tmpisr & (((uint32_t)0x00800004U) << hdma->StreamIndex)) != RESET)
+  {
+    if((((((uint32_t)0x00000002U)) != ((uint32_t)0x00000080U))? ((hdma)->Instance ->CR & (((uint32_t)0x00000002U))) : ((hdma)->Instance ->FCR & (((uint32_t)0x00000002U)))) != RESET)
+    {
+       
+      regs->IFCR = ((uint32_t)0x00800004U) << hdma->StreamIndex;
+
+       
+      hdma->ErrorCode |= ((uint32_t)0x00000004U);
+    }
+  }
+   
+  if ((tmpisr & (((uint32_t)0x00000010U) << hdma->StreamIndex)) != RESET)
+  {
+    if((((((uint32_t)0x00000008U)) != ((uint32_t)0x00000080U))? ((hdma)->Instance ->CR & (((uint32_t)0x00000008U))) : ((hdma)->Instance ->FCR & (((uint32_t)0x00000008U)))) != RESET)
+    {
+       
+      regs->IFCR = ((uint32_t)0x00000010U) << hdma->StreamIndex;
+      
+       
+      if(((hdma->Instance->CR) & (uint32_t)(0x00040000U)) != RESET)
+      {
+         
+        if((hdma->Instance->CR & 0x00080000U) == RESET)
+        {
+          if(hdma->XferHalfCpltCallback != 0)
+          {
+             
+            hdma->XferHalfCpltCallback(hdma);
+          }
+        }
+         
+        else
+        {
+          if(hdma->XferM1HalfCpltCallback != 0)
+          {
+             
+            hdma->XferM1HalfCpltCallback(hdma);
+          }
+        }
+      }
+      else
+      {
+         
+        if((hdma->Instance->CR & 0x00000100U) == RESET)
+        {
+           
+          hdma->Instance->CR  &= ~(((uint32_t)0x00000008U));
+        }
+        
+        if(hdma->XferHalfCpltCallback != 0)
+        {
+           
+          hdma->XferHalfCpltCallback(hdma);
+        }
+      }
+    }
+  }
+   
+  if ((tmpisr & (((uint32_t)0x00000020U) << hdma->StreamIndex)) != RESET)
+  {
+    if((((((uint32_t)0x00000010U)) != ((uint32_t)0x00000080U))? ((hdma)->Instance ->CR & (((uint32_t)0x00000010U))) : ((hdma)->Instance ->FCR & (((uint32_t)0x00000010U)))) != RESET)
+    {
+       
+      regs->IFCR = ((uint32_t)0x00000020U) << hdma->StreamIndex;
+      
+      if(HAL_DMA_STATE_ABORT == hdma->State)
+      {
+         
+        hdma->Instance->CR  &= ~(((uint32_t)0x00000010U) | ((uint32_t)0x00000004U) | ((uint32_t)0x00000002U));
+        hdma->Instance->FCR &= ~(((uint32_t)0x00000080U));
+        
+        if((hdma->XferHalfCpltCallback != 0) || (hdma->XferM1HalfCpltCallback != 0))
+        {
+          hdma->Instance->CR  &= ~(((uint32_t)0x00000008U));
+        }
+
+         
+        regs->IFCR = 0x3FU << hdma->StreamIndex;
+
+         
+        do{ (hdma)->Lock = HAL_UNLOCKED; }while (0);
+
+         
+        hdma->State = HAL_DMA_STATE_READY;
+
+        if(hdma->XferAbortCallback != 0)
+        {
+          hdma->XferAbortCallback(hdma);
+        }
+        return;
+      }
+
+      if(((hdma->Instance->CR) & (uint32_t)(0x00040000U)) != RESET)
+      {
+         
+        if((hdma->Instance->CR & 0x00080000U) == RESET)
+        {
+          if(hdma->XferM1CpltCallback != 0)
+          {
+             
+            hdma->XferM1CpltCallback(hdma);
+          }
+        }
+         
+        else
+        {
+          if(hdma->XferCpltCallback != 0)
+          {
+             
+            hdma->XferCpltCallback(hdma);
+          }
+        }
+      }
+       
+      else
+      {
+        if((hdma->Instance->CR & 0x00000100U) == RESET)
+        {
+           
+          hdma->Instance->CR  &= ~(((uint32_t)0x00000010U));
+
+           
+          do{ (hdma)->Lock = HAL_UNLOCKED; }while (0);
+
+           
+          hdma->State = HAL_DMA_STATE_READY;
+        }
+
+        if(hdma->XferCpltCallback != 0)
+        {
+           
+          hdma->XferCpltCallback(hdma);
+        }
+      }
+    }
+  }
+  
+   
+  if(hdma->ErrorCode != ((uint32_t)0x00000000U))
+  {
+    if((hdma->ErrorCode & ((uint32_t)0x00000001U)) != RESET)
+    {
+      hdma->State = HAL_DMA_STATE_ABORT;
+
+       
+      ((hdma)->Instance ->CR &= ~0x00000001U);
+
+      do
+      {
+        if (++count > timeout)
+        {
+          break;
+        }
+      }
+      while((hdma->Instance->CR & 0x00000001U) != RESET);
+
+       
+      do{ (hdma)->Lock = HAL_UNLOCKED; }while (0);
+
+       
+      hdma->State = HAL_DMA_STATE_READY;
+    }
+
+    if(hdma->XferErrorCallback != 0)
+    {
+       
+      hdma->XferErrorCallback(hdma);
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+                       
+HAL_StatusTypeDef HAL_DMA_RegisterCallback(DMA_HandleTypeDef *hdma, HAL_DMA_CallbackIDTypeDef CallbackID, void (* pCallback)(DMA_HandleTypeDef *_hdma))
+{
+
+  HAL_StatusTypeDef status = HAL_OK;
+
+   
+  do{ if((hdma)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hdma)->Lock = HAL_LOCKED; } }while (0);
+
+  if(HAL_DMA_STATE_READY == hdma->State)
+  {
+    switch (CallbackID)
+    {
+    case  HAL_DMA_XFER_CPLT_CB_ID:
+      hdma->XferCpltCallback = pCallback;
+      break;
+
+    case  HAL_DMA_XFER_HALFCPLT_CB_ID:
+      hdma->XferHalfCpltCallback = pCallback;
+      break;
+
+    case  HAL_DMA_XFER_M1CPLT_CB_ID:
+      hdma->XferM1CpltCallback = pCallback;
+      break;
+
+    case  HAL_DMA_XFER_M1HALFCPLT_CB_ID:
+      hdma->XferM1HalfCpltCallback = pCallback;
+      break;
+
+    case  HAL_DMA_XFER_ERROR_CB_ID:
+      hdma->XferErrorCallback = pCallback;
+      break;
+
+    case  HAL_DMA_XFER_ABORT_CB_ID:
+      hdma->XferAbortCallback = pCallback;
+      break;
+
+    default:
+      break;
+    }
+  }
+  else
+  {
+     
+    status =  HAL_ERROR;
+  }
+
+   
+  do{ (hdma)->Lock = HAL_UNLOCKED; }while (0);
+  
+  return status;
+}
+
+
+
+
+
+
+
+
+               
+HAL_StatusTypeDef HAL_DMA_UnRegisterCallback(DMA_HandleTypeDef *hdma, HAL_DMA_CallbackIDTypeDef CallbackID)
+{
+  HAL_StatusTypeDef status = HAL_OK;
+  
+   
+  do{ if((hdma)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (hdma)->Lock = HAL_LOCKED; } }while (0);
+  
+  if(HAL_DMA_STATE_READY == hdma->State)
+  {
+    switch (CallbackID)
+    {
+    case  HAL_DMA_XFER_CPLT_CB_ID:
+      hdma->XferCpltCallback = 0;
+      break;
+      
+    case  HAL_DMA_XFER_HALFCPLT_CB_ID:
+      hdma->XferHalfCpltCallback = 0;
+      break;
+      
+    case  HAL_DMA_XFER_M1CPLT_CB_ID:
+      hdma->XferM1CpltCallback = 0;
+      break;
+      
+    case  HAL_DMA_XFER_M1HALFCPLT_CB_ID:
+      hdma->XferM1HalfCpltCallback = 0;
+      break;
+      
+    case  HAL_DMA_XFER_ERROR_CB_ID:
+      hdma->XferErrorCallback = 0;
+      break;
+      
+    case  HAL_DMA_XFER_ABORT_CB_ID:
+      hdma->XferAbortCallback = 0;
+      break; 
+      
+    case   HAL_DMA_XFER_ALL_CB_ID:
+      hdma->XferCpltCallback = 0;
+      hdma->XferHalfCpltCallback = 0;
+      hdma->XferM1CpltCallback = 0;
+      hdma->XferM1HalfCpltCallback = 0;
+      hdma->XferErrorCallback = 0;
+      hdma->XferAbortCallback = 0;
+      break; 
+      
+    default:
+      status = HAL_ERROR;
+      break;
+    }
+  }
+  else
+  {
+    status = HAL_ERROR;
+  }
+  
+   
+  do{ (hdma)->Lock = HAL_UNLOCKED; }while (0);
+  
+  return status;
+}
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+HAL_DMA_StateTypeDef HAL_DMA_GetState(DMA_HandleTypeDef *hdma)
+{
+  return hdma->State;
+}
+
+
+
+
+
+
+ 
+uint32_t HAL_DMA_GetError(DMA_HandleTypeDef *hdma)
+{
+  return hdma->ErrorCode;
+}
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+ 
+static void DMA_SetConfig(DMA_HandleTypeDef *hdma, uint32_t SrcAddress, uint32_t DstAddress, uint32_t DataLength)
+{
+   
+  hdma->Instance->CR &= (uint32_t)(~0x00040000U);
+
+   
+  hdma->Instance->NDTR = DataLength;
+
+   
+  if((hdma->Init.Direction) == ((uint32_t)0x00000040U))
+  {
+     
+    hdma->Instance->PAR = DstAddress;
+
+     
+    hdma->Instance->M0AR = SrcAddress;
+  }
+   
+  else
+  {
+     
+    hdma->Instance->PAR = SrcAddress;
+
+     
+    hdma->Instance->M0AR = DstAddress;
+  }
+}
+
+
+
+
+
+
+ 
+static uint32_t DMA_CalcBaseAndBitshift(DMA_HandleTypeDef *hdma)
+{
+  uint32_t stream_number = (((uint32_t)hdma->Instance & 0xFFU) - 16U) / 24U;
+  
+   
+  static const uint8_t flagBitshiftOffset[8U] = {0U, 6U, 16U, 22U, 0U, 6U, 16U, 22U};
+  hdma->StreamIndex = flagBitshiftOffset[stream_number];
+  
+  if (stream_number > 3U)
+  {
+     
+    hdma->StreamBaseAddress = (((uint32_t)hdma->Instance & (uint32_t)(~0x3FFU)) + 4U);
+  }
+  else
+  {
+     
+    hdma->StreamBaseAddress = ((uint32_t)hdma->Instance & (uint32_t)(~0x3FFU));
+  }
+  
+  return hdma->StreamBaseAddress;
+}
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef DMA_CheckFifoParam(DMA_HandleTypeDef *hdma)
+{
+  HAL_StatusTypeDef status = HAL_OK;
+  uint32_t tmp = hdma->Init.FIFOThreshold;
+  
+   
+  if(hdma->Init.MemDataAlignment == ((uint32_t)0x00000000U))
+  {
+    switch (tmp)
+    {
+      case ((uint32_t)0x00000000U):
+        if((hdma->Init.MemBurst & 0x01000000U) == 0x01000000U)
+        {
+          status = HAL_ERROR;
+        }
+        break;
+      case ((uint32_t)0x00000001U):
+        if(hdma->Init.MemBurst == ((uint32_t)0x01800000U))
+        {
+          status = HAL_ERROR;
+        }
+        break;
+      case ((uint32_t)0x00000002U):
+        if((hdma->Init.MemBurst & 0x01000000U) == 0x01000000U)
+        {
+          status = HAL_ERROR;
+        }
+        break;
+      case ((uint32_t)0x00000003U):
+        break;
+      default:
+        break;
+    }
+  }
+  
+   
+  else if (hdma->Init.MemDataAlignment == ((uint32_t)0x00002000U))
+  {
+    switch (tmp)
+    {
+      case ((uint32_t)0x00000000U):
+        status = HAL_ERROR;
+        break;
+      case ((uint32_t)0x00000001U):
+        if ((hdma->Init.MemBurst & 0x01000000U) == 0x01000000U)
+        {
+          status = HAL_ERROR;
+        }
+        break;
+      case ((uint32_t)0x00000002U):
+        status = HAL_ERROR;
+        break;
+      case ((uint32_t)0x00000003U):
+        if (hdma->Init.MemBurst == ((uint32_t)0x01800000U))
+        {
+          status = HAL_ERROR;
+        }
+        break;   
+      default:
+        break;
+    }
+  }
+  
+   
+  else
+  {
+    switch (tmp)
+    {
+      case ((uint32_t)0x00000000U):
+      case ((uint32_t)0x00000001U):
+      case ((uint32_t)0x00000002U):
+        status = HAL_ERROR;
+        break;
+      case ((uint32_t)0x00000003U):
+        if ((hdma->Init.MemBurst & 0x01000000U) == 0x01000000U)
+        {
+          status = HAL_ERROR;
+        }
+		break;
+      default:
+        break;
+    }
+  } 
+  
+  return status; 
+}
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+ 
+
+ 

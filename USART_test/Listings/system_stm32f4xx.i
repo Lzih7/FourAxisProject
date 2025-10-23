@@ -1,9 +1,4 @@
-#line 1 "MyLib\\Delay.c"
-#line 1 ".\\Inc\\main.h"
-
-
-
-#line 1 ".\\Drivers\\STM32F4xx_HAL_Driver\\Inc\\stm32f4xx_hal.h"
+#line 1 "Drivers\\CMSIS\\Device\\ST\\STM32F4xx\\Source\\system_stm32f4xx.c"
 
 
 
@@ -40,302 +35,36 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+   
   
 
- 
-
-
-
-
-
-
-
- 
-#line 1 ".\\Inc\\stm32f4xx_hal_conf.h"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
 
  
 
 
-
-
-
-
-
- 
- 
-
- 
-
-
- 
-#line 100 ".\\Inc\\stm32f4xx_hal_conf.h"
-
- 
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
- 
-
- 
-
-
-      
-#line 165 ".\\Inc\\stm32f4xx_hal_conf.h"
-
- 
-
-
-
- 
- 
-
- 
-
- 
-
- 
-#line 184 ".\\Inc\\stm32f4xx_hal_conf.h"
-
-    
-
-
-
-
-
- 
-
-  
-
-  
-
- 
-
-
-
-
-
- 
-
-
-
- 
-#line 218 ".\\Inc\\stm32f4xx_hal_conf.h"
-
-
-
-
-  
- 
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
-
- 
-
-
-
- 
-
-
- 
-
-#line 1 ".\\Drivers\\STM32F4xx_HAL_Driver\\Inc\\stm32f4xx_hal_rcc.h"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-
- 
-
-
-
-
-
-
-
- 
-#line 1 ".\\Drivers\\STM32F4xx_HAL_Driver\\Inc\\stm32f4xx_hal_def.h"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-
- 
-
-
-
-
-
-
-
- 
 #line 1 ".\\Drivers\\CMSIS\\Device\\ST\\STM32F4xx\\Include\\stm32f4xx.h"
 
 
@@ -6232,10 +5961,15 @@ typedef enum
   
 
  
-#line 264 ".\\Drivers\\STM32F4xx_HAL_Driver\\Inc\\stm32f4xx_hal.h"
+
+
+
+
+
+
 
  
-#line 246 ".\\Drivers\\CMSIS\\Device\\ST\\STM32F4xx\\Include\\stm32f4xx.h"
+#line 1 ".\\Inc\\stm32f4xx_hal_conf.h"
 
 
 
@@ -6243,6 +5977,340 @@ typedef enum
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+ 
+
+
+
+
+
+
+
+ 
+ 
+
+ 
+
+
+ 
+#line 100 ".\\Inc\\stm32f4xx_hal_conf.h"
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+ 
+
+ 
+
+
+      
+#line 165 ".\\Inc\\stm32f4xx_hal_conf.h"
+
+ 
+
+
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+#line 184 ".\\Inc\\stm32f4xx_hal_conf.h"
+
+    
+
+
+
+
+
+ 
+
+  
+
+  
+
+ 
+
+
+
+
+
+ 
+
+
+
+ 
+#line 218 ".\\Inc\\stm32f4xx_hal_conf.h"
+
+
+
+
+  
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+ 
+
+
+ 
+
+#line 1 ".\\Drivers\\STM32F4xx_HAL_Driver\\Inc\\stm32f4xx_hal_rcc.h"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+ 
+
+
+
+
+
+
+
+ 
+#line 1 ".\\Drivers\\STM32F4xx_HAL_Driver\\Inc\\stm32f4xx_hal_def.h"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+ 
+
+
+
+
+
+
+
+ 
+#line 1 ".\\Drivers\\CMSIS\\Device\\ST\\STM32F4xx\\Include\\stm32f4xx.h"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+    
+#line 253 ".\\Drivers\\CMSIS\\Device\\ST\\STM32F4xx\\Include\\stm32f4xx.h"
 
 
  
@@ -27756,36 +27824,253 @@ void HAL_DisableCompensationCell(void);
 
 
  
-#line 5 ".\\Inc\\main.h"
+#line 246 ".\\Drivers\\CMSIS\\Device\\ST\\STM32F4xx\\Include\\stm32f4xx.h"
 
-void SystemClock_Config(void);
-void Error_Handler(void);
 
-#line 2 "MyLib\\Delay.c"
 
-static uint8_t timer_initialized = 0;
-static TIM_HandleTypeDef htim2;
 
-void Timer_Delay_us(uint8_t xus) {
-	if(!timer_initialized) {
-		do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x00000001U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x00000001U)); ((void)(tmpreg)); } while(0);
-		timer_initialized = 1;
 
-		htim2.Instance = ((TIM_TypeDef *) (0x40000000U + 0x0000U));
-		htim2.Init.Prescaler = 84 - 1;
-		htim2.Init.Period = 0xFFFFFFFF;
-		htim2.Init.CounterMode = ((uint32_t)0x00000000U);
-		htim2.Init.ClockDivision = ((uint32_t)0x00000000U);
-		if(HAL_TIM_Base_Init(&htim2) != HAL_OK) {
-			Error_Handler();
-		}
-	}
-	((&htim2)->Instance ->CNT = (0));
-	if(HAL_TIM_Base_Start(&htim2) != HAL_OK) {
-		Error_Handler();
-	}
-	while(((&htim2)->Instance ->CNT) < xus) {
-		
-	}
-	HAL_TIM_Base_Stop(&htim2);
+
+
+
+
+ 
+
+
+
+ 
+  
+
+
+
+ 
+#line 68 "Drivers\\CMSIS\\Device\\ST\\STM32F4xx\\Source\\system_stm32f4xx.c"
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+ 
+ 
+#line 101 "Drivers\\CMSIS\\Device\\ST\\STM32F4xx\\Source\\system_stm32f4xx.c"
+ 
+
+
+
+
+
+
+
+ 
+ 
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+  
+
+
+
+
+
+
+ 
+  uint32_t SystemCoreClock = 16000000;
+const uint8_t AHBPrescTable[16] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9};
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+void SystemInit(void)
+{
+   
+
+    ((SCB_Type *) ((0xE000E000UL) + 0x0D00UL) )->CPACR |= ((3UL << 10*2)|(3UL << 11*2));   
+
+   
+   
+  ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR |= (uint32_t)0x00000001;
+
+   
+  ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR = 0x00000000;
+
+   
+  ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR &= (uint32_t)0xFEF6FFFF;
+
+   
+  ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->PLLCFGR = 0x24003010;
+
+   
+  ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CR &= (uint32_t)0xFFFBFFFF;
+
+   
+  ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CIR = 0x00000000;
+
+
+
+
+
+   
+
+
+
+  ((SCB_Type *) ((0xE000E000UL) + 0x0D00UL) )->VTOR = 0x08000000U | 0x00;  
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+void SystemCoreClockUpdate(void)
+{
+  uint32_t tmp = 0, pllvco = 0, pllp = 2, pllsource = 0, pllm = 2;
+  
+   
+  tmp = ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR & 0x0000000CU;
+
+  switch (tmp)
+  {
+    case 0x00:   
+      SystemCoreClock = ((uint32_t)16000000U);
+      break;
+    case 0x04:   
+      SystemCoreClock = ((uint32_t)25000000U);
+      break;
+    case 0x08:   
+
+      
+
+     
+      pllsource = (((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->PLLCFGR & 0x00400000U) >> 22;
+      pllm = ((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->PLLCFGR & 0x0000003FU;
+      
+      if (pllsource != 0)
+      {
+         
+        pllvco = (((uint32_t)25000000U) / pllm) * ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->PLLCFGR & 0x00007FC0U) >> 6);
+      }
+      else
+      {
+         
+        pllvco = (((uint32_t)16000000U) / pllm) * ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->PLLCFGR & 0x00007FC0U) >> 6);
+      }
+
+      pllp = (((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->PLLCFGR & 0x00030000U) >>16) + 1 ) *2;
+      SystemCoreClock = pllvco/pllp;
+      break;
+    default:
+      SystemCoreClock = ((uint32_t)16000000U);
+      break;
+  }
+   
+   
+  tmp = AHBPrescTable[((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->CFGR & 0x000000F0U) >> 4)];
+   
+  SystemCoreClock >>= tmp;
+}
+
+#line 752 "Drivers\\CMSIS\\Device\\ST\\STM32F4xx\\Source\\system_stm32f4xx.c"
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+ 
