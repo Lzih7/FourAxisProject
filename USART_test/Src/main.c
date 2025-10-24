@@ -7,6 +7,7 @@
 #include "USART_Set.h"
 
 USART_HandleTypeDef husart;
+static uint8_t rxdata = 0;
 
 // HAL库时钟配置函数 - HSE + 84MHz系统时钟 + 48MHz USB
 void SystemClock_Config(void)
@@ -55,35 +56,22 @@ int main(void)
     GPIO_CFG(GPIOA, GPIO_PIN_10, GPIO_MODE_INPUT, GPIO_SPEED_FREQ_HIGH, GPIO_PULLUP);
 	USART1_CFG(115200, USART_WORDLENGTH_9B, USART_STOPBITS_1, USART_PARITY_EVEN, USART_MODE_TX_RX);
 
+	__HAL_USART_ENABLE_IT(&husart, USART_IT_RXNE);
+	
+	HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);  // 4位主优先级，0位子优先级
+	HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(USART1_IRQn);
+	
     uint8_t TxData[2];
     TxData[0] = 0x0;
     TxData[1] = 0x1;
-    
-    // 接收数据缓冲区
-    uint8_t RxData[2];
-    HAL_StatusTypeDef rx_status;
 
     HAL_USART_Transmit(&husart, TxData, sizeof(TxData), HAL_MAX_DELAY);
     OLED_ShowString(1, 1, "Transmit succeed");
     OLED_ShowNum(2, 1, (uint32_t)TxData[0], 2);
     OLED_ShowNum(2, 4, (uint32_t)TxData[1], 2);
     while(1) {
-        // 尝试接收数据 (非阻塞，短超时)
-        rx_status = HAL_USART_Receive(&husart, RxData, sizeof(RxData), 100);
-        
-        if (rx_status == HAL_OK) {
-            // 接收成功，显示接收到的数据
-            OLED_ShowString(3, 1, "Received:");
-            OLED_ShowNum(4, 1, (uint32_t)RxData[0], 2);
-            OLED_ShowNum(4, 4, (uint32_t)RxData[1], 2);
-        }
-        else if (rx_status == HAL_TIMEOUT) {
-            // 接收超时，显示等待状态
-            OLED_ShowString(3, 1, "Waiting...");
-        }
-        
-        // 延时避免过于频繁的接收尝试
-        HAL_Delay(500);
+		OLED_ShowNum(3, 1, rxdata, 2);
     }
 }
 
@@ -94,4 +82,10 @@ void Error_Handler(void)
     while (1)
     {
     }
+}
+
+void USART1_IRQHandler(void) {
+	if(__HAL_USART_GET_FLAG(&husart, USART_FLAG_RXNE) == 1) {
+		rxdata = husart.Instance->DR;
+	}
 }

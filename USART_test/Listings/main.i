@@ -27806,6 +27806,7 @@ extern USART_HandleTypeDef husart;
 #line 8 "Src\\main.c"
 
 USART_HandleTypeDef husart;
+static uint8_t rxdata = 0;
 
 
 void SystemClock_Config(void)
@@ -27854,6 +27855,12 @@ int main(void)
     do { GPIO_InitTypeDef GPIO_InitStructure = {0}; GPIO_InitStructure . Pin = ((uint16_t)0x0400U); GPIO_InitStructure . Mode = ((uint32_t)0x00000000U); GPIO_InitStructure . Speed = ((uint32_t)0x00000002U); GPIO_InitStructure . Pull = ((uint32_t)0x00000001U); HAL_GPIO_Init(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0000U)), &GPIO_InitStructure); } while(0);
 	do { USART_InitTypeDef USART_InitStructure; USART_InitStructure . BaudRate = 115200; USART_InitStructure . WordLength = ((uint32_t)0x1000U); USART_InitStructure . StopBits = ((uint32_t)0x00000000U); USART_InitStructure . Parity = ((uint32_t)0x0400U); USART_InitStructure . Mode = ((uint32_t)(0x0008U |0x0004U)); husart . Init = USART_InitStructure; husart . Instance = ((USART_TypeDef *) ((0x40000000U + 0x00010000U) + 0x1000U)); if(HAL_USART_Init(&husart) != HAL_OK) { Error_Handler(); } } while(0);
 
+	((((((uint32_t)(1U << 28U | 0x0020U))) >> 28U) == 1U)? ((&husart)->Instance ->CR1 |= ((((uint32_t)(1U << 28U | 0x0020U))) & ((uint32_t) 0x0100U | 0x0080U | 0x0040U | 0x0020U | 0x0010U | 0x0040U | 0x0400U | 0x0001U ))): (((((uint32_t)(1U << 28U | 0x0020U))) >> 28U) == 2U)? ((&husart)->Instance ->CR2 |= ((((uint32_t)(1U << 28U | 0x0020U))) & ((uint32_t) 0x0100U | 0x0080U | 0x0040U | 0x0020U | 0x0010U | 0x0040U | 0x0400U | 0x0001U ))): ((&husart)->Instance ->CR3 |= ((((uint32_t)(1U << 28U | 0x0020U))) & ((uint32_t) 0x0100U | 0x0080U | 0x0040U | 0x0020U | 0x0010U | 0x0040U | 0x0400U | 0x0001U ))));
+	
+	HAL_NVIC_SetPriorityGrouping(((uint32_t)0x00000003U));  
+	HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(USART1_IRQn);
+	
     uint8_t TxData[2];
     TxData[0] = 0x0;
     TxData[1] = 0x1;
@@ -27863,7 +27870,7 @@ int main(void)
     OLED_ShowNum(2, 1, (uint32_t)TxData[0], 2);
     OLED_ShowNum(2, 4, (uint32_t)TxData[1], 2);
     while(1) {
-        
+		OLED_ShowNum(3, 1, rxdata, 2);
     }
 }
 
@@ -27874,4 +27881,10 @@ void Error_Handler(void)
     while (1)
     {
     }
+}
+
+void USART1_IRQHandler(void) {
+	if((((&husart)->Instance ->SR & (((uint32_t)0x00000020U))) == (((uint32_t)0x00000020U))) == 1) {
+		rxdata = husart.Instance->DR;
+	}
 }
