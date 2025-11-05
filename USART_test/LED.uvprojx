@@ -1015,6 +1015,11 @@
               <FileType>1</FileType>
               <FilePath>.\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_usart.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_hal_uart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_uart.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1104,6 +1109,11 @@
               <FileName>USART_Set.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\MyLib\USART_Set.h</FilePath>
+            </File>
+            <File>
+              <FileName>UART_Set.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\MyLib\UART_Set.h</FilePath>
             </File>
           </Files>
         </Group>

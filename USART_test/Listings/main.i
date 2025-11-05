@@ -1,4 +1,427 @@
 #line 1 "Src\\main.c"
+#line 1 "C:\\Keil_v5\\ARM\\ARMCC\\Bin\\..\\include\\string.h"
+ 
+ 
+ 
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+#line 38 "C:\\Keil_v5\\ARM\\ARMCC\\Bin\\..\\include\\string.h"
+
+
+  
+
+
+
+    typedef unsigned int size_t;    
+#line 54 "C:\\Keil_v5\\ARM\\ARMCC\\Bin\\..\\include\\string.h"
+
+
+
+
+extern __declspec(__nothrow) void *memcpy(void * __restrict  ,
+                    const void * __restrict  , size_t  ) __attribute__((__nonnull__(1,2)));
+   
+
+
+
+
+ 
+extern __declspec(__nothrow) void *memmove(void *  ,
+                    const void *  , size_t  ) __attribute__((__nonnull__(1,2)));
+   
+
+
+
+
+
+
+
+ 
+extern __declspec(__nothrow) char *strcpy(char * __restrict  , const char * __restrict  ) __attribute__((__nonnull__(1,2)));
+   
+
+
+
+
+ 
+extern __declspec(__nothrow) char *strncpy(char * __restrict  , const char * __restrict  , size_t  ) __attribute__((__nonnull__(1,2)));
+   
+
+
+
+
+
+ 
+
+extern __declspec(__nothrow) char *strcat(char * __restrict  , const char * __restrict  ) __attribute__((__nonnull__(1,2)));
+   
+
+
+
+
+ 
+extern __declspec(__nothrow) char *strncat(char * __restrict  , const char * __restrict  , size_t  ) __attribute__((__nonnull__(1,2)));
+   
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+extern __declspec(__nothrow) int memcmp(const void *  , const void *  , size_t  ) __attribute__((__nonnull__(1,2)));
+   
+
+
+
+
+
+ 
+extern __declspec(__nothrow) int strcmp(const char *  , const char *  ) __attribute__((__nonnull__(1,2)));
+   
+
+
+
+
+ 
+extern __declspec(__nothrow) int strncmp(const char *  , const char *  , size_t  ) __attribute__((__nonnull__(1,2)));
+   
+
+
+
+
+
+
+ 
+extern __declspec(__nothrow) int strcasecmp(const char *  , const char *  ) __attribute__((__nonnull__(1,2)));
+   
+
+
+
+
+
+ 
+extern __declspec(__nothrow) int strncasecmp(const char *  , const char *  , size_t  ) __attribute__((__nonnull__(1,2)));
+   
+
+
+
+
+
+
+ 
+extern __declspec(__nothrow) int strcoll(const char *  , const char *  ) __attribute__((__nonnull__(1,2)));
+   
+
+
+
+
+
+
+
+ 
+
+extern __declspec(__nothrow) size_t strxfrm(char * __restrict  , const char * __restrict  , size_t  ) __attribute__((__nonnull__(2)));
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+#line 193 "C:\\Keil_v5\\ARM\\ARMCC\\Bin\\..\\include\\string.h"
+extern __declspec(__nothrow) void *memchr(const void *  , int  , size_t  ) __attribute__((__nonnull__(1)));
+
+   
+
+
+
+
+
+ 
+
+#line 209 "C:\\Keil_v5\\ARM\\ARMCC\\Bin\\..\\include\\string.h"
+extern __declspec(__nothrow) char *strchr(const char *  , int  ) __attribute__((__nonnull__(1)));
+
+   
+
+
+
+
+ 
+
+extern __declspec(__nothrow) size_t strcspn(const char *  , const char *  ) __attribute__((__nonnull__(1,2)));
+   
+
+
+
+
+ 
+
+#line 232 "C:\\Keil_v5\\ARM\\ARMCC\\Bin\\..\\include\\string.h"
+extern __declspec(__nothrow) char *strpbrk(const char *  , const char *  ) __attribute__((__nonnull__(1,2)));
+
+   
+
+
+
+
+ 
+
+#line 247 "C:\\Keil_v5\\ARM\\ARMCC\\Bin\\..\\include\\string.h"
+extern __declspec(__nothrow) char *strrchr(const char *  , int  ) __attribute__((__nonnull__(1)));
+
+   
+
+
+
+
+
+ 
+
+extern __declspec(__nothrow) size_t strspn(const char *  , const char *  ) __attribute__((__nonnull__(1,2)));
+   
+
+
+
+ 
+
+#line 270 "C:\\Keil_v5\\ARM\\ARMCC\\Bin\\..\\include\\string.h"
+extern __declspec(__nothrow) char *strstr(const char *  , const char *  ) __attribute__((__nonnull__(1,2)));
+
+   
+
+
+
+
+
+ 
+
+extern __declspec(__nothrow) char *strtok(char * __restrict  , const char * __restrict  ) __attribute__((__nonnull__(2)));
+extern __declspec(__nothrow) char *_strtok_r(char *  , const char *  , char **  ) __attribute__((__nonnull__(2,3)));
+
+extern __declspec(__nothrow) char *strtok_r(char *  , const char *  , char **  ) __attribute__((__nonnull__(2,3)));
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+extern __declspec(__nothrow) void *memset(void *  , int  , size_t  ) __attribute__((__nonnull__(1)));
+   
+
+
+
+ 
+extern __declspec(__nothrow) char *strerror(int  );
+   
+
+
+
+
+
+ 
+extern __declspec(__nothrow) size_t strlen(const char *  ) __attribute__((__nonnull__(1)));
+   
+
+
+
+ 
+
+extern __declspec(__nothrow) size_t strlcpy(char *  , const char *  , size_t  ) __attribute__((__nonnull__(1,2)));
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+extern __declspec(__nothrow) size_t strlcat(char *  , const char *  , size_t  ) __attribute__((__nonnull__(1,2)));
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+extern __declspec(__nothrow) void _membitcpybl(void *  , const void *  , int  , int  , size_t  ) __attribute__((__nonnull__(1,2)));
+extern __declspec(__nothrow) void _membitcpybb(void *  , const void *  , int  , int  , size_t  ) __attribute__((__nonnull__(1,2)));
+extern __declspec(__nothrow) void _membitcpyhl(void *  , const void *  , int  , int  , size_t  ) __attribute__((__nonnull__(1,2)));
+extern __declspec(__nothrow) void _membitcpyhb(void *  , const void *  , int  , int  , size_t  ) __attribute__((__nonnull__(1,2)));
+extern __declspec(__nothrow) void _membitcpywl(void *  , const void *  , int  , int  , size_t  ) __attribute__((__nonnull__(1,2)));
+extern __declspec(__nothrow) void _membitcpywb(void *  , const void *  , int  , int  , size_t  ) __attribute__((__nonnull__(1,2)));
+extern __declspec(__nothrow) void _membitmovebl(void *  , const void *  , int  , int  , size_t  ) __attribute__((__nonnull__(1,2)));
+extern __declspec(__nothrow) void _membitmovebb(void *  , const void *  , int  , int  , size_t  ) __attribute__((__nonnull__(1,2)));
+extern __declspec(__nothrow) void _membitmovehl(void *  , const void *  , int  , int  , size_t  ) __attribute__((__nonnull__(1,2)));
+extern __declspec(__nothrow) void _membitmovehb(void *  , const void *  , int  , int  , size_t  ) __attribute__((__nonnull__(1,2)));
+extern __declspec(__nothrow) void _membitmovewl(void *  , const void *  , int  , int  , size_t  ) __attribute__((__nonnull__(1,2)));
+extern __declspec(__nothrow) void _membitmovewb(void *  , const void *  , int  , int  , size_t  ) __attribute__((__nonnull__(1,2)));
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+#line 502 "C:\\Keil_v5\\ARM\\ARMCC\\Bin\\..\\include\\string.h"
+
+
+
+ 
+
+#line 2 "Src\\main.c"
 #line 1 ".\\Inc\\main.h"
 
 
@@ -27761,7 +28184,7 @@ void HAL_DisableCompensationCell(void);
 void SystemClock_Config(void);
 void Error_Handler(void);
 
-#line 2 "Src\\main.c"
+#line 3 "Src\\main.c"
 #line 1 ".\\MyLib\\GPIO_Set.h"
 
 
@@ -27773,7 +28196,7 @@ void Error_Handler(void);
 
 #line 27 ".\\MyLib\\GPIO_Set.h"
 
-#line 3 "Src\\main.c"
+#line 4 "Src\\main.c"
 #line 1 ".\\MyLib\\OLED.h"
 
 
@@ -27787,54 +28210,108 @@ void OLED_ShowSignedNum(uint8_t Line, uint8_t Column, int32_t Number, uint8_t Le
 void OLED_ShowHexNum(uint8_t Line, uint8_t Column, uint32_t Number, uint8_t Length);
 void OLED_ShowBinNum(uint8_t Line, uint8_t Column, uint32_t Number, uint8_t Length);
 
-#line 4 "Src\\main.c"
+#line 5 "Src\\main.c"
 
 
 
-#line 1 ".\\MyLib\\USART_Set.h"
+#line 1 ".\\MyLib\\UART_Set.h"
 
 
 
-#line 5 ".\\MyLib\\USART_Set.h"
+#line 5 ".\\MyLib\\UART_Set.h"
 
-extern USART_HandleTypeDef husart;
+extern UART_HandleTypeDef huart1;
+
  
  
  
-#line 23 ".\\MyLib\\USART_Set.h"
+#line 24 ".\\MyLib\\UART_Set.h"
 
-#line 8 "Src\\main.c"
+ 
 
-USART_HandleTypeDef husart;
-static uint8_t rxdata = 0;
 
+
+ 
+#line 40 ".\\MyLib\\UART_Set.h"
+
+ 
+
+
+
+
+
+ 
+#line 54 ".\\MyLib\\UART_Set.h"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#line 9 "Src\\main.c"
+
+ 
+UART_HandleTypeDef huart1; 
+
+ 
+uint8_t rx_buffer[100];    
+uint8_t rx_data;           
+uint8_t rx_index = 0;      
+uint8_t command_ready = 0; 
+
+
+
+
+
+
+ 
+#line 60 "Src\\main.c"
 
 void SystemClock_Config(void)
 {
     RCC_OscInitTypeDef RCC_OscInitStruct = {0};
     RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
-    
-    RCC_OscInitStruct.OscillatorType = ((uint32_t)0x00000001U);
-    RCC_OscInitStruct.HSEState = ((uint8_t)0x01U);
-    RCC_OscInitStruct.PLL.PLLState = ((uint8_t)0x02U);
-    RCC_OscInitStruct.PLL.PLLSource = 0x00400000U;
-    RCC_OscInitStruct.PLL.PLLM = 8;   
-    RCC_OscInitStruct.PLL.PLLN = 336; 
-    RCC_OscInitStruct.PLL.PLLP = ((uint32_t)0x00000004U); 
-    RCC_OscInitStruct.PLL.PLLQ = 7;   
+     
+    do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x10000000U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x10000000U)); ((void)(tmpreg)); } while(0);
+    do { volatile uint32_t tmpreg = 0x00U; (((((PWR_TypeDef *) (0x40000000U + 0x7000U))->CR)) = ((((((((PWR_TypeDef *) (0x40000000U + 0x7000U))->CR))) & (~(0x0000C000U))) | ((0x00008000U))))); tmpreg = ((((PWR_TypeDef *) (0x40000000U + 0x7000U))->CR) & (0x0000C000U)); ((void)(tmpreg)); } while(0);
+
+     
+    RCC_OscInitStruct.OscillatorType = ((uint32_t)0x00000002U);
+    RCC_OscInitStruct.HSIState = ((uint8_t)0x01U); 
+    RCC_OscInitStruct.HSICalibrationValue = ((uint32_t)0x10U);
+    RCC_OscInitStruct.PLL.PLLState = ((uint8_t)0x02U);         
+    RCC_OscInitStruct.PLL.PLLSource = 0x00000000U; 
+    RCC_OscInitStruct.PLL.PLLM = 8;                      
+    RCC_OscInitStruct.PLL.PLLN = 84;                     
+    RCC_OscInitStruct.PLL.PLLP = ((uint32_t)0x00000002U);          
+    RCC_OscInitStruct.PLL.PLLQ = 4;                      
 
     if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
     {
         Error_Handler();
     }
 
-    
-    RCC_ClkInitStruct.ClockType = ((uint32_t)0x00000002U) | ((uint32_t)0x00000001U) | ((uint32_t)0x00000004U) | ((uint32_t)0x00000008U);
-    RCC_ClkInitStruct.SYSCLKSource = 0x00000002U;
-    RCC_ClkInitStruct.AHBCLKDivider = 0x00000000U;   
-    RCC_ClkInitStruct.APB1CLKDivider = 0x00001000U;    
-    RCC_ClkInitStruct.APB2CLKDivider = 0x00000000U;    
+     
+    RCC_ClkInitStruct.ClockType = ((uint32_t)0x00000002U) | ((uint32_t)0x00000001U) |
+                                  ((uint32_t)0x00000004U) | ((uint32_t)0x00000008U);
+    RCC_ClkInitStruct.SYSCLKSource = 0x00000002U; 
+    RCC_ClkInitStruct.AHBCLKDivider = 0x00000000U;        
+    RCC_ClkInitStruct.APB1CLKDivider = 0x00001000U;         
+    RCC_ClkInitStruct.APB2CLKDivider = 0x00000000U;         
 
     if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, 0x00000002U) != HAL_OK)
     {
@@ -27846,31 +28323,37 @@ int main(void)
 {
     HAL_Init();
     SystemClock_Config();
-	OLED_Init();
-	
-	do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1ENR) |= (0x00000001U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1ENR) & (0x00000001U)); ((void)(tmpreg)); } while(0);
-    do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB2ENR) |= (0x00000010U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB2ENR) & (0x00000010U)); ((void)(tmpreg)); } while(0);
-	
-	do { GPIO_InitTypeDef GPIO_InitStructure = {0}; GPIO_InitStructure . Pin = ((uint16_t)0x0200U); GPIO_InitStructure . Mode = ((uint32_t)0x00000002U); GPIO_InitStructure . Speed = ((uint32_t)0x00000002U); GPIO_InitStructure . Pull = ((uint32_t)0x00000000U); GPIO_InitStructure . Alternate = ((uint8_t)0x07U); HAL_GPIO_Init(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0000U)), &GPIO_InitStructure); } while(0);
-    do { GPIO_InitTypeDef GPIO_InitStructure = {0}; GPIO_InitStructure . Pin = ((uint16_t)0x0400U); GPIO_InitStructure . Mode = ((uint32_t)0x00000000U); GPIO_InitStructure . Speed = ((uint32_t)0x00000002U); GPIO_InitStructure . Pull = ((uint32_t)0x00000001U); HAL_GPIO_Init(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0000U)), &GPIO_InitStructure); } while(0);
-	do { USART_InitTypeDef USART_InitStructure; USART_InitStructure . BaudRate = 115200; USART_InitStructure . WordLength = ((uint32_t)0x1000U); USART_InitStructure . StopBits = ((uint32_t)0x00000000U); USART_InitStructure . Parity = ((uint32_t)0x0400U); USART_InitStructure . Mode = ((uint32_t)(0x0008U |0x0004U)); husart . Init = USART_InitStructure; husart . Instance = ((USART_TypeDef *) ((0x40000000U + 0x00010000U) + 0x1000U)); if(HAL_USART_Init(&husart) != HAL_OK) { Error_Handler(); } } while(0);
+    OLED_Init();
 
-	((((((uint32_t)(1U << 28U | 0x0020U))) >> 28U) == 1U)? ((&husart)->Instance ->CR1 |= ((((uint32_t)(1U << 28U | 0x0020U))) & ((uint32_t) 0x0100U | 0x0080U | 0x0040U | 0x0020U | 0x0010U | 0x0040U | 0x0400U | 0x0001U ))): (((((uint32_t)(1U << 28U | 0x0020U))) >> 28U) == 2U)? ((&husart)->Instance ->CR2 |= ((((uint32_t)(1U << 28U | 0x0020U))) & ((uint32_t) 0x0100U | 0x0080U | 0x0040U | 0x0020U | 0x0010U | 0x0040U | 0x0400U | 0x0001U ))): ((&husart)->Instance ->CR3 |= ((((uint32_t)(1U << 28U | 0x0020U))) & ((uint32_t) 0x0100U | 0x0080U | 0x0040U | 0x0020U | 0x0010U | 0x0040U | 0x0400U | 0x0001U ))));
-	
-	HAL_NVIC_SetPriorityGrouping(((uint32_t)0x00000003U));  
-	HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
-	HAL_NVIC_EnableIRQ(USART1_IRQn);
-	
-    uint8_t TxData[2];
-    TxData[0] = 0x0;
-    TxData[1] = 0x1;
+    do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1ENR) |= (0x00000001U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1ENR) & (0x00000001U)); ((void)(tmpreg)); } while(0);
 
-    HAL_USART_Transmit(&husart, TxData, sizeof(TxData), 0xFFFFFFFFU);
-    OLED_ShowString(1, 1, "Transmit succeed");
-    OLED_ShowNum(2, 1, (uint32_t)TxData[0], 2);
-    OLED_ShowNum(2, 4, (uint32_t)TxData[1], 2);
-    while(1) {
-		OLED_ShowNum(3, 1, rxdata, 2);
+    
+    do { do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB2ENR) |= (0x00000010U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB2ENR) & (0x00000010U)); ((void)(tmpreg)); } while(0); do { GPIO_InitTypeDef GPIO_InitStruct = {0}; do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1ENR) |= (0x00000001U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1ENR) & (0x00000001U)); ((void)(tmpreg)); } while(0); GPIO_InitStruct . Pin = ((uint16_t)0x0200U) | ((uint16_t)0x0400U); GPIO_InitStruct . Mode = ((uint32_t)0x00000002U); GPIO_InitStruct . Pull = ((uint32_t)0x00000000U); GPIO_InitStruct . Speed = ((uint32_t)0x00000003U); GPIO_InitStruct . Alternate = ((uint8_t)0x07U); HAL_GPIO_Init(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0000U)), &GPIO_InitStruct); } while(0); do { huart1 . Instance = ((USART_TypeDef *) ((0x40000000U + 0x00010000U) + 0x1000U)); huart1 . Init . BaudRate = 9600; huart1 . Init . WordLength = ((uint32_t)0x00000000U); huart1 . Init . StopBits = ((uint32_t)0x00000000U); huart1 . Init . Parity = ((uint32_t)0x00000000U); huart1 . Init . Mode = ((uint32_t)(0x0008U |0x0004U)); huart1 . Init . HwFlowCtl = ((uint32_t)0x00000000U); huart1 . Init . OverSampling = ((uint32_t)0x00000000U); if(HAL_UART_Init(&huart1) != HAL_OK) { Error_Handler(); } } while(0); do { HAL_NVIC_SetPriority(USART1_IRQn, 0, 0); HAL_NVIC_EnableIRQ(USART1_IRQn); } while(0); } while(0);
+
+     
+    HAL_UART_Receive_IT(&huart1, &rx_data, 1);
+
+    OLED_ShowString(1, 1, "UART Ready");
+
+    while (1)
+    {
+         
+        if (command_ready)
+        {
+            command_ready = 0; 
+             
+            char echo_msg[150];
+            sprintf(echo_msg, "Echo: %s\r\n", rx_buffer);
+            HAL_UART_Transmit_IT(&huart1, (uint8_t *)echo_msg, strlen(echo_msg));
+
+             
+            OLED_Clear();
+            OLED_ShowString(1, 1, "Received:");
+            OLED_ShowString(2, 1, (char *)rx_buffer);
+            memset(rx_buffer, 0, sizeof(rx_buffer));
+        }
+
+        HAL_Delay(10);
     }
 }
 
@@ -27883,8 +28366,56 @@ void Error_Handler(void)
     }
 }
 
-void USART1_IRQHandler(void) {
-	if((((&husart)->Instance ->SR & (((uint32_t)0x00000020U))) == (((uint32_t)0x00000020U))) == 1) {
-		rxdata = husart.Instance->DR;
-	}
+ 
+void USART1_IRQHandler(void)
+{
+    HAL_UART_IRQHandler(&huart1);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+    if (huart->Instance == ((USART_TypeDef *) ((0x40000000U + 0x00010000U) + 0x1000U)))
+    {
+         
+        HAL_UART_Receive_IT(&huart1, &rx_data, 1);
+
+         
+        if (rx_data == '\n' || rx_data == '\r')
+        {
+             
+            if (rx_index > 0)
+            {
+                rx_buffer[rx_index] = '\0'; 
+                command_ready = 1;          
+                rx_index = 0;               
+            }
+        }
+        else
+        {
+             
+            if (rx_index < sizeof(rx_buffer) - 1)
+            {
+                rx_buffer[rx_index++] = rx_data;
+            }
+            else
+            {
+                 
+                rx_index = 0;
+                memset(rx_buffer, 0, sizeof(rx_buffer));
+            }
+        }
+    }
 }
