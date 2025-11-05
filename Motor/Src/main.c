@@ -2,7 +2,7 @@
 #include "main.h"
 #include "GPIO_Set.h"
 #include "OLED.h"
-#include "TB6612FNG.h"
+#include "BLDC.h"
 // #include "GY86.h"
 // #include "BMP180.h"
 // #include "PWM_Set.h"
@@ -49,10 +49,12 @@ int main(void)
     HAL_Init();
     SystemClock_Config();
     OLED_Init();
-	TB6612FNG_Init();
-	uint16_t motor_speed = 500;
+    BLDC_Init();
 
-	TB6612FNG_SetSpeed(motor_speed);
+    uint16_t throttle_us = 1200; // 轻油门
+    BLDC_SetThrottle_us(throttle_us);
+    // Atomizer_Click(1400, 500); // 示例：以1.4ms脉宽点击500ms
+
     while (1)
     {
         
