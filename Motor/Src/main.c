@@ -53,7 +53,7 @@ int main(void)
 
     uint16_t throttle_us = 1200; // 轻油门
     BLDC_SetThrottle_us(throttle_us);
-    // Atomizer_Click(1400, 500); // 示例：以1.4ms脉宽点击500ms
+    // Atomizer_Click(1400, 500); // 以1.4ms脉宽点击500ms
 
     while (1)
     {
