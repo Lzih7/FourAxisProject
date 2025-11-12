@@ -1116,14 +1116,24 @@
               <FilePath>.\MyLib\UART_Set.h</FilePath>
             </File>
             <File>
-              <FileName>TB6612FNG.c</FileName>
+              <FileName>BLDC.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\MyLib\TB6612FNG.c</FilePath>
+              <FilePath>.\MyLib\BLDC.c</FilePath>
             </File>
             <File>
-              <FileName>TB6612FNG.h</FileName>
+              <FileName>BLDC.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\MyLib\TB6612FNG.h</FilePath>
+              <FilePath>.\MyLib\BLDC.h</FilePath>
+            </File>
+            <File>
+              <FileName>Receive_IC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\MyLib\Receive_IC.c</FilePath>
+            </File>
+            <File>
+              <FileName>Receive_IC.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\MyLib\Receive_IC.h</FilePath>
             </File>
           </Files>
         </Group>

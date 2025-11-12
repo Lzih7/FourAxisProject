@@ -656,7 +656,7 @@
 
   <Group>
     <GroupName>HAL_inc</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1951,8 +1951,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\MyLib\TB6612FNG.c</PathWithFileName>
-      <FilenameWithoutPath>TB6612FNG.c</FilenameWithoutPath>
+      <PathWithFileName>.\MyLib\BLDC.c</PathWithFileName>
+      <FilenameWithoutPath>BLDC.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1963,8 +1963,32 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\MyLib\TB6612FNG.h</PathWithFileName>
-      <FilenameWithoutPath>TB6612FNG.h</FilenameWithoutPath>
+      <PathWithFileName>.\MyLib\BLDC.h</PathWithFileName>
+      <FilenameWithoutPath>BLDC.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>7</GroupNumber>
+      <FileNumber>144</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\MyLib\Receive_IC.c</PathWithFileName>
+      <FilenameWithoutPath>Receive_IC.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>7</GroupNumber>
+      <FileNumber>145</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\MyLib\Receive_IC.h</PathWithFileName>
+      <FilenameWithoutPath>Receive_IC.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

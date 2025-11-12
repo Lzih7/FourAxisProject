@@ -3,7 +3,6 @@
 #include "PWM_Set.h"
 #include "BLDC.h"
 
-// 使用 TIM3 作为 PWM 定时器（句柄在 main.c 中定义）
 extern TIM_HandleTypeDef htim3;
 
 // 限制脉宽到 [BLDC_MIN_US, BLDC_MAX_US]
@@ -27,10 +26,10 @@ void BLDC_Init(void)
     // 定时器基础配置: 84MHz / 84 / 20000 -> 50Hz，周期 20000us
     TIM_Base_CFG(TIM3, 84 - 1, 20000 - 1, TIM_CLOCKDIVISION_DIV1, TIM_COUNTERMODE_UP);
 
-    // 初始化 PWM 并配置通道为 PWM1，占空比初始为 BLDC_OFF_US
-    if (HAL_TIM_PWM_Init(&htim3) != HAL_OK) {
-        Error_Handler();
-    }
+    // // 初始化 PWM 并配置通道为 PWM1，占空比初始为 BLDC_OFF_US
+    // if (HAL_TIM_PWM_Init(&htim3) != HAL_OK) {
+    //     Error_Handler();
+    // }
     TIM_PWM_CFG(TIM3, TIM_OCMODE_PWM1, BLDC_OFF_US, TIM_OCPOLARITY_HIGH, BLDC_PWM_CHANNEL);
 
     // 启动 PWM

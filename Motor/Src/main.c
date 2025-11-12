@@ -9,6 +9,8 @@
 // #include "UART_Set.h"
 
 TIM_HandleTypeDef htim3;
+TIM_HandleTypeDef htim5;
+uint16_t PWM_IN_Wid[4];
 
 // HAL库时钟配置函数 - HSE + 84MHz系统时钟 + 48MHz USB
 void SystemClock_Config(void)
