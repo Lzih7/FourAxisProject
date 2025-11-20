@@ -1100,6 +1100,16 @@
               <FileType>5</FileType>
               <FilePath>.\MyLib\BMP180.h</FilePath>
             </File>
+            <File>
+              <FileName>ReadPeripherals.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\MyLib\ReadPeripherals.c</FilePath>
+            </File>
+            <File>
+              <FileName>ReadPeripherals.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\MyLib\ReadPeripherals.h</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

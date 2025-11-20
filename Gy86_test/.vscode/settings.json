@@ -15,6 +15,7 @@
         "xmemory": "cpp",
         "main.h": "c",
         "compare": "c",
-        "cstddef": "c"
+        "cstddef": "c",
+        "stdint.h": "c"
     }
 }

@@ -27802,11 +27802,9 @@ extern TIM_HandleTypeDef htim3;
 #line 30 "MyLib\\BLDC.h"
 
 void BLDC_Init(void);
-void BLDC_SetThrottle_us(uint16_t pulse_us);
-void BLDC_Stop(void);
-
-
-void Atomizer_Click(uint16_t pulse_us, uint16_t duration_ms);
+void BLDC_SetThrottle3_us(uint16_t pulse_us);
+void BLDC_Stop3(void);
+void Calibrate_BLDC(void);
 
 #line 5 "MyLib\\BLDC.c"
 
@@ -27834,34 +27832,33 @@ void BLDC_Init(void)
     do { TIM_Base_InitTypeDef TIM_Base_InitStruct = {0}; TIM_Base_InitStruct . Prescaler = 84 - 1; TIM_Base_InitStruct . Period = 20000 - 1; TIM_Base_InitStruct . ClockDivision = ((uint32_t)0x00000000U); TIM_Base_InitStruct . CounterMode = ((uint32_t)0x00000000U); htim3 . Instance = ((TIM_TypeDef *) (0x40000000U + 0x0400U)); htim3 . Init = TIM_Base_InitStruct; if(HAL_TIM_Base_Init(&htim3) != HAL_OK) { Error_Handler(); } } while(0);
 
     
-    
-    
-    
+    if (HAL_TIM_PWM_Init(&htim3) != HAL_OK) {
+        Error_Handler();
+    }
     do { TIM_OC_InitTypeDef TIM_OC_InitStruct = {0}; TIM_OC_InitStruct . OCMode = (0x0020U | 0x0040U); TIM_OC_InitStruct . Pulse = 1000; TIM_OC_InitStruct . OCPolarity = ((uint32_t)0x00000000U); TIM_OC_InitStruct . OCFastMode = ((uint32_t)0x00000000U); if(HAL_TIM_PWM_ConfigChannel(&htim3, &TIM_OC_InitStruct, ((uint32_t)0x00000008U)) != HAL_OK) { Error_Handler(); } } while(0);
 
     
-    if (HAL_TIM_PWM_Start(&htim3, ((uint32_t)0x00000008U)) != HAL_OK) {
-        Error_Handler();
-    }
+    
+    
+    
     (*(volatile uint32_t *)(&((&htim3)->Instance ->CCR1) + ((((uint32_t)0x00000008U)) >> 2U)) = (1000));
 }
 
-void BLDC_SetThrottle_us(uint16_t pulse_us)
+void BLDC_SetThrottle3_us(uint16_t pulse_us)
 {
     
     uint16_t duty = clamp_u16(pulse_us, 1000, 2000);
     (*(volatile uint32_t *)(&((&htim3)->Instance ->CCR1) + ((((uint32_t)0x00000008U)) >> 2U)) = (duty));
 }
 
-void BLDC_Stop(void)
+void BLDC_Stop3(void)
 {
     (*(volatile uint32_t *)(&((&htim3)->Instance ->CCR1) + ((((uint32_t)0x00000008U)) >> 2U)) = (1000));
 }
 
-void Atomizer_Click(uint16_t pulse_us, uint16_t duration_ms)
-{
-    
-    BLDC_SetThrottle_us(pulse_us);
-    HAL_Delay(duration_ms);
-    BLDC_Stop();
+void Calibrate_BLDC(void) {
+    BLDC_SetThrottle3_us(2000);
+    HAL_Delay(5000);
+    BLDC_SetThrottle3_us(1000);
+    HAL_Delay(1000);
 }

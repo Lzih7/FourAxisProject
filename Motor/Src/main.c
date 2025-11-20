@@ -3,6 +3,7 @@
 #include "GPIO_Set.h"
 #include "OLED.h"
 #include "BLDC.h"
+#include "Receive_IC.h"
 // #include "GY86.h"
 // #include "BMP180.h"
 // #include "PWM_Set.h"
@@ -51,15 +52,16 @@ int main(void)
     HAL_Init();
     SystemClock_Config();
     OLED_Init();
+    IC_Init();
     BLDC_Init();
-
-    uint16_t throttle_us = 1200; // 轻油门
-    BLDC_SetThrottle_us(throttle_us);
-    // Atomizer_Click(1400, 500); // 以1.4ms脉宽点击500ms
-
+    OLED_ShowString(1, 1, "BLDC Init");
+    // Calibrate_BLDC();
+    // OLED_ShowString(1, 1, "BLDC Calibrated");
+    
     while (1)
     {
-        
+        OLED_ShowNum(2, 1, PWM_IN_Wid[2], 4);
+        // BLDC_SetThrottle3_us(PWM_IN_Wid[2]);
     }
 }
 

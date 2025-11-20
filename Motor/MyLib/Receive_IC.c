@@ -1,7 +1,6 @@
 #include "main.h"
 #include "GPIO_Set.h"
 #include "Receive_IC.h"
-#include <math.h>
 
 extern TIM_HandleTypeDef htim5;
 extern uint16_t PWM_IN_Wid[4];
@@ -11,7 +10,7 @@ uint16_t TIM5_Cap_Val[4][2] = {0}; // 两次捕获的值相减获取脉宽
 void IC_Init(void) {
 	__HAL_RCC_GPIOA_CLK_ENABLE();
 	__HAL_RCC_TIM5_CLK_ENABLE();
-	GPIO_AF_CFG(IC_Port, IC_ALL_PIN, GPIO_MODE_AF_PP, GPIO_SPEED_FREQ_HIGH, GPIO_NOPULL, GPIO_AF2_TIM5);
+	GPIO_AF_CFG(IC_Port, IC_ALL_PIN, GPIO_MODE_AF_PP, GPIO_SPEED_FREQ_HIGH, GPIO_PULLDOWN, GPIO_AF2_TIM5);
 	
 	htim5.Instance = TIM5;
 	htim5.Init.Prescaler = 84 - 1;
@@ -53,8 +52,9 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
 	uint8_t i;
 	if(htim->Instance != TIM5) return;
 	for(i = 0; i < 4; i++) {
-		if(htim->Channel == pow(2, i)) { // 这里是TIM_ACTIVE_CHANNEL
+		if(htim->Channel == (1U << i)) { // 这里是TIM_ACTIVE_CHANNEL
 			if(TIM5_Cap_Status[i]) {
+                TIM5_Cap_Status[i] = 0;
 				TIM5_Cap_Val[i][1] = HAL_TIM_ReadCapturedValue(htim, i * 4); //这里是TIM_CHANNEL
 				PWM_IN_Wid[i] = TIM5_Cap_Val[i][1] - TIM5_Cap_Val[i][0];
 				TIM_SET_CAPTUREPOLARITY(&htim5, i * 4, TIM_ICPOLARITY_RISING);

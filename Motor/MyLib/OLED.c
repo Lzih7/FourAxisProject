@@ -2,22 +2,22 @@
 #include "OLED_Font.h"
 
 /*引脚配置 - HAL库版本*/
-#define OLED_W_SCL(x)		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, (x) ? GPIO_PIN_SET : GPIO_PIN_RESET)
-#define OLED_W_SDA(x)		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, (x) ? GPIO_PIN_SET : GPIO_PIN_RESET)
+#define OLED_W_SCL(x)		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, (x) ? GPIO_PIN_SET : GPIO_PIN_RESET)
+#define OLED_W_SDA(x)		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, (x) ? GPIO_PIN_SET : GPIO_PIN_RESET)
 
 /*引脚初始化*/
 void OLED_I2C_Init(void)
 {
     // 使能GPIOB时钟
-    __HAL_RCC_GPIOA_CLK_ENABLE();
+    __HAL_RCC_GPIOC_CLK_ENABLE();
 	
 	GPIO_InitTypeDef GPIO_InitStruct = {0};
 	
-	GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1;
+	GPIO_InitStruct.Pin = GPIO_PIN_2 | GPIO_PIN_3;
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
 	GPIO_InitStruct.Pull = GPIO_PULLUP;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+	HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 	
 	// 初始化引脚为高电平
 	OLED_W_SCL(1);

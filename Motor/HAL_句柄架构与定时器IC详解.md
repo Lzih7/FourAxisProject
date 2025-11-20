@@ -144,3 +144,42 @@ void USART2_UART_Setup(void) {
 
 ---
 通过以上梳理，你可以把任何 HAL 外设都归纳为：“句柄标识实例 → 基础 InitTypeDef 写入寄存器 →（可选）通道级/模式级配置 → 选择阻塞/中断/DMA 的运行方式 → IRQ 分发到回调进行业务处理”。掌握这套范式，TIM、UART、SPI、I2C 等外设的使用都会更顺畅、可靠且易维护。
+
+## 10. ActiveChannel 深入剖析
+- 生命周期与语义：
+  - `htim->Channel` 的类型为 `HAL_TIM_ActiveChannel`，仅在 HAL 的中断处理期间用于标识“当前正在处理的通道”。
+  - 典型取值：`HAL_TIM_ACTIVE_CHANNEL_1..4`；处理完一次事件后，通常会被置回 `HAL_TIM_ACTIVE_CHANNEL_CLEARED`。
+  - 它不是硬件寄存器快照，也不长期保存；不要在回调之外依赖它的值。
+- 设置与清除的流程（伪代码）：
+  ```c
+  void HAL_TIM_IRQHandler(TIM_HandleTypeDef *htim) {
+      // 更新事件（溢出）
+      if (UPDATE_FLAG && UPDATE_IT) { CLEAR_UPDATE; HAL_TIM_PeriodElapsedCallback(htim); }
+
+      // CC1 事件
+      if (CC1_FLAG && CC1_IT) {
+          CLEAR_CC1;
+          htim->Channel = HAL_TIM_ACTIVE_CHANNEL_1;
+          TIM_CCxHandler(htim);   // 按当前模式路由到 IC/OC/PWM 回调
+          htim->Channel = HAL_TIM_ACTIVE_CHANNEL_CLEARED;
+      }
+      // CC2/CC3/CC4 同理，依次检查与分发
+  }
+  ```
+- 与模式的关系：
+  - 路由到哪个用户回调，取决于你用的“启动 API”和当前模式：
+    - 输入捕获：`HAL_TIM_IC_Start_IT` → `HAL_TIM_IC_CaptureCallback`
+    - 输出比较/延时：`HAL_TIM_OC_Start_IT` → `HAL_TIM_OC_DelayElapsedCallback`
+    - PWM：`HAL_TIM_PWM_Start_IT` → `HAL_TIM_PWM_PulseFinishedCallback`
+    - 触发/从模式：`HAL_TIMEx_MasterConfigSynchronization` 配合 `HAL_TIM_TriggerCallback`
+  - HAL 会在 `TIM_CCxHandler` 内根据通道配置（IC/OC/PWM）选择正确的回调。
+- 多通道并发：
+  - 若同一次 IRQ 内多个通道同时置位，HAL 会按顺序为每个通道分别设置 `ActiveChannel` 并多次调用对应回调；你的回调应使用 `if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_x)` 精确匹配来源。
+- 与 `TIM_CHANNEL_x` 的配合：
+  - 判断来源用 `HAL_TIM_ACTIVE_CHANNEL_x`；读/写寄存器用 `TIM_CHANNEL_x`（如 `HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1)`）。
+  - 两者数值与语义不同，不能混用；这是最常见的误区之一。
+- 过捕获与错误处理：
+  - 当脉冲过快或未及时读取导致 `CCxOF` 置位，HAL 可能通过错误回调（如 `HAL_TIM_ErrorCallback`）报告；你也可以在 IRQ 中自行检查并清除 `TIM_FLAG_CCxOF`。
+- 调试建议：
+  - 在回调内短暂点亮 LED 或打印当前 `ActiveChannel` 与 `CCR` 值，确认分发顺序与数据有效。
+  - 用示波器观察输入信号与中断回调的节拍，排除极性切换时的竞态；切极性时坚持“停→设→启”。

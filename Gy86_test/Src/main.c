@@ -1,8 +1,7 @@
 #include "main.h"
 #include "GPIO_Set.h"
-#include "OLED.h"
-#include "GY86.h"
-#include "BMP180.h"
+#include "ReadPeripherals.h"
+// #include "BMP180.h"
 // #include "PWM_Set.h"
 
 // HAL库时钟配置函数 - HSE + 84MHz系统时钟 + 48MHz USB
@@ -46,39 +45,11 @@ int main(void)
 
     /* 配置系统时钟 */
     SystemClock_Config();
-	OLED_Init();
-	MPU6050_Init();
-	BMP180_Init();
-	
-    uint8_t MPU_id = MPU6050_GetId();
-	OLED_ShowString(1, 1, "ID: ");
-	OLED_ShowHexNum(1, 5, MPU_id, 4);
+    ReadPeripherals_Init();
 
     while(1) {
-        // 读取BMP180数据
-        BMP180_Data_t bmp_data;
-        if (BMP180_GetData(&bmp_data, BMP180_OSS_HIGH_RESOLUTION) == HAL_OK) {
-            // 显示温度 (第2行)
-            OLED_ShowString(2, 1, "T:");
-            OLED_ShowNum(2, 3, bmp_data.temperature, 4);
-            OLED_ShowString(2, 8, "C");
-            
-            // 显示气压 (第3行，单位：hPa)
-            OLED_ShowString(3, 1, "P:");
-            OLED_ShowNum(3, 3, bmp_data.pressure / 100.0f, 4);
-            OLED_ShowString(3, 9, "hPa");
-            
-            // 显示海拔 (第4行)
-            OLED_ShowString(4, 1, "A:");
-            OLED_ShowNum(4, 3, bmp_data.altitude, 3);
-            OLED_ShowString(4, 8, "m");
-        } else {
-            // 读取失败显示错误信息
-            OLED_ShowString(2, 1, "BMP180 Error");
-        }
-        
-        // 延时1秒刷新一次
-        HAL_Delay(10);
+        ReadPeripherals_Process();
+        HAL_Delay(5);
     }
 }
 

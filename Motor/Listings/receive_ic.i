@@ -27779,17 +27779,19 @@ void Error_Handler(void);
 
 
 #line 10 "MyLib\\Receive_IC.h"
+void IC_Init(void);
 
 #line 4 "MyLib\\Receive_IC.c"
 
 extern TIM_HandleTypeDef htim5;
-uint8_t TIM5_Cap_Status[4] = {0};
-uint16_t TIM5_Cap_Val[4][2] = {0};
+extern uint16_t PWM_IN_Wid[4];
+uint8_t TIM5_Cap_Status[4] = {0}; 
+uint16_t TIM5_Cap_Val[4][2] = {0}; 
 
 void IC_Init(void) {
 	do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1ENR) |= (0x00000001U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1ENR) & (0x00000001U)); ((void)(tmpreg)); } while(0);
 	do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x00000008U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x00000008U)); ((void)(tmpreg)); } while(0);
-	do { GPIO_InitTypeDef GPIO_InitStructure = {0}; GPIO_InitStructure . Pin = ((uint16_t)0x0001U) | ((uint16_t)0x0002U) | ((uint16_t)0x0004U) | ((uint16_t)0x0008U); GPIO_InitStructure . Mode = ((uint32_t)0x00000002U); GPIO_InitStructure . Speed = ((uint32_t)0x00000002U); GPIO_InitStructure . Pull = ((uint32_t)0x00000000U); GPIO_InitStructure . Alternate = ((uint8_t)0x02U); HAL_GPIO_Init(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0000U)), &GPIO_InitStructure); } while(0);
+	do { GPIO_InitTypeDef GPIO_InitStructure = {0}; GPIO_InitStructure . Pin = ((uint16_t)0x0001U) | ((uint16_t)0x0002U) | ((uint16_t)0x0004U) | ((uint16_t)0x0008U); GPIO_InitStructure . Mode = ((uint32_t)0x00000002U); GPIO_InitStructure . Speed = ((uint32_t)0x00000002U); GPIO_InitStructure . Pull = ((uint32_t)0x00000002U); GPIO_InitStructure . Alternate = ((uint8_t)0x02U); HAL_GPIO_Init(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0000U)), &GPIO_InitStructure); } while(0);
 	
 	htim5.Instance = ((TIM_TypeDef *) (0x40000000U + 0x0C00U));
 	htim5.Init.Prescaler = 84 - 1;
@@ -27799,13 +27801,13 @@ void IC_Init(void) {
 	if(HAL_TIM_Base_Init(&htim5) != HAL_OK) {
 		return;
 	}
-	if(HAL_TIM_IC_Init(&htim5) != HAL_OK) {
-		return;
-	}
+	
+	
+	
 	
 	TIM_IC_InitTypeDef TIM_IC_InitStructure = {0};
 	TIM_IC_InitStructure.ICFilter = 0x0B;
-	TIM_IC_InitStructure.ICPolarity = ((uint32_t)0x00000000U);
+	TIM_IC_InitStructure.ICPolarity = ((uint32_t)0x00000000U); 
 	TIM_IC_InitStructure.ICPrescaler = ((uint32_t)0x00000000U);
 	TIM_IC_InitStructure.ICSelection = (0x0001U); 
 	
@@ -27828,5 +27830,20 @@ void TIM5_IRQHandler(void) {
 }
 
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
-	
+	uint8_t i;
+	if(htim->Instance != ((TIM_TypeDef *) (0x40000000U + 0x0C00U))) return;
+	for(i = 0; i < 4; i++) {
+		if(htim->Channel == (1U << i)) { 
+			if(TIM5_Cap_Status[i]) {
+                TIM5_Cap_Status[i] = 0;
+				TIM5_Cap_Val[i][1] = HAL_TIM_ReadCapturedValue(htim, i * 4); 
+				PWM_IN_Wid[i] = TIM5_Cap_Val[i][1] - TIM5_Cap_Val[i][0];
+				(((i * 4) == ((uint32_t)0x00000000U)) ? ((&htim5)->Instance ->CCER |= (((uint32_t)0x00000000U))) : ((i * 4) == ((uint32_t)0x00000004U)) ? ((&htim5)->Instance ->CCER |= ((((uint32_t)0x00000000U)) << 4U)) : ((i * 4) == ((uint32_t)0x00000008U)) ? ((&htim5)->Instance ->CCER |= ((((uint32_t)0x00000000U)) << 8U)) : ((&htim5)->Instance ->CCER |= (((((uint32_t)0x00000000U)) << 12U) & 0x2000U)));
+			} else {
+				TIM5_Cap_Status[i] = 1;
+				TIM5_Cap_Val[i][0] = HAL_TIM_ReadCapturedValue(htim, i * 4);
+				(((i * 4) == ((uint32_t)0x00000000U)) ? ((&htim5)->Instance ->CCER |= ((0x0002U))) : ((i * 4) == ((uint32_t)0x00000004U)) ? ((&htim5)->Instance ->CCER |= (((0x0002U)) << 4U)) : ((i * 4) == ((uint32_t)0x00000008U)) ? ((&htim5)->Instance ->CCER |= (((0x0002U)) << 8U)) : ((&htim5)->Instance ->CCER |= ((((0x0002U)) << 12U) & 0x2000U)));
+			}
+		}
+	}
 }

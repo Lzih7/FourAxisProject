@@ -27827,6 +27827,60 @@ uint8_t MPU6050_GetId(void);
 
 
 
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+typedef struct {
+    uint16_t C1; 
+    uint16_t C2; 
+    uint16_t C3; 
+    uint16_t C4; 
+    uint16_t C5; 
+    uint16_t C6; 
+} MS561101BA_CalibData_t;
+
+
+void MS561101BA_Reset(void);
+void MS561101BA_Init(void);
+uint16_t MS561101BA_ReadPROM(uint8_t index);
+void MS561101BA_ReadPROM_All(MS561101BA_CalibData_t* calib);
+void MS561101BA_StartConversionD1(uint8_t osr);
+void MS561101BA_StartConversionD2(uint8_t osr);
+uint32_t MS561101BA_ReadADC(void);
+uint32_t MS561101BA_ReadPressureRaw(uint8_t osr);
+uint32_t MS561101BA_ReadTemperatureRaw(uint8_t osr);
+
 #line 5 "Src\\main.c"
 #line 1 ".\\MyLib\\BMP180.h"
 

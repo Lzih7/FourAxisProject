@@ -27816,6 +27816,60 @@ uint8_t MPU6050_GetId(void);
 
 
 
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+typedef struct {
+    uint16_t C1; 
+    uint16_t C2; 
+    uint16_t C3; 
+    uint16_t C4; 
+    uint16_t C5; 
+    uint16_t C6; 
+} MS561101BA_CalibData_t;
+
+
+void MS561101BA_Reset(void);
+void MS561101BA_Init(void);
+uint16_t MS561101BA_ReadPROM(uint8_t index);
+void MS561101BA_ReadPROM_All(MS561101BA_CalibData_t* calib);
+void MS561101BA_StartConversionD1(uint8_t osr);
+void MS561101BA_StartConversionD2(uint8_t osr);
+uint32_t MS561101BA_ReadADC(void);
+uint32_t MS561101BA_ReadPressureRaw(uint8_t osr);
+uint32_t MS561101BA_ReadTemperatureRaw(uint8_t osr);
+
 #line 4 "MyLib\\GY86.c"
 
 
@@ -27933,15 +27987,148 @@ uint8_t HMC5883L_ReadReg(uint8_t RegAddr) {
 }
 
 void HMC5883L_GetData(int16_t* X, int16_t* Y, int16_t* Z) {
-	uint8_t High, Low;
-	High = HMC5883L_ReadReg(0x03);
-	Low = HMC5883L_ReadReg(0x04);
-	*X = Low | (High << 8);
-	High = HMC5883L_ReadReg(0x07);
-	Low = HMC5883L_ReadReg(0x08);
-	*Y = Low | (High << 8);
-	High = HMC5883L_ReadReg(0x05);
-	Low = HMC5883L_ReadReg(0x06);
-	*Z = Low | (High << 8);
+    uint8_t High, Low;
+    High = HMC5883L_ReadReg(0x03);
+    Low = HMC5883L_ReadReg(0x04);
+    *X = Low | (High << 8);
+    High = HMC5883L_ReadReg(0x07);
+    Low = HMC5883L_ReadReg(0x08);
+    *Y = Low | (High << 8);
+    High = HMC5883L_ReadReg(0x05);
+    Low = HMC5883L_ReadReg(0x06);
+    *Z = Low | (High << 8);
+}
+
+
+
+ 
+
+
+static MS561101BA_CalibData_t ms5611_calib;
+static uint8_t ms5611_calib_loaded = 0;
+
+
+void MS561101BA_Reset(void) {
+    if(!already_init){
+        MyI2C_Init();
+        already_init = 1;
+    }
+    MyI2C_Start();
+    MyI2C_SendByte(0xEE);
+    MyI2C_ReceiveAck();
+    MyI2C_SendByte(0x1E);
+    MyI2C_ReceiveAck();
+    MyI2C_Stop();
+    
+    HAL_Delay(3);
+}
+
+
+uint16_t MS561101BA_ReadPROM(uint8_t index) {
+    uint8_t msb, lsb;
+    uint8_t prom_addr = 0xA0 + (index << 1);
+
+    MyI2C_Start();
+    MyI2C_SendByte(0xEE);
+    MyI2C_ReceiveAck();
+    MyI2C_SendByte(prom_addr);
+    MyI2C_ReceiveAck();
+    
+    MyI2C_Start();
+    MyI2C_SendByte(0xEE | 0x01);
+    MyI2C_ReceiveAck();
+    msb = MyI2C_ReceiveByte();
+    MyI2C_SendAck(0);
+    lsb = MyI2C_ReceiveByte();
+    MyI2C_SendAck(1);
+    MyI2C_Stop();
+    
+    return ((uint16_t)msb << 8) | lsb;
+}
+
+
+void MS561101BA_ReadPROM_All(MS561101BA_CalibData_t* calib) {
+    calib->C1 = MS561101BA_ReadPROM(1);
+    calib->C2 = MS561101BA_ReadPROM(2);
+    calib->C3 = MS561101BA_ReadPROM(3);
+    calib->C4 = MS561101BA_ReadPROM(4);
+    calib->C5 = MS561101BA_ReadPROM(5);
+    calib->C6 = MS561101BA_ReadPROM(6);
+}
+
+
+static uint8_t MS561101BA_GetDelayMs(uint8_t osr) {
+    switch(osr) {
+        case 0x00:  return 1;  
+        case 0x02:  return 2;  
+        case 0x04: return 3;  
+        case 0x06: return 5;  
+        case 0x08: return 10; 
+        default: return 3;
+    }
+}
+
+
+void MS561101BA_StartConversionD1(uint8_t osr) {
+    MyI2C_Start();
+    MyI2C_SendByte(0xEE);
+    MyI2C_ReceiveAck();
+    MyI2C_SendByte(0x40 + osr);
+    MyI2C_ReceiveAck();
+    MyI2C_Stop();
+}
+
+
+void MS561101BA_StartConversionD2(uint8_t osr) {
+    MyI2C_Start();
+    MyI2C_SendByte(0xEE);
+    MyI2C_ReceiveAck();
+    MyI2C_SendByte(0x50 + osr);
+    MyI2C_ReceiveAck();
+    MyI2C_Stop();
+}
+
+
+uint32_t MS561101BA_ReadADC(void) {
+    uint8_t b1, b2, b3;
+    MyI2C_Start();
+    MyI2C_SendByte(0xEE);
+    MyI2C_ReceiveAck();
+    MyI2C_SendByte(0x00); 
+    MyI2C_ReceiveAck();
+
+    MyI2C_Start();
+    MyI2C_SendByte(0xEE | 0x01);
+    MyI2C_ReceiveAck();
+    b1 = MyI2C_ReceiveByte();
+    MyI2C_SendAck(0);
+    b2 = MyI2C_ReceiveByte();
+    MyI2C_SendAck(0);
+    b3 = MyI2C_ReceiveByte();
+    MyI2C_SendAck(1);
+    MyI2C_Stop();
+    
+    return ((uint32_t)b1 << 16) | ((uint32_t)b2 << 8) | (uint32_t)b3;
+}
+
+
+uint32_t MS561101BA_ReadPressureRaw(uint8_t osr) {
+    MS561101BA_StartConversionD1(osr);
+    HAL_Delay(MS561101BA_GetDelayMs(osr));
+    return MS561101BA_ReadADC();
+}
+
+
+uint32_t MS561101BA_ReadTemperatureRaw(uint8_t osr) {
+    MS561101BA_StartConversionD2(osr);
+    HAL_Delay(MS561101BA_GetDelayMs(osr));
+    return MS561101BA_ReadADC();
+}
+
+
+void MS561101BA_Init(void) {
+    MS561101BA_Reset();
+    MS561101BA_ReadPROM_All(&ms5611_calib);
+    ms5611_calib_loaded = 1;
 }
 

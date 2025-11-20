@@ -4,17 +4,17 @@
 #include "stm32f4xx_hal.h"
 
 // 默认引脚映射（可在编译前重定义以适配你的硬件）
-#ifndef BLDC_PWM_GPIO
-#define BLDC_PWM_GPIO        GPIOB
+#ifndef BLDC_PWM_GPIO_3
+#define BLDC_PWM_GPIO_3      GPIOB
 #endif
-#ifndef BLDC_PWM_PIN
-#define BLDC_PWM_PIN         GPIO_PIN_0          // TIM3_CH3 默认在 PB0
+#ifndef BLDC_PWM_PIN_3
+#define BLDC_PWM_PIN_3       GPIO_PIN_0          // TIM3_CH3 默认在 PB0
 #endif
 #ifndef BLDC_PWM_AF
 #define BLDC_PWM_AF          GPIO_AF2_TIM3
 #endif
-#ifndef BLDC_PWM_CHANNEL
-#define BLDC_PWM_CHANNEL     TIM_CHANNEL_3
+#ifndef BLDC_PWM_CHANNEL_3
+#define BLDC_PWM_CHANNEL_3   TIM_CHANNEL_3
 #endif
 
 // ESC/无刷驱动常用参数（50Hz，周期20ms）
@@ -29,10 +29,8 @@
 #endif
 
 void BLDC_Init(void);
-void BLDC_SetThrottle_us(uint16_t pulse_us);
-void BLDC_Stop(void);
-
-// 雾化点击：以指定脉宽驱动指定时长（毫秒），结束后停止
-void Atomizer_Click(uint16_t pulse_us, uint16_t duration_ms);
+void BLDC_SetThrottle3_us(uint16_t pulse_us);
+void BLDC_Stop3(void);
+void Calibrate_BLDC(void);
 
 #endif
