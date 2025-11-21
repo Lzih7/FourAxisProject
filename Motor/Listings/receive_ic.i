@@ -27801,9 +27801,9 @@ void IC_Init(void) {
 	if(HAL_TIM_Base_Init(&htim5) != HAL_OK) {
 		return;
 	}
-	
-	
-	
+	if(HAL_TIM_IC_Init(&htim5) != HAL_OK) {
+		return;
+	}
 	
 	TIM_IC_InitTypeDef TIM_IC_InitStructure = {0};
 	TIM_IC_InitStructure.ICFilter = 0x0B;
@@ -27829,21 +27829,76 @@ void TIM5_IRQHandler(void) {
 	HAL_TIM_IRQHandler(&htim5);
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
-	uint8_t i;
+	uint32_t channel;
+	uint8_t idx;
+	
 	if(htim->Instance != ((TIM_TypeDef *) (0x40000000U + 0x0C00U))) return;
-	for(i = 0; i < 4; i++) {
-		if(htim->Channel == (1U << i)) { 
-			if(TIM5_Cap_Status[i]) {
-                TIM5_Cap_Status[i] = 0;
-				TIM5_Cap_Val[i][1] = HAL_TIM_ReadCapturedValue(htim, i * 4); 
-				PWM_IN_Wid[i] = TIM5_Cap_Val[i][1] - TIM5_Cap_Val[i][0];
-				(((i * 4) == ((uint32_t)0x00000000U)) ? ((&htim5)->Instance ->CCER |= (((uint32_t)0x00000000U))) : ((i * 4) == ((uint32_t)0x00000004U)) ? ((&htim5)->Instance ->CCER |= ((((uint32_t)0x00000000U)) << 4U)) : ((i * 4) == ((uint32_t)0x00000008U)) ? ((&htim5)->Instance ->CCER |= ((((uint32_t)0x00000000U)) << 8U)) : ((&htim5)->Instance ->CCER |= (((((uint32_t)0x00000000U)) << 12U) & 0x2000U)));
-			} else {
-				TIM5_Cap_Status[i] = 1;
-				TIM5_Cap_Val[i][0] = HAL_TIM_ReadCapturedValue(htim, i * 4);
-				(((i * 4) == ((uint32_t)0x00000000U)) ? ((&htim5)->Instance ->CCER |= ((0x0002U))) : ((i * 4) == ((uint32_t)0x00000004U)) ? ((&htim5)->Instance ->CCER |= (((0x0002U)) << 4U)) : ((i * 4) == ((uint32_t)0x00000008U)) ? ((&htim5)->Instance ->CCER |= (((0x0002U)) << 8U)) : ((&htim5)->Instance ->CCER |= ((((0x0002U)) << 12U) & 0x2000U)));
-			}
+	
+	
+	if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1) {
+		channel = ((uint32_t)0x00000000U);
+		idx = 0;
+	}
+	else if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2) {
+		channel = ((uint32_t)0x00000004U);
+		idx = 1;
+	}
+	else if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_3) {
+		channel = ((uint32_t)0x00000008U);
+		idx = 2;
+	}
+	else if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_4) {
+		channel = ((uint32_t)0x0000000CU);
+		idx = 3;
+	}
+	else {
+		return; 
+	}
+	
+	if(TIM5_Cap_Status[idx]) {
+		
+		TIM5_Cap_Status[idx] = 0;
+		TIM5_Cap_Val[idx][1] = HAL_TIM_ReadCapturedValue(htim, channel);
+		
+		
+		if(TIM5_Cap_Val[idx][1] >= TIM5_Cap_Val[idx][0]) {
+			PWM_IN_Wid[idx] = TIM5_Cap_Val[idx][1] - TIM5_Cap_Val[idx][0];
+		} else {
+			PWM_IN_Wid[idx] = (uint16_t)(TIM5_Cap_Val[idx][1] + 0xFFFF + 1 - TIM5_Cap_Val[idx][0]);
 		}
+		
+		
+		HAL_TIM_IC_Stop_IT(&htim5, channel);
+		do{ ((((channel)) == ((uint32_t)0x00000000U)) ? (((&htim5))->Instance ->CCER &= (uint16_t)~(0x0002U | 0x0008U)) : (((channel)) == ((uint32_t)0x00000004U)) ? (((&htim5))->Instance ->CCER &= (uint16_t)~(0x0020U | 0x0080U)) : (((channel)) == ((uint32_t)0x00000008U)) ? (((&htim5))->Instance ->CCER &= (uint16_t)~(0x0200U | 0x0800U)) : (((&htim5))->Instance ->CCER &= (uint16_t)~0x2000U)); ((((channel)) == ((uint32_t)0x00000000U)) ? (((&htim5))->Instance ->CCER |= ((((uint32_t)0x00000000U)))) : (((channel)) == ((uint32_t)0x00000004U)) ? (((&htim5))->Instance ->CCER |= (((((uint32_t)0x00000000U))) << 4U)) : (((channel)) == ((uint32_t)0x00000008U)) ? (((&htim5))->Instance ->CCER |= (((((uint32_t)0x00000000U))) << 8U)) : (((&htim5))->Instance ->CCER |= ((((((uint32_t)0x00000000U))) << 12U) & 0x2000U))); }while(0);
+		HAL_TIM_IC_Start_IT(&htim5, channel);
+	} else {
+		
+		TIM5_Cap_Status[idx] = 1;
+		TIM5_Cap_Val[idx][0] = HAL_TIM_ReadCapturedValue(htim, channel);
+		
+		
+		HAL_TIM_IC_Stop_IT(&htim5, channel);
+		do{ ((((channel)) == ((uint32_t)0x00000000U)) ? (((&htim5))->Instance ->CCER &= (uint16_t)~(0x0002U | 0x0008U)) : (((channel)) == ((uint32_t)0x00000004U)) ? (((&htim5))->Instance ->CCER &= (uint16_t)~(0x0020U | 0x0080U)) : (((channel)) == ((uint32_t)0x00000008U)) ? (((&htim5))->Instance ->CCER &= (uint16_t)~(0x0200U | 0x0800U)) : (((&htim5))->Instance ->CCER &= (uint16_t)~0x2000U)); ((((channel)) == ((uint32_t)0x00000000U)) ? (((&htim5))->Instance ->CCER |= (((0x0002U)))) : (((channel)) == ((uint32_t)0x00000004U)) ? (((&htim5))->Instance ->CCER |= ((((0x0002U))) << 4U)) : (((channel)) == ((uint32_t)0x00000008U)) ? (((&htim5))->Instance ->CCER |= ((((0x0002U))) << 8U)) : (((&htim5))->Instance ->CCER |= (((((0x0002U))) << 12U) & 0x2000U))); }while(0);
+		HAL_TIM_IC_Start_IT(&htim5, channel);
 	}
 }
