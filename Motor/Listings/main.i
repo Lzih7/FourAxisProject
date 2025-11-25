@@ -28249,35 +28249,35 @@ uint16_t PWM_IN_Wid[4];
 
 void SystemClock_Config(void)
 {
-    RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-    RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
-    
-    RCC_OscInitStruct.OscillatorType = ((uint32_t)0x00000001U);
-    RCC_OscInitStruct.HSEState = ((uint8_t)0x01U);
-    RCC_OscInitStruct.PLL.PLLState = ((uint8_t)0x02U);
-    RCC_OscInitStruct.PLL.PLLSource = 0x00400000U;
-    RCC_OscInitStruct.PLL.PLLM = 8;             
-    RCC_OscInitStruct.PLL.PLLN = 336;           
-    RCC_OscInitStruct.PLL.PLLP = ((uint32_t)0x00000004U); 
-    RCC_OscInitStruct.PLL.PLLQ = 7;             
+   
+   RCC_OscInitStruct.OscillatorType = ((uint32_t)0x00000001U);
+   RCC_OscInitStruct.HSEState = ((uint8_t)0x01U);
+   RCC_OscInitStruct.PLL.PLLState = ((uint8_t)0x02U);
+   RCC_OscInitStruct.PLL.PLLSource = 0x00400000U;
+   RCC_OscInitStruct.PLL.PLLM = 8;             
+   RCC_OscInitStruct.PLL.PLLN = 336;           
+   RCC_OscInitStruct.PLL.PLLP = ((uint32_t)0x00000004U); 
+   RCC_OscInitStruct.PLL.PLLQ = 7;             
 
-    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-    {
-        Error_Handler();
-    }
+   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+   {
+       Error_Handler();
+   }
 
-    
-    RCC_ClkInitStruct.ClockType = ((uint32_t)0x00000002U) | ((uint32_t)0x00000001U) | ((uint32_t)0x00000004U) | ((uint32_t)0x00000008U);
-    RCC_ClkInitStruct.SYSCLKSource = 0x00000002U;
-    RCC_ClkInitStruct.AHBCLKDivider = 0x00000000U; 
-    RCC_ClkInitStruct.APB1CLKDivider = 0x00001000U;  
-    RCC_ClkInitStruct.APB2CLKDivider = 0x00000000U;  
+   
+   RCC_ClkInitStruct.ClockType = ((uint32_t)0x00000002U) | ((uint32_t)0x00000001U) | ((uint32_t)0x00000004U) | ((uint32_t)0x00000008U);
+   RCC_ClkInitStruct.SYSCLKSource = 0x00000002U;
+   RCC_ClkInitStruct.AHBCLKDivider = 0x00000000U; 
+   RCC_ClkInitStruct.APB1CLKDivider = 0x00001000U;  
+   RCC_ClkInitStruct.APB2CLKDivider = 0x00000000U;  
 
-    if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, 0x00000002U) != HAL_OK)
-    {
-        Error_Handler();
-    }
+   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, 0x00000002U) != HAL_OK)
+   {
+       Error_Handler();
+   }
 }
 
 int main(void)

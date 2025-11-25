@@ -27785,13 +27785,13 @@ void IC_Init(void);
 
 extern TIM_HandleTypeDef htim5;
 extern uint16_t PWM_IN_Wid[4];
-uint8_t TIM5_Cap_Status[4] = {0}; 
-uint16_t TIM5_Cap_Val[4][2] = {0}; 
+static uint8_t TIM5_Cap_Status[4] = {0}; 
+static uint16_t TIM5_Cap_Val[4][2] = {0}; 
 
 void IC_Init(void) {
 	do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1ENR) |= (0x00000001U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1ENR) & (0x00000001U)); ((void)(tmpreg)); } while(0);
 	do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x00000008U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x00000008U)); ((void)(tmpreg)); } while(0);
-	do { GPIO_InitTypeDef GPIO_InitStructure = {0}; GPIO_InitStructure . Pin = ((uint16_t)0x0001U) | ((uint16_t)0x0002U) | ((uint16_t)0x0004U) | ((uint16_t)0x0008U); GPIO_InitStructure . Mode = ((uint32_t)0x00000002U); GPIO_InitStructure . Speed = ((uint32_t)0x00000002U); GPIO_InitStructure . Pull = ((uint32_t)0x00000002U); GPIO_InitStructure . Alternate = ((uint8_t)0x02U); HAL_GPIO_Init(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0000U)), &GPIO_InitStructure); } while(0);
+	do { GPIO_InitTypeDef GPIO_InitStructure = {0}; GPIO_InitStructure . Pin = ((uint16_t)0x0001U) | ((uint16_t)0x0002U) | ((uint16_t)0x0004U) | ((uint16_t)0x0008U); GPIO_InitStructure . Mode = ((uint32_t)0x00000002U); GPIO_InitStructure . Speed = ((uint32_t)0x00000002U); GPIO_InitStructure . Pull = ((uint32_t)0x00000001U); GPIO_InitStructure . Alternate = ((uint8_t)0x02U); HAL_GPIO_Init(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0000U)), &GPIO_InitStructure); } while(0);
 	
 	htim5.Instance = ((TIM_TypeDef *) (0x40000000U + 0x0C00U));
 	htim5.Init.Prescaler = 84 - 1;
@@ -27806,7 +27806,7 @@ void IC_Init(void) {
 	}
 	
 	TIM_IC_InitTypeDef TIM_IC_InitStructure = {0};
-	TIM_IC_InitStructure.ICFilter = 0x0B;
+	TIM_IC_InitStructure.ICFilter = 0x0;
 	TIM_IC_InitStructure.ICPolarity = ((uint32_t)0x00000000U); 
 	TIM_IC_InitStructure.ICPrescaler = ((uint32_t)0x00000000U);
 	TIM_IC_InitStructure.ICSelection = (0x0001U); 
@@ -27816,7 +27816,7 @@ void IC_Init(void) {
 	HAL_TIM_IC_ConfigChannel(&htim5, &TIM_IC_InitStructure, ((uint32_t)0x00000008U));
 	HAL_TIM_IC_ConfigChannel(&htim5, &TIM_IC_InitStructure, ((uint32_t)0x0000000CU));
 	
-	HAL_NVIC_SetPriority(TIM5_IRQn, 0, 0);
+	HAL_NVIC_SetPriority(TIM5_IRQn, 2, 0);
 	HAL_NVIC_EnableIRQ(TIM5_IRQn);
 	
 	HAL_TIM_IC_Start_IT(&htim5, ((uint32_t)0x00000000U));
@@ -27825,9 +27825,9 @@ void IC_Init(void) {
 	HAL_TIM_IC_Start_IT(&htim5, ((uint32_t)0x0000000CU));
 }
 
-void TIM5_IRQHandler(void) {
-	HAL_TIM_IRQHandler(&htim5);
-}
+
+
+
 
 
 

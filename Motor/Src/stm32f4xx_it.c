@@ -10,3 +10,8 @@ void SVC_Handler(void) {}
 void DebugMon_Handler(void) {}
 void PendSV_Handler(void) {}
 void SysTick_Handler(void) { HAL_IncTick(); }
+
+extern TIM_HandleTypeDef htim5;
+void TIM5_IRQHandler(void) {
+	HAL_TIM_IRQHandler(&htim5);
+}
