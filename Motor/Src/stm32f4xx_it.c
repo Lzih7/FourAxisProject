@@ -11,7 +11,7 @@ void DebugMon_Handler(void) {}
 void PendSV_Handler(void) {}
 void SysTick_Handler(void) { HAL_IncTick(); }
 
-extern TIM_HandleTypeDef htim5;
-void TIM5_IRQHandler(void) {
-	HAL_TIM_IRQHandler(&htim5);
+extern TIM_HandleTypeDef htim2;
+void TIM2_IRQHandler(void) {
+	HAL_TIM_IRQHandler(&htim2);
 }
