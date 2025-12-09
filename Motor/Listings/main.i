@@ -28224,7 +28224,7 @@ void OLED_ShowBinNum(uint8_t Line, uint8_t Column, uint32_t Number, uint8_t Leng
 #line 30 ".\\MyLib\\BLDC.h"
 
 void BLDC_Init(void);
-void BLDC_SetThrottle3_us(uint16_t pulse_us);
+void BLDC_SetThrottle_us(uint16_t pulse_us, uint8_t idx);
 void BLDC_Stop3(void);
 void Calibrate_BLDC(void);
 
@@ -28233,8 +28233,22 @@ void Calibrate_BLDC(void);
 
 
 
-#line 10 ".\\MyLib\\Receive_IC.h"
+
+
+
+
+
+
+
+
+
+
+
+
+
 void IC_Init(void);
+
+
 
 #line 7 "Src\\main.c"
 
@@ -28243,7 +28257,6 @@ void IC_Init(void);
 
 
 TIM_HandleTypeDef htim3;
-TIM_HandleTypeDef htim5;
 uint16_t PWM_IN_Wid[4];
 
 
@@ -28287,13 +28300,12 @@ int main(void)
     OLED_Init();
     IC_Init();
     BLDC_Init();
-    OLED_ShowString(1, 1, "BLDC Init");
     
     
     
     while (1)
     {
-        OLED_ShowNum(2, 1, PWM_IN_Wid[2], 4);
+        
         
     }
 }

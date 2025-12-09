@@ -12,7 +12,7 @@
 #define IC_PIN_CH1 GPIO_PIN_0
 #define IC_PIN_CH2 GPIO_PIN_1
 #define IC_PIN_CH3 GPIO_PIN_10
-#define IC_PIN_CH4 GPIO_PIN_11
+#define IC_PIN_CH4 GPIO_PIN_7
 
 void IC_Init(void);
 

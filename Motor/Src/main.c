@@ -53,14 +53,13 @@ int main(void)
     OLED_Init();
     IC_Init();
     BLDC_Init();
-    OLED_ShowString(1, 1, "BLDC Init");
     // Calibrate_BLDC();
     // OLED_ShowString(1, 1, "BLDC Calibrated");
     
     while (1)
     {
-        OLED_ShowNum(2, 1, PWM_IN_Wid[2], 4);
-        // BLDC_SetThrottle3_us(PWM_IN_Wid[2]);
+        // OLED_ShowNum(2, 1, PWM_IN_Wid[2], 4);
+        // BLDC_SetThrottle_us(1500, 3);
     }
 }
 

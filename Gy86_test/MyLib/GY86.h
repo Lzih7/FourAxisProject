@@ -48,6 +48,10 @@ uint8_t MPU6050_GetId(void);
 #define HMC5883L_ID_B           0x0B
 #define HMC5883L_ID_C           0x0C
 
+void HMC5883L_Init(void);
+uint8_t HMC5883L_ReadReg(uint8_t RegAddr);
+void HMC5883L_GetData(int16_t* X, int16_t* Y, int16_t* Z);
+void HMC5883L_WriteReg(uint8_t RegAddr, uint8_t data);
 /* MS5611 Register Address ------------------------------------------------------------*/
 //#define MS561101BA_Addr  0xec   //CBR=1 0x76 I2C address when CSB is connected to HIGH (VCC)
 #define MS561101BA_Addr 0xEE //CBR=0 0x77 I2C address when CSB is connected to LOW (GND)

@@ -1,11 +1,19 @@
 #include "main.h"
 #include "GPIO_Set.h"
 #include "Receive_IC.h"
+#include "BLDC.h"
 
 TIM_HandleTypeDef htim2;
 extern uint16_t PWM_IN_Wid[4];
 static uint8_t TIM2_Cap_Status[4] = {0}; // 1代表上升沿捕获
-static uint16_t TIM2_Cap_Val[4][2] = {0}; // 两次捕获的值相减获取脉宽
+static uint32_t TIM2_Cap_Val[4][2] = {0}; // 两次捕获的值相减获取脉宽
+
+uint16_t Set_Speed(uint16_t val) {
+	if(val > 2000) val = 2000;
+	else if(val < 1500) val = 1000;
+	else val = (val - 1500) * 2 + 1000;
+	return val;
+}
 
 void IC_Init(void) {
 	__HAL_RCC_GPIOA_CLK_ENABLE();
@@ -21,7 +29,7 @@ void IC_Init(void) {
 	GPIO_InitStructure.Alternate = GPIO_AF1_TIM2;
 	HAL_GPIO_Init(IC_PORT_A, &GPIO_InitStructure);
 
-	// PB10, PB11 -> TIM2 CH3, CH4
+	// PB10, PB7 -> TIM2 CH3, CH4
 	GPIO_InitStructure.Pin = IC_PIN_CH3 | IC_PIN_CH4;
 	GPIO_InitStructure.Alternate = GPIO_AF1_TIM2;
 	HAL_GPIO_Init(IC_PORT_B, &GPIO_InitStructure);
@@ -30,7 +38,7 @@ void IC_Init(void) {
 	htim2.Init.Prescaler = 84 - 1;
 	htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
 	htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-	htim2.Init.Period = 0xFFFF;
+	htim2.Init.Period = 0xFFFFFFFF;
 	if(HAL_TIM_Base_Init(&htim2) != HAL_OK) {
 		return;
 	}
@@ -113,13 +121,17 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
 		TIM2_Cap_Status[idx] = 0;
 		TIM2_Cap_Val[idx][1] = HAL_TIM_ReadCapturedValue(htim, channel);
 		
-		// 处理计数器溢出
-		if(TIM2_Cap_Val[idx][1] >= TIM2_Cap_Val[idx][0]) {
-			PWM_IN_Wid[idx] = TIM2_Cap_Val[idx][1] - TIM2_Cap_Val[idx][0];
+		// 计算脉宽 (32位计数器自动处理溢出回绕)
+		if (TIM2_Cap_Val[idx][1] >= TIM2_Cap_Val[idx][0]) {
+			PWM_IN_Wid[idx] = (uint16_t)(TIM2_Cap_Val[idx][1] - TIM2_Cap_Val[idx][0]);
 		} else {
-			PWM_IN_Wid[idx] = (uint16_t)(TIM2_Cap_Val[idx][1] + 0xFFFF + 1 - TIM2_Cap_Val[idx][0]);
+			// 即使发生回绕，无符号减法也会得到正确结果 (例如: 0x00000010 - 0xFFFFFFF0 = 0x20)
+			PWM_IN_Wid[idx] = (uint16_t)(TIM2_Cap_Val[idx][1] - TIM2_Cap_Val[idx][0]);
 		}
 		
+		// 更新BLDC油门 (索引修正为 1-4)
+		BLDC_SetThrottle_us(Set_Speed(PWM_IN_Wid[idx]), idx + 1);
+
 		// 切换为上升沿捕获
 		HAL_TIM_IC_Stop_IT(&htim2, channel);
 		__HAL_TIM_SET_CAPTUREPOLARITY(&htim2, channel, TIM_ICPOLARITY_RISING);

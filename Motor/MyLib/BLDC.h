@@ -29,7 +29,7 @@
 #endif
 
 void BLDC_Init(void);
-void BLDC_SetThrottle3_us(uint16_t pulse_us);
+void BLDC_SetThrottle_us(uint16_t pulse_us, uint8_t idx);
 void BLDC_Stop3(void);
 void Calibrate_BLDC(void);
 

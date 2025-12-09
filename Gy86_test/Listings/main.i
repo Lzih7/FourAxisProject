@@ -27774,58 +27774,33 @@ void Error_Handler(void);
 #line 27 ".\\MyLib\\GPIO_Set.h"
 
 #line 3 "Src\\main.c"
-#line 1 ".\\MyLib\\OLED.h"
+#line 1 ".\\MyLib\\ReadPeripherals.h"
 
 
 
-void OLED_Init(void);
-void OLED_Clear(void);
-void OLED_ShowChar(uint8_t Line, uint8_t Column, char Char);
-void OLED_ShowString(uint8_t Line, uint8_t Column, char *String);
-void OLED_ShowNum(uint8_t Line, uint8_t Column, uint32_t Number, uint8_t Length);
-void OLED_ShowSignedNum(uint8_t Line, uint8_t Column, int32_t Number, uint8_t Length);
-void OLED_ShowHexNum(uint8_t Line, uint8_t Column, uint32_t Number, uint8_t Length);
-void OLED_ShowBinNum(uint8_t Line, uint8_t Column, uint32_t Number, uint8_t Length);
+void ReadPeripherals_Init(void);
+void ReadPeripherals_Process(void);
 
 #line 4 "Src\\main.c"
-#line 1 ".\\MyLib\\GY86.h"
+#line 1 ".\\MyLib\\UART_Set.h"
 
 
 
-extern uint8_t already_init;
+#line 5 ".\\MyLib\\UART_Set.h"
+
+extern UART_HandleTypeDef huart1;
+
+ 
+ 
+ 
+#line 24 ".\\MyLib\\UART_Set.h"
+
+ 
 
 
 
-
-
-
-#line 25 ".\\MyLib\\GY86.h"
-
-
-
-
-
-void MPU6050_WriteReg(uint8_t RegAddr, uint8_t data);
-void MPU6050_Init(void);
-uint8_t MPU6050_ReadReg(uint8_t RegAddr);
-void MPU6050_GetData(int16_t* AccX, int16_t* AccY, int16_t* AccZ, int16_t* GyroX, int16_t* GyroY, int16_t* GyroZ);
-uint8_t MPU6050_GetId(void);
-
-#line 50 ".\\MyLib\\GY86.h"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+ 
+#line 40 ".\\MyLib\\UART_Set.h"
 
  
 
@@ -27833,6 +27808,8 @@ uint8_t MPU6050_GetId(void);
 
 
 
+ 
+#line 54 ".\\MyLib\\UART_Set.h"
 
 
 
@@ -27851,144 +27828,48 @@ uint8_t MPU6050_GetId(void);
 
 
 
-
-
-
-
-
-
-
-
-
-
-typedef struct {
-    uint16_t C1; 
-    uint16_t C2; 
-    uint16_t C3; 
-    uint16_t C4; 
-    uint16_t C5; 
-    uint16_t C6; 
-} MS561101BA_CalibData_t;
-
-
-void MS561101BA_Reset(void);
-void MS561101BA_Init(void);
-uint16_t MS561101BA_ReadPROM(uint8_t index);
-void MS561101BA_ReadPROM_All(MS561101BA_CalibData_t* calib);
-void MS561101BA_StartConversionD1(uint8_t osr);
-void MS561101BA_StartConversionD2(uint8_t osr);
-uint32_t MS561101BA_ReadADC(void);
-uint32_t MS561101BA_ReadPressureRaw(uint8_t osr);
-uint32_t MS561101BA_ReadTemperatureRaw(uint8_t osr);
 
 #line 5 "Src\\main.c"
-#line 1 ".\\MyLib\\BMP180.h"
 
-
-
-#line 5 ".\\MyLib\\BMP180.h"
-
-
-
-
-
-
-
-#line 34 ".\\MyLib\\BMP180.h"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-typedef enum {
-    BMP180_OSS_ULTRA_LOW_POWER = 0,    
-    BMP180_OSS_STANDARD = 1,           
-    BMP180_OSS_HIGH_RESOLUTION = 2,    
-    BMP180_OSS_ULTRA_HIGH_RES = 3      
-} BMP180_OSS_t;
-
-
-typedef struct {
-    int16_t AC1;    
-    int16_t AC2;    
-    int16_t AC3;    
-    uint16_t AC4;   
-    uint16_t AC5;   
-    uint16_t AC6;   
-    int16_t B1;     
-    int16_t B2;     
-    int16_t MB;     
-    int16_t MC;     
-    int16_t MD;     
-} BMP180_CalibData_t;
-
-
-typedef struct {
-    float temperature;      
-    float pressure;         
-    float altitude;         
-} BMP180_Data_t;
-
-
-HAL_StatusTypeDef BMP180_Init(void);
-HAL_StatusTypeDef BMP180_ReadCalibration(BMP180_CalibData_t* calib_data);
-int32_t BMP180_ReadUncompensatedTemperature(void);
-int32_t BMP180_ReadUncompensatedPressure(BMP180_OSS_t oss);
-float BMP180_CalculateTemperature(int32_t ut, BMP180_CalibData_t* calib_data);
-float BMP180_CalculatePressure(int32_t up, int32_t ut, BMP180_OSS_t oss, BMP180_CalibData_t* calib_data);
-float BMP180_CalculateAltitude(float pressure, float sea_level_pressure);
-HAL_StatusTypeDef BMP180_GetData(BMP180_Data_t* data, BMP180_OSS_t oss);
-HAL_StatusTypeDef BMP180_WriteReg(uint8_t reg_addr, uint8_t data);
-HAL_StatusTypeDef BMP180_ReadReg(uint8_t reg_addr, uint8_t* data);
-HAL_StatusTypeDef BMP180_ReadRegs(uint8_t reg_addr, uint8_t* data, uint8_t length);
-
-#line 6 "Src\\main.c"
-
-
-
+UART_HandleTypeDef huart1;
 void SystemClock_Config(void)
 {
     RCC_OscInitTypeDef RCC_OscInitStruct = {0};
     RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
-    
-    RCC_OscInitStruct.OscillatorType = ((uint32_t)0x00000001U);
-    RCC_OscInitStruct.HSEState = ((uint8_t)0x01U);
-    RCC_OscInitStruct.PLL.PLLState = ((uint8_t)0x02U);
-    RCC_OscInitStruct.PLL.PLLSource = 0x00400000U;
-    RCC_OscInitStruct.PLL.PLLM = 8;   
-    RCC_OscInitStruct.PLL.PLLN = 336; 
-    RCC_OscInitStruct.PLL.PLLP = ((uint32_t)0x00000004U); 
-    RCC_OscInitStruct.PLL.PLLQ = 7;   
+     
+    do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x10000000U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x10000000U)); ((void)(tmpreg)); } while(0);
+    do { volatile uint32_t tmpreg = 0x00U; (((((PWR_TypeDef *) (0x40000000U + 0x7000U))->CR)) = ((((((((PWR_TypeDef *) (0x40000000U + 0x7000U))->CR))) & (~(0x0000C000U))) | ((0x00008000U))))); tmpreg = ((((PWR_TypeDef *) (0x40000000U + 0x7000U))->CR) & (0x0000C000U)); ((void)(tmpreg)); } while(0);
+
+     
+    RCC_OscInitStruct.OscillatorType = ((uint32_t)0x00000002U);
+    RCC_OscInitStruct.HSIState = ((uint8_t)0x01U); 
+    RCC_OscInitStruct.HSICalibrationValue = ((uint32_t)0x10U);
+    RCC_OscInitStruct.PLL.PLLState = ((uint8_t)0x02U);         
+    RCC_OscInitStruct.PLL.PLLSource = 0x00000000U; 
+    RCC_OscInitStruct.PLL.PLLM = 8;                      
+    RCC_OscInitStruct.PLL.PLLN = 84;                     
+    RCC_OscInitStruct.PLL.PLLP = ((uint32_t)0x00000002U);          
+    RCC_OscInitStruct.PLL.PLLQ = 4;                      
 
     if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
     {
         Error_Handler();
     }
 
-    
-    RCC_ClkInitStruct.ClockType = ((uint32_t)0x00000002U) | ((uint32_t)0x00000001U) | ((uint32_t)0x00000004U) | ((uint32_t)0x00000008U);
-    RCC_ClkInitStruct.SYSCLKSource = 0x00000002U;
-    RCC_ClkInitStruct.AHBCLKDivider = 0x00000000U;   
-    RCC_ClkInitStruct.APB1CLKDivider = 0x00001000U;    
-    RCC_ClkInitStruct.APB2CLKDivider = 0x00000000U;    
+     
+    RCC_ClkInitStruct.ClockType = ((uint32_t)0x00000002U) | ((uint32_t)0x00000001U) |
+                                  ((uint32_t)0x00000004U) | ((uint32_t)0x00000008U);
+    RCC_ClkInitStruct.SYSCLKSource = 0x00000002U; 
+    RCC_ClkInitStruct.AHBCLKDivider = 0x00000000U;        
+    RCC_ClkInitStruct.APB1CLKDivider = 0x00001000U;         
+    RCC_ClkInitStruct.APB2CLKDivider = 0x00000000U;         
 
     if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, 0x00000002U) != HAL_OK)
     {
         Error_Handler();
     }
 }
-
 int main(void)
 {
      
@@ -27996,39 +27877,11 @@ int main(void)
 
      
     SystemClock_Config();
-	OLED_Init();
-	MPU6050_Init();
-	BMP180_Init();
-	
-    uint8_t MPU_id = MPU6050_GetId();
-	OLED_ShowString(1, 1, "ID: ");
-	OLED_ShowHexNum(1, 5, MPU_id, 4);
-
+    ReadPeripherals_Init();
+    do { do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB2ENR) |= (0x00000010U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB2ENR) & (0x00000010U)); ((void)(tmpreg)); } while(0); do { GPIO_InitTypeDef GPIO_InitStruct = {0}; do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1ENR) |= (0x00000001U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1ENR) & (0x00000001U)); ((void)(tmpreg)); } while(0); GPIO_InitStruct . Pin = ((uint16_t)0x0200U) | ((uint16_t)0x0400U); GPIO_InitStruct . Mode = ((uint32_t)0x00000002U); GPIO_InitStruct . Pull = ((uint32_t)0x00000000U); GPIO_InitStruct . Speed = ((uint32_t)0x00000003U); GPIO_InitStruct . Alternate = ((uint8_t)0x07U); HAL_GPIO_Init(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0000U)), &GPIO_InitStruct); } while(0); do { huart1 . Instance = ((USART_TypeDef *) ((0x40000000U + 0x00010000U) + 0x1000U)); huart1 . Init . BaudRate = 9600; huart1 . Init . WordLength = ((uint32_t)0x00000000U); huart1 . Init . StopBits = ((uint32_t)0x00000000U); huart1 . Init . Parity = ((uint32_t)0x00000000U); huart1 . Init . Mode = ((uint32_t)0x0008U); huart1 . Init . HwFlowCtl = ((uint32_t)0x00000000U); huart1 . Init . OverSampling = ((uint32_t)0x00000000U); if(HAL_UART_Init(&huart1) != HAL_OK) { Error_Handler(); } } while(0); } while(0);
     while(1) {
-        
-        BMP180_Data_t bmp_data;
-        if (BMP180_GetData(&bmp_data, BMP180_OSS_HIGH_RESOLUTION) == HAL_OK) {
-            
-            OLED_ShowString(2, 1, "T:");
-            OLED_ShowNum(2, 3, bmp_data.temperature, 4);
-            OLED_ShowString(2, 8, "C");
-            
-            
-            OLED_ShowString(3, 1, "P:");
-            OLED_ShowNum(3, 3, bmp_data.pressure / 100.0f, 4);
-            OLED_ShowString(3, 9, "hPa");
-            
-            
-            OLED_ShowString(4, 1, "A:");
-            OLED_ShowNum(4, 3, bmp_data.altitude, 3);
-            OLED_ShowString(4, 8, "m");
-        } else {
-            
-            OLED_ShowString(2, 1, "BMP180 Error");
-        }
-        
-        
-        HAL_Delay(10);
+        ReadPeripherals_Process();
+        HAL_Delay(5);
     }
 }
 

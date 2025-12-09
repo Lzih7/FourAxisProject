@@ -1,8 +1,160 @@
-#line 1 "MyLib\\BLDC.c"
-#line 1 ".\\Inc\\main.h"
+#line 1 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_uart.c"
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+ 
 #line 1 ".\\Drivers\\STM32F4xx_HAL_Driver\\Inc\\stm32f4xx_hal.h"
 
 
@@ -27756,124 +27908,1804 @@ void HAL_DisableCompensationCell(void);
 
 
  
-#line 5 ".\\Inc\\main.h"
+#line 158 "Drivers\\STM32F4xx_HAL_Driver\\Src\\stm32f4xx_hal_uart.c"
 
-void SystemClock_Config(void);
-void Error_Handler(void);
 
-#line 2 "MyLib\\BLDC.c"
-#line 1 "MyLib\\GPIO_Set.h"
+
+ 
 
 
 
 
-#line 6 "MyLib\\GPIO_Set.h"
+ 
 
-#line 16 "MyLib\\GPIO_Set.h"
-
-#line 27 "MyLib\\GPIO_Set.h"
-
-#line 3 "MyLib\\BLDC.c"
-#line 1 "MyLib\\PWM_Set.h"
+    
+ 
+ 
 
 
+ 
 
 
-#line 6 "MyLib\\PWM_Set.h"
+ 
+ 
+ 
+ 
 
 
-extern TIM_HandleTypeDef htim3;
-
-#line 22 "MyLib\\PWM_Set.h"
-
-#line 33 "MyLib\\PWM_Set.h"
-
-#line 4 "MyLib\\BLDC.c"
-#line 1 "MyLib\\BLDC.h"
-
-
-
-#line 5 "MyLib\\BLDC.h"
-
-
-#line 19 "MyLib\\BLDC.h"
-
-
-#line 30 "MyLib\\BLDC.h"
-
-void BLDC_Init(void);
-void BLDC_SetThrottle_us(uint16_t pulse_us, uint8_t idx);
-void BLDC_Stop3(void);
-void Calibrate_BLDC(void);
-
-#line 5 "MyLib\\BLDC.c"
-
-extern TIM_HandleTypeDef htim3;
+ 
+static void UART_EndTxTransfer(UART_HandleTypeDef *huart);
+static void UART_EndRxTransfer(UART_HandleTypeDef *huart);
+static void UART_DMATransmitCplt(DMA_HandleTypeDef *hdma);
+static void UART_DMAReceiveCplt(DMA_HandleTypeDef *hdma);
+static void UART_DMATxHalfCplt(DMA_HandleTypeDef *hdma);
+static void UART_DMARxHalfCplt(DMA_HandleTypeDef *hdma);
+static void UART_DMAError(DMA_HandleTypeDef *hdma); 
+static void UART_DMAAbortOnError(DMA_HandleTypeDef *hdma);
+static HAL_StatusTypeDef UART_Transmit_IT(UART_HandleTypeDef *huart);
+static HAL_StatusTypeDef UART_EndTransmit_IT(UART_HandleTypeDef *huart);
+static HAL_StatusTypeDef UART_Receive_IT(UART_HandleTypeDef *huart);
+static HAL_StatusTypeDef UART_WaitOnFlagUntilTimeout(UART_HandleTypeDef *huart, uint32_t Flag, FlagStatus Status, uint32_t Tickstart, uint32_t Timeout);
+static void UART_SetConfig (UART_HandleTypeDef *huart);
 
 
-static inline uint16_t clamp_u16(uint16_t v, uint16_t lo, uint16_t hi)
+ 
+
+ 
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_UART_Init(UART_HandleTypeDef *huart)
 {
-    if (v < lo) return lo;
-    if (v > hi) return hi;
-    return v;
+   
+  if(huart == 0)
+  {
+    return HAL_ERROR;
+  }
+
+   
+  if(huart->Init.HwFlowCtl != ((uint32_t)0x00000000U))
+  { 
+     
+    ((void)0);
+    ((void)0);
+  }
+  else
+  {
+    ((void)0);
+  }
+  ((void)0);
+  ((void)0);
+  
+  if(huart->gState == HAL_UART_STATE_RESET)
+  {  
+     
+    huart->Lock = HAL_UNLOCKED;
+     
+    HAL_UART_MspInit(huart);
+  }
+
+  huart->gState = HAL_UART_STATE_BUSY;
+
+   
+  ((huart)->Instance ->CR1 &= ~0x2000U);
+  
+   
+  UART_SetConfig(huart);
+  
+  
+
+ 
+  ((huart->Instance ->CR2) &= ~((0x4000U | 0x0800U)));
+  ((huart->Instance ->CR3) &= ~((0x0020U | 0x0008U | 0x0002U)));
+  
+   
+  ((huart)->Instance ->CR1 |= 0x2000U);
+  
+   
+  huart->ErrorCode = ((uint32_t)0x00000000U);
+  huart->gState= HAL_UART_STATE_READY;
+  huart->RxState= HAL_UART_STATE_READY;
+  
+  return HAL_OK;
 }
 
-void BLDC_Init(void)
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_HalfDuplex_Init(UART_HandleTypeDef *huart)
+{
+   
+  if(huart == 0)
+  {
+    return HAL_ERROR;
+  }
+ 
+    
+  ((void)0);
+  ((void)0);
+  ((void)0);
+
+  if(huart->gState == HAL_UART_STATE_RESET)
+  { 
+     
+    huart->Lock = HAL_UNLOCKED;
+     
+    HAL_UART_MspInit(huart);
+  }
+
+  huart->gState = HAL_UART_STATE_BUSY;
+
+   
+  ((huart)->Instance ->CR1 &= ~0x2000U);
+  
+   
+  UART_SetConfig(huart);
+  
+  
+
+ 
+  ((huart->Instance ->CR2) &= ~((0x4000U | 0x0800U)));
+  ((huart->Instance ->CR3) &= ~((0x0002U | 0x0020U)));
+  
+   
+  ((huart->Instance ->CR3) |= (0x0008U));
+ 
+   
+  ((huart)->Instance ->CR1 |= 0x2000U);
+  
+   
+  huart->ErrorCode = ((uint32_t)0x00000000U);
+  huart->gState= HAL_UART_STATE_READY;
+  huart->RxState= HAL_UART_STATE_READY;
+  
+  return HAL_OK;
+}
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_LIN_Init(UART_HandleTypeDef *huart, uint32_t BreakDetectLength)
+{
+   
+  if(huart == 0)
+  {
+    return HAL_ERROR;
+  }
+   
+   
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  
+  if(huart->gState == HAL_UART_STATE_RESET)
+  {
+     
+    huart->Lock = HAL_UNLOCKED;
+     
+    HAL_UART_MspInit(huart);
+  }
+
+  huart->gState = HAL_UART_STATE_BUSY;
+
+   
+  ((huart)->Instance ->CR1 &= ~0x2000U);
+  
+   
+  UART_SetConfig(huart);
+  
+  
+
+ 
+  ((huart->Instance ->CR2) &= ~(0x0800U));
+  ((huart->Instance ->CR3) &= ~((0x0008U | 0x0002U | 0x0020U)));
+  
+   
+  ((huart->Instance ->CR2) |= (0x4000U));
+  
+   
+  ((huart->Instance ->CR2) &= ~(0x0020U));
+  ((huart->Instance ->CR2) |= (BreakDetectLength));
+  
+   
+  ((huart)->Instance ->CR1 |= 0x2000U);
+  
+   
+  huart->ErrorCode = ((uint32_t)0x00000000U);
+  huart->gState= HAL_UART_STATE_READY;
+  huart->RxState= HAL_UART_STATE_READY;
+  
+  return HAL_OK;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_MultiProcessor_Init(UART_HandleTypeDef *huart, uint8_t Address, uint32_t WakeUpMethod)
+{
+   
+  if(huart == 0)
+  {
+    return HAL_ERROR;
+  }
+
+   
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+
+  if(huart->gState == HAL_UART_STATE_RESET)
+  {
+     
+    huart->Lock = HAL_UNLOCKED;
+     
+    HAL_UART_MspInit(huart);
+  }
+
+  huart->gState = HAL_UART_STATE_BUSY;
+
+   
+  ((huart)->Instance ->CR1 &= ~0x2000U);
+  
+   
+  UART_SetConfig(huart);
+  
+  
+
+ 
+  ((huart->Instance ->CR2) &= ~((0x4000U | 0x0800U)));
+  ((huart->Instance ->CR3) &= ~((0x0020U | 0x0008U | 0x0002U)));
+  
+   
+  ((huart->Instance ->CR2) &= ~(0x000FU));
+   
+  ((huart->Instance ->CR2) |= (Address));
+  
+   
+  ((huart->Instance ->CR1) &= ~(0x0800U));
+  ((huart->Instance ->CR1) |= (WakeUpMethod));
+  
+   
+  ((huart)->Instance ->CR1 |= 0x2000U);
+  
+   
+  huart->ErrorCode = ((uint32_t)0x00000000U);
+  huart->gState= HAL_UART_STATE_READY;
+  huart->RxState= HAL_UART_STATE_READY;
+  
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_UART_DeInit(UART_HandleTypeDef *huart)
+{
+   
+  if(huart == 0)
+  {
+    return HAL_ERROR;
+  }
+  
+   
+  ((void)0);
+
+  huart->gState = HAL_UART_STATE_BUSY;
+  
+   
+  HAL_UART_MspDeInit(huart);
+  
+  huart->ErrorCode = ((uint32_t)0x00000000U);
+  huart->gState = HAL_UART_STATE_RESET;
+  huart->RxState = HAL_UART_STATE_RESET;
+
+   
+  do{ (huart)->Lock = HAL_UNLOCKED; }while (0);
+
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+ __weak void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 {
     
-    do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1ENR) |= (0x00000002U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1ENR) & (0x00000002U)); ((void)(tmpreg)); } while(0);   
-    do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x00000002U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x00000002U)); ((void)(tmpreg)); } while(0);    
+  ((void)(huart));
+  
 
-    
-    do { GPIO_InitTypeDef GPIO_InitStructure = {0}; GPIO_InitStructure . Pin = ((uint16_t)0x0001U); GPIO_InitStructure . Mode = ((uint32_t)0x00000002U); GPIO_InitStructure . Speed = ((uint32_t)0x00000002U); GPIO_InitStructure . Pull = ((uint32_t)0x00000000U); GPIO_InitStructure . Alternate = ((uint8_t)0x02U); HAL_GPIO_Init(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0400U)), &GPIO_InitStructure); } while(0);
+  
+}
 
 
-    
-    do { TIM_Base_InitTypeDef TIM_Base_InitStruct = {0}; TIM_Base_InitStruct . Prescaler = 84 - 1; TIM_Base_InitStruct . Period = 20000 - 1; TIM_Base_InitStruct . ClockDivision = ((uint32_t)0x00000000U); TIM_Base_InitStruct . CounterMode = ((uint32_t)0x00000000U); htim3 . Instance = ((TIM_TypeDef *) (0x40000000U + 0x0400U)); htim3 . Init = TIM_Base_InitStruct; if(HAL_TIM_Base_Init(&htim3) != HAL_OK) { Error_Handler(); } } while(0);
 
-    
-    if (HAL_TIM_PWM_Init(&htim3) != HAL_OK) {
-        Error_Handler();
+
+
+
+ 
+ __weak void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
+{
+   
+  ((void)(huart));
+  
+
+  
+}
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint32_t Timeout)
+{
+  uint16_t* tmp;
+  uint32_t tickstart = 0U;
+  
+   
+  if(huart->gState == HAL_UART_STATE_READY) 
+  {
+    if((pData == 0 ) || (Size == 0U)) 
+    {
+      return  HAL_ERROR;
     }
-    do { TIM_OC_InitTypeDef TIM_OC_InitStruct = {0}; TIM_OC_InitStruct . OCMode = (0x0020U | 0x0040U); TIM_OC_InitStruct . Pulse = 1000; TIM_OC_InitStruct . OCPolarity = ((uint32_t)0x00000000U); TIM_OC_InitStruct . OCFastMode = ((uint32_t)0x00000000U); if(HAL_TIM_PWM_ConfigChannel(&htim3, &TIM_OC_InitStruct, ((uint32_t)0x00000008U)) != HAL_OK) { Error_Handler(); } } while(0);
-
     
-    if (HAL_TIM_PWM_Start(&htim3, ((uint32_t)0x00000008U)) != HAL_OK) {
-        Error_Handler();
+     
+    do{ if((huart)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (huart)->Lock = HAL_LOCKED; } }while (0);
+    
+    huart->ErrorCode = ((uint32_t)0x00000000U);
+    huart->gState = HAL_UART_STATE_BUSY_TX;
+	
+     
+    tickstart = HAL_GetTick();
+
+    huart->TxXferSize = Size;
+    huart->TxXferCount = Size;
+    while(huart->TxXferCount > 0U)
+    {
+      huart->TxXferCount--;
+      if(huart->Init.WordLength == ((uint32_t)0x1000U))
+      {
+        if(UART_WaitOnFlagUntilTimeout(huart, ((uint32_t)0x0080U), RESET, tickstart, Timeout) != HAL_OK)
+        { 
+          return HAL_TIMEOUT;
+        }
+        tmp = (uint16_t*) pData;
+        huart->Instance->DR = (*tmp & (uint16_t)0x01FFU);
+        if(huart->Init.Parity == ((uint32_t)0x00000000U))
+        {
+          pData +=2U;
+        }
+        else
+        { 
+          pData +=1U;
+        }
+      } 
+      else
+      {
+        if(UART_WaitOnFlagUntilTimeout(huart, ((uint32_t)0x0080U), RESET, tickstart, Timeout) != HAL_OK)
+        {
+          return HAL_TIMEOUT;
+        }
+        huart->Instance->DR = (*pData++ & (uint8_t)0xFFU);
+      } 
     }
-    (*(volatile uint32_t *)(&((&htim3)->Instance ->CCR1) + ((((uint32_t)0x00000008U)) >> 2U)) = (1000));
+    
+    if(UART_WaitOnFlagUntilTimeout(huart, ((uint32_t)0x0040U), RESET, tickstart, Timeout) != HAL_OK)
+    { 
+      return HAL_TIMEOUT;
+    }
+    
+     
+      huart->gState = HAL_UART_STATE_READY;
+    
+     
+    do{ (huart)->Lock = HAL_UNLOCKED; }while (0);
+    
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
 }
 
-void BLDC_SetThrottle_us(uint16_t pulse_us, uint8_t idx)
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint32_t Timeout)
+{ 
+  uint16_t* tmp;
+  uint32_t tickstart = 0U;
+  
+   
+  if(huart->RxState == HAL_UART_STATE_READY) 
+  { 
+    if((pData == 0 ) || (Size == 0U)) 
+    {
+      return  HAL_ERROR;
+    }
+    
+     
+    do{ if((huart)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (huart)->Lock = HAL_LOCKED; } }while (0);
+    
+    huart->ErrorCode = ((uint32_t)0x00000000U);
+    huart->RxState = HAL_UART_STATE_BUSY_RX;
+	
+     
+    tickstart = HAL_GetTick();
+        
+    huart->RxXferSize = Size; 
+    huart->RxXferCount = Size;
+    
+     
+    while(huart->RxXferCount > 0U)
+    {
+      huart->RxXferCount--;
+      if(huart->Init.WordLength == ((uint32_t)0x1000U))
+      {
+        if(UART_WaitOnFlagUntilTimeout(huart, ((uint32_t)0x0020U), RESET, tickstart, Timeout) != HAL_OK)
+        { 
+          return HAL_TIMEOUT;
+        }
+        tmp = (uint16_t*) pData;
+        if(huart->Init.Parity == ((uint32_t)0x00000000U))
+        {
+          *tmp = (uint16_t)(huart->Instance->DR & (uint16_t)0x01FFU);
+          pData +=2U;
+        }
+        else
+        {
+          *tmp = (uint16_t)(huart->Instance->DR & (uint16_t)0x00FFU);
+          pData +=1U;
+        }
+
+      } 
+      else
+      {
+        if(UART_WaitOnFlagUntilTimeout(huart, ((uint32_t)0x0020U), RESET, tickstart, Timeout) != HAL_OK)
+        { 
+          return HAL_TIMEOUT;
+        }
+        if(huart->Init.Parity == ((uint32_t)0x00000000U))
+        {
+          *pData++ = (uint8_t)(huart->Instance->DR & (uint8_t)0x00FFU);
+        }
+        else
+        {
+          *pData++ = (uint8_t)(huart->Instance->DR & (uint8_t)0x007FU);
+        }
+        
+      }
+    }
+    
+     
+    huart->RxState = HAL_UART_STATE_READY;
+    
+     
+    do{ (huart)->Lock = HAL_UNLOCKED; }while (0);
+    
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;   
+  }
+}
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_UART_Transmit_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size)
+{
+   
+  if(huart->gState == HAL_UART_STATE_READY)
+  {
+    if((pData == 0 ) || (Size == 0U)) 
+    {
+      return HAL_ERROR;
+    }
+    
+     
+    do{ if((huart)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (huart)->Lock = HAL_LOCKED; } }while (0);
+    
+    huart->pTxBuffPtr = pData;
+    huart->TxXferSize = Size;
+    huart->TxXferCount = Size;
+
+    huart->ErrorCode = ((uint32_t)0x00000000U);
+    huart->gState = HAL_UART_STATE_BUSY_TX;
+
+     
+    do{ (huart)->Lock = HAL_UNLOCKED; }while (0);
+
+     
+    ((huart->Instance ->CR1) |= (0x0080U));
+    
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;   
+  }
+}
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size)
 {
     
-    uint16_t duty = clamp_u16(pulse_us, 1000, 2000);
-    switch(idx) {
-        case 1:
-            (*(volatile uint32_t *)(&((&htim3)->Instance ->CCR1) + ((((uint32_t)0x00000000U)) >> 2U)) = (duty));
-            break;
-        case 2:
-            (*(volatile uint32_t *)(&((&htim3)->Instance ->CCR1) + ((((uint32_t)0x00000004U)) >> 2U)) = (duty));
-            break;
-        case 3:
-            (*(volatile uint32_t *)(&((&htim3)->Instance ->CCR1) + ((((uint32_t)0x00000008U)) >> 2U)) = (duty));
-            break;
-        case 4:
-            (*(volatile uint32_t *)(&((&htim3)->Instance ->CCR1) + ((((uint32_t)0x0000000CU)) >> 2U)) = (duty));
-            break;
-        default:
-            break;
+  if(huart->RxState == HAL_UART_STATE_READY)
+  {
+    if((pData == 0 ) || (Size == 0U)) 
+    {
+      return HAL_ERROR;
     }
+    
+     
+    do{ if((huart)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (huart)->Lock = HAL_LOCKED; } }while (0);
+    
+    huart->pRxBuffPtr = pData;
+    huart->RxXferSize = Size;
+    huart->RxXferCount = Size;
+    
+    huart->ErrorCode = ((uint32_t)0x00000000U);
+    huart->RxState = HAL_UART_STATE_BUSY_RX;
+    
+     
+    do{ (huart)->Lock = HAL_UNLOCKED; }while (0);
+        
+     
+    ((huart->Instance ->CR1) |= (0x0100U));
+    
+     
+    ((huart->Instance ->CR3) |= (0x0001U));
+
+     
+     ((huart->Instance ->CR1) |= (0x0020U));
+    
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY; 
+  }
 }
 
-void BLDC_Stop3(void)
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_UART_Transmit_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size)
 {
-    (*(volatile uint32_t *)(&((&htim3)->Instance ->CCR1) + ((((uint32_t)0x00000008U)) >> 2U)) = (1000));
+  uint32_t *tmp;
+  
+   
+  if(huart->gState == HAL_UART_STATE_READY)
+  {
+    if((pData == 0 ) || (Size == 0U))
+    {
+      return HAL_ERROR;
+    }
+
+     
+    do{ if((huart)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (huart)->Lock = HAL_LOCKED; } }while (0);
+
+    huart->pTxBuffPtr = pData;
+    huart->TxXferSize = Size;
+    huart->TxXferCount = Size;
+
+    huart->ErrorCode = ((uint32_t)0x00000000U);
+    huart->gState = HAL_UART_STATE_BUSY_TX;
+
+     
+    huart->hdmatx->XferCpltCallback = UART_DMATransmitCplt;
+
+     
+    huart->hdmatx->XferHalfCpltCallback = UART_DMATxHalfCplt;
+
+     
+    huart->hdmatx->XferErrorCallback = UART_DMAError;
+
+     
+    huart->hdmatx->XferAbortCallback = 0;
+
+     
+    tmp = (uint32_t*)&pData;
+    HAL_DMA_Start_IT(huart->hdmatx, *(uint32_t*)tmp, (uint32_t)&huart->Instance->DR, Size);
+    
+     
+    ((huart)->Instance ->SR = ~(((uint32_t)0x0040U)));
+    
+     
+    do{ (huart)->Lock = HAL_UNLOCKED; }while (0);
+    
+    
+ 
+    ((huart->Instance ->CR3) |= (0x0080U));
+    
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
 }
 
-void Calibrate_BLDC(void) {
-    BLDC_SetThrottle_us(2000, 3);
-    HAL_Delay(5000);
-    BLDC_SetThrottle_us(1000, 3);
-    HAL_Delay(1000);
+
+
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_UART_Receive_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size)
+{  
+  uint32_t *tmp;
+  
+   
+  if(huart->RxState == HAL_UART_STATE_READY) 
+  {
+    if((pData == 0 ) || (Size == 0U)) 
+    {
+      return HAL_ERROR;
+    }
+    
+     
+    do{ if((huart)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (huart)->Lock = HAL_LOCKED; } }while (0);
+    
+    huart->pRxBuffPtr = pData;
+    huart->RxXferSize = Size;
+    
+    huart->ErrorCode = ((uint32_t)0x00000000U);
+    huart->RxState = HAL_UART_STATE_BUSY_RX;
+        
+     
+    huart->hdmarx->XferCpltCallback = UART_DMAReceiveCplt;
+    
+     
+    huart->hdmarx->XferHalfCpltCallback = UART_DMARxHalfCplt;
+    
+     
+    huart->hdmarx->XferErrorCallback = UART_DMAError;
+    
+     
+    huart->hdmarx->XferAbortCallback = 0;
+
+     
+    tmp = (uint32_t*)&pData;
+    HAL_DMA_Start_IT(huart->hdmarx, (uint32_t)&huart->Instance->DR, *(uint32_t*)tmp, Size); 
+
+     
+    ((huart->Instance ->CR1) |= (0x0100U));
+
+     
+    ((huart->Instance ->CR3) |= (0x0001U));
+    
+    
+ 
+    ((huart->Instance ->CR3) |= (0x0040U));
+    
+     
+    do{ (huart)->Lock = HAL_UNLOCKED; }while (0);
+    
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY; 
+  }
 }
+    
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_UART_DMAPause(UART_HandleTypeDef *huart)
+{
+   uint32_t dmarequest = 0x00U;
+
+   
+  do{ if((huart)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (huart)->Lock = HAL_LOCKED; } }while (0);
+  dmarequest = (((huart->Instance ->CR3) & (0x0080U)) != RESET);
+  if((huart->gState == HAL_UART_STATE_BUSY_TX) && dmarequest)
+  {
+     
+    ((huart->Instance ->CR3) &= ~(0x0080U));
+  }
+  dmarequest = (((huart->Instance ->CR3) & (0x0040U)) != RESET);
+  if((huart->RxState == HAL_UART_STATE_BUSY_RX) && dmarequest)
+  {
+     
+    ((huart->Instance ->CR1) &= ~(0x0100U));
+    ((huart->Instance ->CR3) &= ~(0x0001U));
+    
+     
+    ((huart->Instance ->CR3) &= ~(0x0040U));
+  }
+  
+   
+  do{ (huart)->Lock = HAL_UNLOCKED; }while (0);
+  
+  return HAL_OK; 
+}
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_UART_DMAResume(UART_HandleTypeDef *huart)
+{
+   
+  do{ if((huart)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (huart)->Lock = HAL_LOCKED; } }while (0);
+  
+  if(huart->gState == HAL_UART_STATE_BUSY_TX)
+  {
+     
+    ((huart->Instance ->CR3) |= (0x0080U));
+  }
+  if(huart->RxState == HAL_UART_STATE_BUSY_RX)
+  {
+     
+    do{ volatile uint32_t tmpreg = 0x00U; tmpreg = (huart)->Instance ->SR; tmpreg = (huart)->Instance ->DR; ((void)(tmpreg)); } while(0);
+    
+     
+    ((huart->Instance ->CR1) |= (0x0100U));
+    ((huart->Instance ->CR3) |= (0x0001U));
+    
+     
+    ((huart->Instance ->CR3) |= (0x0040U));
+  }
+  
+   
+  do{ (huart)->Lock = HAL_UNLOCKED; }while (0);
+  
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_UART_DMAStop(UART_HandleTypeDef *huart)
+{
+  uint32_t dmarequest = 0x00U;
+  
+
+
+
+ 
+  
+   
+  dmarequest = (((huart->Instance ->CR3) & (0x0080U)) != RESET);
+  if((huart->gState == HAL_UART_STATE_BUSY_TX) && dmarequest)
+  {
+    ((huart->Instance ->CR3) &= ~(0x0080U));
+
+     
+    if(huart->hdmatx != 0)
+    {
+      HAL_DMA_Abort(huart->hdmatx);
+    }
+    UART_EndTxTransfer(huart);
+  }
+
+   
+  dmarequest = (((huart->Instance ->CR3) & (0x0040U)) != RESET);
+  if((huart->RxState == HAL_UART_STATE_BUSY_RX) && dmarequest)
+  {
+    ((huart->Instance ->CR3) &= ~(0x0040U));
+
+     
+    if(huart->hdmarx != 0)
+    {
+      HAL_DMA_Abort(huart->hdmarx);
+    }
+    UART_EndRxTransfer(huart);
+  }
+
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+void HAL_UART_IRQHandler(UART_HandleTypeDef *huart)
+{
+   uint32_t isrflags   = ((huart->Instance ->SR));
+   uint32_t cr1its     = ((huart->Instance ->CR1));
+   uint32_t cr3its     = ((huart->Instance ->CR3));
+   uint32_t errorflags = 0x00U;
+   uint32_t dmarequest = 0x00U;
+
+   
+  errorflags = (isrflags & (uint32_t)(0x0001U | 0x0002U | 0x0008U | 0x0004U));
+  if(errorflags == RESET)
+  {
+     
+    if(((isrflags & 0x0020U) != RESET) && ((cr1its & 0x0020U) != RESET))
+    {
+      UART_Receive_IT(huart);
+      return;
+    }
+  }  
+
+   
+  if((errorflags != RESET) && ((cr3its & (0x0001U | 0x0100U)) != RESET))
+  {
+     
+    if(((isrflags & 0x0001U) != RESET) && ((cr1its & 0x0100U) != RESET))
+    {
+      huart->ErrorCode |= ((uint32_t)0x00000001U);
+    }
+    
+     
+    if(((isrflags & 0x0004U) != RESET) && ((cr3its & 0x0001U) != RESET))
+    {
+      huart->ErrorCode |= ((uint32_t)0x00000002U);
+    }
+    
+     
+    if(((isrflags & 0x0002U) != RESET) && ((cr3its & 0x0001U) != RESET))
+    {
+      huart->ErrorCode |= ((uint32_t)0x00000004U);
+    }
+    
+     
+    if(((isrflags & 0x0008U) != RESET) && ((cr3its & 0x0001U) != RESET))
+    { 
+      huart->ErrorCode |= ((uint32_t)0x00000008U);
+    }
+
+         
+    if(huart->ErrorCode != ((uint32_t)0x00000000U))
+    {
+       
+      if(((isrflags & 0x0020U) != RESET) && ((cr1its & 0x0020U) != RESET))
+      {
+        UART_Receive_IT(huart);
+      }
+
+      
+ 
+      dmarequest = (((huart->Instance ->CR3) & (0x0040U)) != RESET);
+      if(((huart->ErrorCode & ((uint32_t)0x00000008U)) != RESET) || dmarequest)
+      {
+        
+
+ 
+        UART_EndRxTransfer(huart);
+        
+         
+        if((((huart->Instance ->CR3) & (0x0040U)) != RESET))
+        {
+          ((huart->Instance ->CR3) &= ~(0x0040U));
+          
+           
+          if(huart->hdmarx != 0)
+          {
+            
+ 
+            huart->hdmarx->XferAbortCallback = UART_DMAAbortOnError;
+            if(HAL_DMA_Abort_IT(huart->hdmarx) != HAL_OK)
+            {
+               
+              huart->hdmarx->XferAbortCallback(huart->hdmarx);
+            }
+          }
+          else
+          {
+             
+            HAL_UART_ErrorCallback(huart);
+          }
+        }
+        else
+        {
+           
+          HAL_UART_ErrorCallback(huart);
+        }
+      }
+      else
+      {
+        
+ 
+        HAL_UART_ErrorCallback(huart);
+        huart->ErrorCode = ((uint32_t)0x00000000U);
+      }
+    }
+    return;
+  }  
+
+   
+  if(((isrflags & 0x0080U) != RESET) && ((cr1its & 0x0080U) != RESET))
+  {
+    UART_Transmit_IT(huart);
+    return;
+  }
+  
+   
+  if(((isrflags & 0x0040U) != RESET) && ((cr1its & 0x0040U) != RESET))
+  {
+    UART_EndTransmit_IT(huart);
+    return;
+  }
+}
+
+
+
+
+
+
+ 
+ __weak void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+{
+   
+  ((void)(huart));
+  
+
+  
+}
+
+
+
+
+
+
+ 
+ __weak void HAL_UART_TxHalfCpltCallback(UART_HandleTypeDef *huart)
+{
+   
+  ((void)(huart));
+  
+
+  
+}
+
+
+
+
+
+
+ 
+__weak void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+   
+  ((void)(huart));
+  
+
+ 
+}
+
+
+
+
+
+
+ 
+__weak void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart)
+{
+   
+  ((void)(huart));
+  
+
+ 
+}
+
+
+
+
+
+
+ 
+ __weak void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
+{
+   
+  ((void)(huart)); 
+  
+
+  
+}
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_LIN_SendBreak(UART_HandleTypeDef *huart)
+{
+   
+  ((void)0);
+  
+   
+  do{ if((huart)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (huart)->Lock = HAL_LOCKED; } }while (0);
+  
+  huart->gState = HAL_UART_STATE_BUSY;
+  
+   
+  ((huart->Instance ->CR1) |= (0x0001U));
+ 
+  huart->gState = HAL_UART_STATE_READY;
+  
+   
+  do{ (huart)->Lock = HAL_UNLOCKED; }while (0);
+  
+  return HAL_OK; 
+}
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_MultiProcessor_EnterMuteMode(UART_HandleTypeDef *huart)
+{
+   
+  ((void)0);
+  
+   
+  do{ if((huart)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (huart)->Lock = HAL_LOCKED; } }while (0);
+  
+  huart->gState = HAL_UART_STATE_BUSY;
+  
+   
+  ((huart->Instance ->CR1) |= (0x0002U));
+  
+  huart->gState = HAL_UART_STATE_READY;
+  
+   
+  do{ (huart)->Lock = HAL_UNLOCKED; }while (0);
+  
+  return HAL_OK; 
+}
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_MultiProcessor_ExitMuteMode(UART_HandleTypeDef *huart)
+{
+   
+  ((void)0);
+  
+   
+  do{ if((huart)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (huart)->Lock = HAL_LOCKED; } }while (0);
+  
+  huart->gState = HAL_UART_STATE_BUSY;
+  
+   
+  ((huart->Instance ->CR1) &= ~(0x0002U));
+  
+  huart->gState = HAL_UART_STATE_READY;
+  
+   
+  do{ (huart)->Lock = HAL_UNLOCKED; }while (0);
+  
+  return HAL_OK; 
+}
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_HalfDuplex_EnableTransmitter(UART_HandleTypeDef *huart)
+{
+  uint32_t tmpreg = 0x00U;
+
+   
+  do{ if((huart)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (huart)->Lock = HAL_LOCKED; } }while (0);
+  
+  huart->gState = HAL_UART_STATE_BUSY;
+
+   
+  tmpreg = huart->Instance->CR1;
+  
+   
+  tmpreg &= (uint32_t)~((uint32_t)(0x0008U | 0x0004U));
+  
+   
+  tmpreg |= (uint32_t)0x0008U;
+  
+   
+  ((huart->Instance ->CR1) = ((uint32_t)tmpreg));
+ 
+  huart->gState = HAL_UART_STATE_READY;
+  
+   
+  do{ (huart)->Lock = HAL_UNLOCKED; }while (0);
+  
+  return HAL_OK; 
+}
+
+
+
+
+
+
+ 
+HAL_StatusTypeDef HAL_HalfDuplex_EnableReceiver(UART_HandleTypeDef *huart)
+{
+  uint32_t tmpreg = 0x00U;
+
+   
+  do{ if((huart)->Lock == HAL_LOCKED) { return HAL_BUSY; } else { (huart)->Lock = HAL_LOCKED; } }while (0);
+  
+  huart->gState = HAL_UART_STATE_BUSY;
+
+   
+  tmpreg = huart->Instance->CR1;
+  
+   
+  tmpreg &= (uint32_t)~((uint32_t)(0x0008U | 0x0004U));
+  
+   
+  tmpreg |= (uint32_t)0x0004U;
+  
+   
+  ((huart->Instance ->CR1) = ((uint32_t)tmpreg));
+  
+  huart->gState = HAL_UART_STATE_READY;
+  
+   
+  do{ (huart)->Lock = HAL_UNLOCKED; }while (0);
+  
+  return HAL_OK; 
+}
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+  
+
+
+
+
+
+ 
+HAL_UART_StateTypeDef HAL_UART_GetState(UART_HandleTypeDef *huart)
+{
+  uint32_t temp1= 0x00U, temp2 = 0x00U;
+  temp1 = huart->gState;
+  temp2 = huart->RxState;
+  
+  return (HAL_UART_StateTypeDef)(temp1 | temp2);
+}
+
+
+
+
+
+
+ 
+uint32_t HAL_UART_GetError(UART_HandleTypeDef *huart)
+{
+  return huart->ErrorCode;
+}
+
+
+
+ 
+
+
+
+
+
+ 
+static void UART_DMATransmitCplt(DMA_HandleTypeDef *hdma)
+{
+  UART_HandleTypeDef* huart = ( UART_HandleTypeDef* )((DMA_HandleTypeDef* )hdma)->Parent;
+   
+  if((hdma->Instance->CR & 0x00000100U) == 0U)
+  {
+    huart->TxXferCount = 0U;
+
+    
+ 
+    ((huart->Instance ->CR3) &= ~(0x0080U));
+
+     
+    ((huart->Instance ->CR1) |= (0x0040U));
+
+  }
+   
+  else
+  {
+    HAL_UART_TxCpltCallback(huart);
+  }
+}
+
+
+
+
+
+
+ 
+static void UART_DMATxHalfCplt(DMA_HandleTypeDef *hdma)
+{
+  UART_HandleTypeDef* huart = (UART_HandleTypeDef*)((DMA_HandleTypeDef*)hdma)->Parent;
+
+  HAL_UART_TxHalfCpltCallback(huart);
+}
+
+
+
+
+
+ 
+static void UART_DMAReceiveCplt(DMA_HandleTypeDef *hdma)
+{
+  UART_HandleTypeDef* huart = ( UART_HandleTypeDef* )((DMA_HandleTypeDef* )hdma)->Parent;
+   
+  if((hdma->Instance->CR & 0x00000100U) == 0U)
+  {
+    huart->RxXferCount = 0U;
+  
+     
+    ((huart->Instance ->CR1) &= ~(0x0100U));
+    ((huart->Instance ->CR3) &= ~(0x0001U));
+    
+    
+ 
+    ((huart->Instance ->CR3) &= ~(0x0040U));
+	
+     
+    huart->RxState = HAL_UART_STATE_READY;
+  }
+  HAL_UART_RxCpltCallback(huart);
+}
+
+
+
+
+
+
+ 
+static void UART_DMARxHalfCplt(DMA_HandleTypeDef *hdma)
+{
+  UART_HandleTypeDef* huart = (UART_HandleTypeDef*)((DMA_HandleTypeDef*)hdma)->Parent;
+
+  HAL_UART_RxHalfCpltCallback(huart); 
+}
+
+
+
+
+
+ 
+static void UART_DMAError(DMA_HandleTypeDef *hdma)
+{
+  uint32_t dmarequest = 0x00U;
+  UART_HandleTypeDef* huart = ( UART_HandleTypeDef* )((DMA_HandleTypeDef* )hdma)->Parent;
+
+   
+  dmarequest = (((huart->Instance ->CR3) & (0x0080U)) != RESET);
+  if((huart->gState == HAL_UART_STATE_BUSY_TX) && dmarequest)
+  {
+    huart->TxXferCount = 0U;
+    UART_EndTxTransfer(huart);
+  }
+
+   
+  dmarequest = (((huart->Instance ->CR3) & (0x0040U)) != RESET); 
+  if((huart->RxState == HAL_UART_STATE_BUSY_RX) && dmarequest)
+  {
+    huart->RxXferCount = 0U;
+    UART_EndRxTransfer(huart);
+  }
+
+  huart->ErrorCode |= ((uint32_t)0x00000010U);
+  HAL_UART_ErrorCallback(huart);
+}
+
+
+
+
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef UART_WaitOnFlagUntilTimeout(UART_HandleTypeDef *huart, uint32_t Flag, FlagStatus Status, uint32_t Tickstart, uint32_t Timeout)
+{
+   
+  while(((((huart)->Instance ->SR & (Flag)) == (Flag)) ? SET : RESET) == Status) 
+  {
+     
+    if(Timeout != 0xFFFFFFFFU)
+    {
+      if((Timeout == 0U)||((HAL_GetTick() - Tickstart ) > Timeout))
+      {
+         
+        ((huart->Instance ->CR1) &= ~((0x0020U | 0x0100U | 0x0080U)));
+        ((huart->Instance ->CR3) &= ~(0x0001U));
+        
+        huart->gState  = HAL_UART_STATE_READY;
+        huart->RxState = HAL_UART_STATE_READY;
+        
+         
+        do{ (huart)->Lock = HAL_UNLOCKED; }while (0);
+        
+        return HAL_TIMEOUT;
+      }
+    }
+  }
+  
+  return HAL_OK;
+}
+
+
+
+
+
+ 
+static void UART_EndTxTransfer(UART_HandleTypeDef *huart)
+{
+   
+  ((huart->Instance ->CR1) &= ~((0x0080U | 0x0040U)));
+
+   
+  huart->gState = HAL_UART_STATE_READY;
+}
+
+
+
+
+
+ 
+static void UART_EndRxTransfer(UART_HandleTypeDef *huart)
+{
+   
+  ((huart->Instance ->CR1) &= ~((0x0020U | 0x0100U)));
+  ((huart->Instance ->CR3) &= ~(0x0001U));
+
+   
+  huart->RxState = HAL_UART_STATE_READY;
+}
+
+
+
+
+
+
+ 
+static void UART_DMAAbortOnError(DMA_HandleTypeDef *hdma)
+{
+  UART_HandleTypeDef* huart = ( UART_HandleTypeDef* )((DMA_HandleTypeDef* )hdma)->Parent;
+  huart->RxXferCount = 0;
+  huart->TxXferCount = 0;
+
+  HAL_UART_ErrorCallback(huart);
+}
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef UART_Transmit_IT(UART_HandleTypeDef *huart)
+{
+  uint16_t* tmp;
+  
+   
+  if(huart->gState == HAL_UART_STATE_BUSY_TX)
+  {
+    if(huart->Init.WordLength == ((uint32_t)0x1000U))
+    {
+      tmp = (uint16_t*) huart->pTxBuffPtr;
+      huart->Instance->DR = (uint16_t)(*tmp & (uint16_t)0x01FFU);
+      if(huart->Init.Parity == ((uint32_t)0x00000000U))
+      {
+        huart->pTxBuffPtr += 2U;
+      }
+      else
+      {
+        huart->pTxBuffPtr += 1U;
+      }
+    } 
+    else
+    {
+      huart->Instance->DR = (uint8_t)(*huart->pTxBuffPtr++ & (uint8_t)0x00FFU);
+    }
+
+    if(--huart->TxXferCount == 0U)
+    {
+       
+      ((huart->Instance ->CR1) &= ~(0x0080U));
+
+           
+      ((huart->Instance ->CR1) |= (0x0040U));
+    }
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef UART_EndTransmit_IT(UART_HandleTypeDef *huart)
+{
+       
+  ((huart->Instance ->CR1) &= ~(0x0040U));
+  
+   
+  huart->gState = HAL_UART_STATE_READY;
+    
+  HAL_UART_TxCpltCallback(huart);
+  
+  return HAL_OK;
+}
+
+
+
+
+
+
+ 
+static HAL_StatusTypeDef UART_Receive_IT(UART_HandleTypeDef *huart)
+{
+  uint16_t* tmp;
+  
+   
+  if(huart->RxState == HAL_UART_STATE_BUSY_RX) 
+  {
+    if(huart->Init.WordLength == ((uint32_t)0x1000U))
+    {
+      tmp = (uint16_t*) huart->pRxBuffPtr;
+      if(huart->Init.Parity == ((uint32_t)0x00000000U))
+      {
+        *tmp = (uint16_t)(huart->Instance->DR & (uint16_t)0x01FFU);
+        huart->pRxBuffPtr += 2U;
+      }
+      else
+      {
+        *tmp = (uint16_t)(huart->Instance->DR & (uint16_t)0x00FFU);
+        huart->pRxBuffPtr += 1U;
+      }
+    }
+    else
+    {
+      if(huart->Init.Parity == ((uint32_t)0x00000000U))
+      {
+        *huart->pRxBuffPtr++ = (uint8_t)(huart->Instance->DR & (uint8_t)0x00FFU);
+      }
+      else
+      {
+        *huart->pRxBuffPtr++ = (uint8_t)(huart->Instance->DR & (uint8_t)0x007FU);
+      }
+    }
+
+    if(--huart->RxXferCount == 0U)
+    {
+       
+      ((huart->Instance ->CR1) &= ~((0x0020U | 0x0100U)));
+
+       
+      ((huart->Instance ->CR3) &= ~(0x0001U));
+
+       
+      huart->RxState = HAL_UART_STATE_READY;
+     
+      HAL_UART_RxCpltCallback(huart);
+
+      return HAL_OK;
+    }
+    return HAL_OK;
+  }
+  else
+  {
+    return HAL_BUSY;
+  }
+}
+
+
+
+
+
+
+ 
+static void UART_SetConfig(UART_HandleTypeDef *huart)
+{
+  uint32_t tmpreg = 0x00U;
+  
+   
+  ((void)0);
+  ((void)0);
+  ((void)0);
+  ((void)0);
+
+   
+  tmpreg = huart->Instance->CR2;
+
+   
+  tmpreg &= (uint32_t)~((uint32_t)0x3000U);
+
+   
+  tmpreg |= (uint32_t)huart->Init.StopBits;
+  
+   
+  ((huart->Instance ->CR2) = ((uint32_t)tmpreg));
+
+   
+  tmpreg = huart->Instance->CR1;
+
+   
+  tmpreg &= (uint32_t)~((uint32_t)(0x1000U | 0x0400U | 0x0200U | 0x0008U |                                    0x0004U | 0x8000U));
+
+
+  
+
+
+
+ 
+  tmpreg |= (uint32_t)huart->Init.WordLength | huart->Init.Parity | huart->Init.Mode | huart->Init.OverSampling;
+  
+   
+  ((huart->Instance ->CR1) = ((uint32_t)tmpreg));
+  
+     
+  tmpreg = huart->Instance->CR3;
+  
+   
+  tmpreg &= (uint32_t)~((uint32_t)(0x0100U | 0x0200U));
+  
+   
+  tmpreg |= huart->Init.HwFlowCtl;
+  
+   
+  ((huart->Instance ->CR3) = ((uint32_t)tmpreg));
+  
+   
+  if(huart->Init.OverSampling == ((uint32_t)0x8000U))
+  {
+     
+    if((huart->Instance == ((USART_TypeDef *) ((0x40000000U + 0x00010000U) + 0x1000U))) || (huart->Instance == ((USART_TypeDef *) ((0x40000000U + 0x00010000U) + 0x1400U))))
+    {
+      huart->Instance->BRR = (((((((((HAL_RCC_GetPCLK2Freq())))*25U)/(2U*(((huart->Init . BaudRate)))))/100U) << 4U) + ((((((((((HAL_RCC_GetPCLK2Freq())))*25U)/(2U*(((huart->Init . BaudRate))))) - ((((((((HAL_RCC_GetPCLK2Freq()))))*25U)/(2U*((((huart->Init . BaudRate))))))/100U) * 100U)) * 8U + 50U) / 100U) & 0xF8U) << 1U)) + (((((((((HAL_RCC_GetPCLK2Freq())))*25U)/(2U*(((huart->Init . BaudRate))))) - ((((((((HAL_RCC_GetPCLK2Freq()))))*25U)/(2U*((((huart->Init . BaudRate))))))/100U) * 100U)) * 8U + 50U) / 100U) & 0x07U));
+    }
+    else
+    {
+      huart->Instance->BRR = (((((((((HAL_RCC_GetPCLK1Freq())))*25U)/(2U*(((huart->Init . BaudRate)))))/100U) << 4U) + ((((((((((HAL_RCC_GetPCLK1Freq())))*25U)/(2U*(((huart->Init . BaudRate))))) - ((((((((HAL_RCC_GetPCLK1Freq()))))*25U)/(2U*((((huart->Init . BaudRate))))))/100U) * 100U)) * 8U + 50U) / 100U) & 0xF8U) << 1U)) + (((((((((HAL_RCC_GetPCLK1Freq())))*25U)/(2U*(((huart->Init . BaudRate))))) - ((((((((HAL_RCC_GetPCLK1Freq()))))*25U)/(2U*((((huart->Init . BaudRate))))))/100U) * 100U)) * 8U + 50U) / 100U) & 0x07U));
+    }
+  }
+  else
+  {
+     
+    if((huart->Instance == ((USART_TypeDef *) ((0x40000000U + 0x00010000U) + 0x1000U))) || (huart->Instance == ((USART_TypeDef *) ((0x40000000U + 0x00010000U) + 0x1400U))))
+    {
+      huart->Instance->BRR = (((((((((HAL_RCC_GetPCLK2Freq())))*25U)/(4U*(((huart->Init . BaudRate)))))/100U) << 4U) + (((((((((HAL_RCC_GetPCLK2Freq())))*25U)/(4U*(((huart->Init . BaudRate))))) - ((((((((HAL_RCC_GetPCLK2Freq()))))*25U)/(4U*((((huart->Init . BaudRate))))))/100U) * 100U)) * 16U + 50U) / 100U) & 0xF0U)) + (((((((((HAL_RCC_GetPCLK2Freq())))*25U)/(4U*(((huart->Init . BaudRate))))) - ((((((((HAL_RCC_GetPCLK2Freq()))))*25U)/(4U*((((huart->Init . BaudRate))))))/100U) * 100U)) * 16U + 50U) / 100U) & 0x0FU));
+    }
+    else
+    {
+      huart->Instance->BRR = (((((((((HAL_RCC_GetPCLK1Freq())))*25U)/(4U*(((huart->Init . BaudRate)))))/100U) << 4U) + (((((((((HAL_RCC_GetPCLK1Freq())))*25U)/(4U*(((huart->Init . BaudRate))))) - ((((((((HAL_RCC_GetPCLK1Freq()))))*25U)/(4U*((((huart->Init . BaudRate))))))/100U) * 100U)) * 16U + 50U) / 100U) & 0xF0U)) + (((((((((HAL_RCC_GetPCLK1Freq())))*25U)/(4U*(((huart->Init . BaudRate))))) - ((((((((HAL_RCC_GetPCLK1Freq()))))*25U)/(4U*((((huart->Init . BaudRate))))))/100U) * 100U)) * 16U + 50U) / 100U) & 0x0FU));
+    }
+  }
+}
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+ 
+
+ 

@@ -32,28 +32,43 @@ void BLDC_Init(void)
     }
     TIM_PWM_CFG(TIM3, TIM_OCMODE_PWM1, BLDC_MIN_US, TIM_OCPOLARITY_HIGH, BLDC_PWM_CHANNEL_3);
 
-    // // 启动 PWM
-    // if (HAL_TIM_PWM_Start(&htim3, BLDC_PWM_CHANNEL_3) != HAL_OK) {
-    //     Error_Handler();
-    // }
+    // 启动 PWM
+    if (HAL_TIM_PWM_Start(&htim3, BLDC_PWM_CHANNEL_3) != HAL_OK) {
+        Error_Handler();
+    }
     __HAL_TIM_SET_COMPARE(&htim3, BLDC_PWM_CHANNEL_3, BLDC_OFF_US);
 }
 
-void BLDC_SetThrottle3_us(uint16_t pulse_us)
+void BLDC_SetThrottle_us(uint16_t pulse_us, uint8_t idx)
 {
     // 限幅到 [BLDC_MIN_US, BLDC_MAX_US]
     uint16_t duty = clamp_u16(pulse_us, BLDC_MIN_US, BLDC_MAX_US);
-    __HAL_TIM_SET_COMPARE(&htim3, BLDC_PWM_CHANNEL_3, duty);
+    switch(idx) {
+        case 1:
+            __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, duty);
+            break;
+        case 2:
+            __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, duty);
+            break;
+        case 3:
+            __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_3, duty);
+            break;
+        case 4:
+            __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_4, duty);
+            break;
+        default:
+            break;
+    }
 }
 
 void BLDC_Stop3(void)
 {
-    __HAL_TIM_SET_COMPARE(&htim3, BLDC_PWM_CHANNEL_3, BLDC_OFF_US);
+    __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_3, BLDC_OFF_US);
 }
 
 void Calibrate_BLDC(void) {
-    BLDC_SetThrottle3_us(2000);
+    BLDC_SetThrottle_us(2000, 3);
     HAL_Delay(5000);
-    BLDC_SetThrottle3_us(1000);
+    BLDC_SetThrottle_us(1000, 3);
     HAL_Delay(1000);
 }

@@ -16,6 +16,7 @@
         "main.h": "c",
         "compare": "c",
         "cstddef": "c",
-        "stdint.h": "c"
+        "stdint.h": "c",
+        "uart_set.h": "c"
     }
 }

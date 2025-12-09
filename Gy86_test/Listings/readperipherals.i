@@ -1,4 +1,4 @@
-#line 1 "MyLib\\BLDC.c"
+#line 1 "MyLib\\ReadPeripherals.c"
 #line 1 ".\\Inc\\main.h"
 
 
@@ -27761,119 +27761,664 @@ void HAL_DisableCompensationCell(void);
 void SystemClock_Config(void);
 void Error_Handler(void);
 
-#line 2 "MyLib\\BLDC.c"
-#line 1 "MyLib\\GPIO_Set.h"
+#line 2 "MyLib\\ReadPeripherals.c"
+#line 1 "MyLib\\GY86.h"
+
+
+
+extern uint8_t already_init;
 
 
 
 
-#line 6 "MyLib\\GPIO_Set.h"
 
-#line 16 "MyLib\\GPIO_Set.h"
 
-#line 27 "MyLib\\GPIO_Set.h"
-
-#line 3 "MyLib\\BLDC.c"
-#line 1 "MyLib\\PWM_Set.h"
+#line 25 "MyLib\\GY86.h"
 
 
 
 
-#line 6 "MyLib\\PWM_Set.h"
+
+void MPU6050_WriteReg(uint8_t RegAddr, uint8_t data);
+void MPU6050_Init(void);
+uint8_t MPU6050_ReadReg(uint8_t RegAddr);
+void MPU6050_GetData(int16_t* AccX, int16_t* AccY, int16_t* AccZ, int16_t* GyroX, int16_t* GyroY, int16_t* GyroZ);
+uint8_t MPU6050_GetId(void);
+
+#line 50 "MyLib\\GY86.h"
+
+void HMC5883L_Init(void);
+uint8_t HMC5883L_ReadReg(uint8_t RegAddr);
+void HMC5883L_GetData(int16_t* X, int16_t* Y, int16_t* Z);
+void HMC5883L_WriteReg(uint8_t RegAddr, uint8_t data);
+ 
 
 
-extern TIM_HandleTypeDef htim3;
-
-#line 22 "MyLib\\PWM_Set.h"
-
-#line 33 "MyLib\\PWM_Set.h"
-
-#line 4 "MyLib\\BLDC.c"
-#line 1 "MyLib\\BLDC.h"
 
 
 
-#line 5 "MyLib\\BLDC.h"
 
 
-#line 19 "MyLib\\BLDC.h"
 
 
-#line 30 "MyLib\\BLDC.h"
-
-void BLDC_Init(void);
-void BLDC_SetThrottle_us(uint16_t pulse_us, uint8_t idx);
-void BLDC_Stop3(void);
-void Calibrate_BLDC(void);
-
-#line 5 "MyLib\\BLDC.c"
-
-extern TIM_HandleTypeDef htim3;
 
 
-static inline uint16_t clamp_u16(uint16_t v, uint16_t lo, uint16_t hi)
-{
-    if (v < lo) return lo;
-    if (v > hi) return hi;
-    return v;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+typedef struct {
+    uint16_t C1; 
+    uint16_t C2; 
+    uint16_t C3; 
+    uint16_t C4; 
+    uint16_t C5; 
+    uint16_t C6; 
+} MS561101BA_CalibData_t;
+
+
+typedef struct {
+    float temperature; 
+    float pressure;    
+    float altitude;    
+} MS561101BA_Data_t;
+
+
+void MS561101BA_Reset(void);
+void MS561101BA_Init(void);
+uint16_t MS561101BA_ReadPROM(uint8_t index);
+void MS561101BA_ReadPROM_All(MS561101BA_CalibData_t* calib);
+void MS561101BA_StartConversionD1(uint8_t osr);
+void MS561101BA_StartConversionD2(uint8_t osr);
+uint32_t MS561101BA_ReadADC(void);
+uint32_t MS561101BA_ReadPressureRaw(uint8_t osr);
+uint32_t MS561101BA_ReadTemperatureRaw(uint8_t osr);
+uint8_t MS561101BA_GetData(MS561101BA_Data_t* data, uint8_t osr);
+
+#line 3 "MyLib\\ReadPeripherals.c"
+#line 1 "MyLib\\OLED.h"
+
+
+
+void OLED_Init(void);
+void OLED_Clear(void);
+void OLED_ShowChar(uint8_t Line, uint8_t Column, char Char);
+void OLED_ShowString(uint8_t Line, uint8_t Column, char *String);
+void OLED_ShowNum(uint8_t Line, uint8_t Column, uint32_t Number, uint8_t Length);
+void OLED_ShowSignedNum(uint8_t Line, uint8_t Column, int32_t Number, uint8_t Length);
+void OLED_ShowHexNum(uint8_t Line, uint8_t Column, uint32_t Number, uint8_t Length);
+void OLED_ShowBinNum(uint8_t Line, uint8_t Column, uint32_t Number, uint8_t Length);
+
+#line 4 "MyLib\\ReadPeripherals.c"
+#line 1 "MyLib\\UART_Set.h"
+
+
+
+#line 5 "MyLib\\UART_Set.h"
+
+extern UART_HandleTypeDef huart1;
+
+ 
+ 
+ 
+#line 24 "MyLib\\UART_Set.h"
+
+ 
+
+
+
+ 
+#line 40 "MyLib\\UART_Set.h"
+
+ 
+
+
+
+
+
+ 
+#line 54 "MyLib\\UART_Set.h"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#line 5 "MyLib\\ReadPeripherals.c"
+#line 6 "MyLib\\ReadPeripherals.c"
+#line 1 "C:\\Keil_v5\\ARM\\ARMCC\\Bin\\..\\include\\string.h"
+ 
+ 
+ 
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+#line 38 "C:\\Keil_v5\\ARM\\ARMCC\\Bin\\..\\include\\string.h"
+
+
+  
+
+
+
+    typedef unsigned int size_t;    
+#line 54 "C:\\Keil_v5\\ARM\\ARMCC\\Bin\\..\\include\\string.h"
+
+
+
+
+extern __declspec(__nothrow) void *memcpy(void * __restrict  ,
+                    const void * __restrict  , size_t  ) __attribute__((__nonnull__(1,2)));
+   
+
+
+
+
+ 
+extern __declspec(__nothrow) void *memmove(void *  ,
+                    const void *  , size_t  ) __attribute__((__nonnull__(1,2)));
+   
+
+
+
+
+
+
+
+ 
+extern __declspec(__nothrow) char *strcpy(char * __restrict  , const char * __restrict  ) __attribute__((__nonnull__(1,2)));
+   
+
+
+
+
+ 
+extern __declspec(__nothrow) char *strncpy(char * __restrict  , const char * __restrict  , size_t  ) __attribute__((__nonnull__(1,2)));
+   
+
+
+
+
+
+ 
+
+extern __declspec(__nothrow) char *strcat(char * __restrict  , const char * __restrict  ) __attribute__((__nonnull__(1,2)));
+   
+
+
+
+
+ 
+extern __declspec(__nothrow) char *strncat(char * __restrict  , const char * __restrict  , size_t  ) __attribute__((__nonnull__(1,2)));
+   
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+extern __declspec(__nothrow) int memcmp(const void *  , const void *  , size_t  ) __attribute__((__nonnull__(1,2)));
+   
+
+
+
+
+
+ 
+extern __declspec(__nothrow) int strcmp(const char *  , const char *  ) __attribute__((__nonnull__(1,2)));
+   
+
+
+
+
+ 
+extern __declspec(__nothrow) int strncmp(const char *  , const char *  , size_t  ) __attribute__((__nonnull__(1,2)));
+   
+
+
+
+
+
+
+ 
+extern __declspec(__nothrow) int strcasecmp(const char *  , const char *  ) __attribute__((__nonnull__(1,2)));
+   
+
+
+
+
+
+ 
+extern __declspec(__nothrow) int strncasecmp(const char *  , const char *  , size_t  ) __attribute__((__nonnull__(1,2)));
+   
+
+
+
+
+
+
+ 
+extern __declspec(__nothrow) int strcoll(const char *  , const char *  ) __attribute__((__nonnull__(1,2)));
+   
+
+
+
+
+
+
+
+ 
+
+extern __declspec(__nothrow) size_t strxfrm(char * __restrict  , const char * __restrict  , size_t  ) __attribute__((__nonnull__(2)));
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+#line 193 "C:\\Keil_v5\\ARM\\ARMCC\\Bin\\..\\include\\string.h"
+extern __declspec(__nothrow) void *memchr(const void *  , int  , size_t  ) __attribute__((__nonnull__(1)));
+
+   
+
+
+
+
+
+ 
+
+#line 209 "C:\\Keil_v5\\ARM\\ARMCC\\Bin\\..\\include\\string.h"
+extern __declspec(__nothrow) char *strchr(const char *  , int  ) __attribute__((__nonnull__(1)));
+
+   
+
+
+
+
+ 
+
+extern __declspec(__nothrow) size_t strcspn(const char *  , const char *  ) __attribute__((__nonnull__(1,2)));
+   
+
+
+
+
+ 
+
+#line 232 "C:\\Keil_v5\\ARM\\ARMCC\\Bin\\..\\include\\string.h"
+extern __declspec(__nothrow) char *strpbrk(const char *  , const char *  ) __attribute__((__nonnull__(1,2)));
+
+   
+
+
+
+
+ 
+
+#line 247 "C:\\Keil_v5\\ARM\\ARMCC\\Bin\\..\\include\\string.h"
+extern __declspec(__nothrow) char *strrchr(const char *  , int  ) __attribute__((__nonnull__(1)));
+
+   
+
+
+
+
+
+ 
+
+extern __declspec(__nothrow) size_t strspn(const char *  , const char *  ) __attribute__((__nonnull__(1,2)));
+   
+
+
+
+ 
+
+#line 270 "C:\\Keil_v5\\ARM\\ARMCC\\Bin\\..\\include\\string.h"
+extern __declspec(__nothrow) char *strstr(const char *  , const char *  ) __attribute__((__nonnull__(1,2)));
+
+   
+
+
+
+
+
+ 
+
+extern __declspec(__nothrow) char *strtok(char * __restrict  , const char * __restrict  ) __attribute__((__nonnull__(2)));
+extern __declspec(__nothrow) char *_strtok_r(char *  , const char *  , char **  ) __attribute__((__nonnull__(2,3)));
+
+extern __declspec(__nothrow) char *strtok_r(char *  , const char *  , char **  ) __attribute__((__nonnull__(2,3)));
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+extern __declspec(__nothrow) void *memset(void *  , int  , size_t  ) __attribute__((__nonnull__(1)));
+   
+
+
+
+ 
+extern __declspec(__nothrow) char *strerror(int  );
+   
+
+
+
+
+
+ 
+extern __declspec(__nothrow) size_t strlen(const char *  ) __attribute__((__nonnull__(1)));
+   
+
+
+
+ 
+
+extern __declspec(__nothrow) size_t strlcpy(char *  , const char *  , size_t  ) __attribute__((__nonnull__(1,2)));
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+extern __declspec(__nothrow) size_t strlcat(char *  , const char *  , size_t  ) __attribute__((__nonnull__(1,2)));
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+extern __declspec(__nothrow) void _membitcpybl(void *  , const void *  , int  , int  , size_t  ) __attribute__((__nonnull__(1,2)));
+extern __declspec(__nothrow) void _membitcpybb(void *  , const void *  , int  , int  , size_t  ) __attribute__((__nonnull__(1,2)));
+extern __declspec(__nothrow) void _membitcpyhl(void *  , const void *  , int  , int  , size_t  ) __attribute__((__nonnull__(1,2)));
+extern __declspec(__nothrow) void _membitcpyhb(void *  , const void *  , int  , int  , size_t  ) __attribute__((__nonnull__(1,2)));
+extern __declspec(__nothrow) void _membitcpywl(void *  , const void *  , int  , int  , size_t  ) __attribute__((__nonnull__(1,2)));
+extern __declspec(__nothrow) void _membitcpywb(void *  , const void *  , int  , int  , size_t  ) __attribute__((__nonnull__(1,2)));
+extern __declspec(__nothrow) void _membitmovebl(void *  , const void *  , int  , int  , size_t  ) __attribute__((__nonnull__(1,2)));
+extern __declspec(__nothrow) void _membitmovebb(void *  , const void *  , int  , int  , size_t  ) __attribute__((__nonnull__(1,2)));
+extern __declspec(__nothrow) void _membitmovehl(void *  , const void *  , int  , int  , size_t  ) __attribute__((__nonnull__(1,2)));
+extern __declspec(__nothrow) void _membitmovehb(void *  , const void *  , int  , int  , size_t  ) __attribute__((__nonnull__(1,2)));
+extern __declspec(__nothrow) void _membitmovewl(void *  , const void *  , int  , int  , size_t  ) __attribute__((__nonnull__(1,2)));
+extern __declspec(__nothrow) void _membitmovewb(void *  , const void *  , int  , int  , size_t  ) __attribute__((__nonnull__(1,2)));
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+#line 502 "C:\\Keil_v5\\ARM\\ARMCC\\Bin\\..\\include\\string.h"
+
+
+
+ 
+
+#line 7 "MyLib\\ReadPeripherals.c"
+
+typedef enum { SENSOR_MPU = 0, SENSOR_HMC = 1, SENSOR_BARO = 2 } SensorType;
+
+static SensorType current_sensor = SENSOR_MPU;
+static uint32_t last_switch_ms = 0;
+static const uint32_t SAMPLE_PERIOD_MS = 500;
+
+void ReadPeripherals_Init(void) {
+    OLED_Init();
+    MPU6050_Init();
+    HMC5883L_Init();
+    MS561101BA_Init();
+    uint8_t mpu_id = MPU6050_GetId();
+    OLED_ShowString(1, 1, "ID: ");
+    OLED_ShowHexNum(1, 5, mpu_id, 4);
+    last_switch_ms = HAL_GetTick();
 }
 
-void BLDC_Init(void)
-{
-    
-    do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1ENR) |= (0x00000002U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1ENR) & (0x00000002U)); ((void)(tmpreg)); } while(0);   
-    do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x00000002U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x00000002U)); ((void)(tmpreg)); } while(0);    
+void ReadPeripherals_Process(void) {
+    uint32_t now = HAL_GetTick();
+    char buffer[128];
 
-    
-    do { GPIO_InitTypeDef GPIO_InitStructure = {0}; GPIO_InitStructure . Pin = ((uint16_t)0x0001U); GPIO_InitStructure . Mode = ((uint32_t)0x00000002U); GPIO_InitStructure . Speed = ((uint32_t)0x00000002U); GPIO_InitStructure . Pull = ((uint32_t)0x00000000U); GPIO_InitStructure . Alternate = ((uint8_t)0x02U); HAL_GPIO_Init(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0400U)), &GPIO_InitStructure); } while(0);
+    if (now - last_switch_ms >= SAMPLE_PERIOD_MS) {
+        last_switch_ms = now;
+        
+        switch (current_sensor) {
+            case SENSOR_MPU: {
+                int16_t ax, ay, az, gx, gy, gz;
+                MPU6050_GetData(&ax, &ay, &az, &gx, &gy, &gz);
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                sprintf(buffer, "MPU6050 AX:%d AY:%d AZ:%d GX:%d GY:%d GZ:%d\r\n", ax, ay, az, gx, gy, gz);
+                HAL_UART_Transmit(&huart1, (uint8_t*)buffer, strlen(buffer), 100);
 
+                current_sensor = SENSOR_HMC;
+            } break;
+            case SENSOR_HMC: {
+                int16_t mx, my, mz;
+                HMC5883L_GetData(&mx, &my, &mz);
+                
+                
+                
+                
+                
 
-    
-    do { TIM_Base_InitTypeDef TIM_Base_InitStruct = {0}; TIM_Base_InitStruct . Prescaler = 84 - 1; TIM_Base_InitStruct . Period = 20000 - 1; TIM_Base_InitStruct . ClockDivision = ((uint32_t)0x00000000U); TIM_Base_InitStruct . CounterMode = ((uint32_t)0x00000000U); htim3 . Instance = ((TIM_TypeDef *) (0x40000000U + 0x0400U)); htim3 . Init = TIM_Base_InitStruct; if(HAL_TIM_Base_Init(&htim3) != HAL_OK) { Error_Handler(); } } while(0);
+                sprintf(buffer, "HMC5883L MX:%d MY:%d MZ:%d\r\n", mx, my, mz);
+                HAL_UART_Transmit(&huart1, (uint8_t*)buffer, strlen(buffer), 100);
 
-    
-    if (HAL_TIM_PWM_Init(&htim3) != HAL_OK) {
-        Error_Handler();
+                current_sensor = SENSOR_BARO;
+            } break;
+            case SENSOR_BARO: {
+                MS561101BA_Data_t ms_data;
+                
+                if (MS561101BA_GetData(&ms_data, 0x08)) {
+                    int32_t tC = (int32_t)(ms_data.temperature + 0.5f);
+                    int32_t p_hPa = (int32_t)(ms_data.pressure * 0.01f + 0.5f);
+                    int32_t alt_m = (int32_t)(ms_data.altitude + 0.5f);
+                    
+                    
+                    
+                    
+
+                    sprintf(buffer, "MS5611 T:%dC P:%dhPa A:%dm\r\n", tC, p_hPa, alt_m);
+                    HAL_UART_Transmit(&huart1, (uint8_t*)buffer, strlen(buffer), 100);
+                } else {
+                    
+                    sprintf(buffer, "MS5611 Error\r\n");
+                    HAL_UART_Transmit(&huart1, (uint8_t*)buffer, strlen(buffer), 100);
+                }
+                current_sensor = SENSOR_MPU;
+            } break;
+        }
     }
-    do { TIM_OC_InitTypeDef TIM_OC_InitStruct = {0}; TIM_OC_InitStruct . OCMode = (0x0020U | 0x0040U); TIM_OC_InitStruct . Pulse = 1000; TIM_OC_InitStruct . OCPolarity = ((uint32_t)0x00000000U); TIM_OC_InitStruct . OCFastMode = ((uint32_t)0x00000000U); if(HAL_TIM_PWM_ConfigChannel(&htim3, &TIM_OC_InitStruct, ((uint32_t)0x00000008U)) != HAL_OK) { Error_Handler(); } } while(0);
-
-    
-    if (HAL_TIM_PWM_Start(&htim3, ((uint32_t)0x00000008U)) != HAL_OK) {
-        Error_Handler();
-    }
-    (*(volatile uint32_t *)(&((&htim3)->Instance ->CCR1) + ((((uint32_t)0x00000008U)) >> 2U)) = (1000));
 }
 
-void BLDC_SetThrottle_us(uint16_t pulse_us, uint8_t idx)
-{
-    
-    uint16_t duty = clamp_u16(pulse_us, 1000, 2000);
-    switch(idx) {
-        case 1:
-            (*(volatile uint32_t *)(&((&htim3)->Instance ->CCR1) + ((((uint32_t)0x00000000U)) >> 2U)) = (duty));
-            break;
-        case 2:
-            (*(volatile uint32_t *)(&((&htim3)->Instance ->CCR1) + ((((uint32_t)0x00000004U)) >> 2U)) = (duty));
-            break;
-        case 3:
-            (*(volatile uint32_t *)(&((&htim3)->Instance ->CCR1) + ((((uint32_t)0x00000008U)) >> 2U)) = (duty));
-            break;
-        case 4:
-            (*(volatile uint32_t *)(&((&htim3)->Instance ->CCR1) + ((((uint32_t)0x0000000CU)) >> 2U)) = (duty));
-            break;
-        default:
-            break;
-    }
-}
-
-void BLDC_Stop3(void)
-{
-    (*(volatile uint32_t *)(&((&htim3)->Instance ->CCR1) + ((((uint32_t)0x00000008U)) >> 2U)) = (1000));
-}
-
-void Calibrate_BLDC(void) {
-    BLDC_SetThrottle_us(2000, 3);
-    HAL_Delay(5000);
-    BLDC_SetThrottle_us(1000, 3);
-    HAL_Delay(1000);
-}

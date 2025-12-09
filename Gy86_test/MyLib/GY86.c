@@ -1,9 +1,7 @@
 #include "main.h"
 #include "MyI2C.h"
 #include "GY86.h"
-/*
- * MS561101BA代码尚未完成，使用BMP180芯片代替
- */
+
 uint8_t already_init = 0;
 
 /*
@@ -294,7 +292,7 @@ uint8_t MS561101BA_GetData(MS561101BA_Data_t* data, uint8_t osr) {
     int32_t P = (int32_t)(((((int64_t)D1 * SENS) >> 21) - OFF) >> 15);
 
     data->temperature = TEMP / 100.0f;
-    data->pressure = (float)P * 100.0f; // hPa -> Pa
+    data->pressure = (float)P; // P is already in Pa (0.01 mbar)
     data->altitude = 44330.0f * (1.0f - powf(data->pressure / 101325.0f, 0.1903f));
 
     return 1;

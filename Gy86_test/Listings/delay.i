@@ -27764,28 +27764,28 @@ void Error_Handler(void);
 #line 2 "MyLib\\Delay.c"
 
 static uint8_t timer_initialized = 0;
-static TIM_HandleTypeDef htim2;
+static TIM_HandleTypeDef htim5;
 
 void Timer_Delay_us(uint8_t xus) {
 	if(!timer_initialized) {
-		do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x00000001U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x00000001U)); ((void)(tmpreg)); } while(0);
+		do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x00000008U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x00000008U)); ((void)(tmpreg)); } while(0);
 		timer_initialized = 1;
 
-		htim2.Instance = ((TIM_TypeDef *) (0x40000000U + 0x0000U));
-		htim2.Init.Prescaler = 84 - 1;
-		htim2.Init.Period = 0xFFFFFFFF;
-		htim2.Init.CounterMode = ((uint32_t)0x00000000U);
-		htim2.Init.ClockDivision = ((uint32_t)0x00000000U);
-		if(HAL_TIM_Base_Init(&htim2) != HAL_OK) {
+		htim5.Instance = ((TIM_TypeDef *) (0x40000000U + 0x0C00U));
+		htim5.Init.Prescaler = 84 - 1;
+		htim5.Init.Period = 0xFFFFFFFF;
+		htim5.Init.CounterMode = ((uint32_t)0x00000000U);
+		htim5.Init.ClockDivision = ((uint32_t)0x00000000U);
+		if(HAL_TIM_Base_Init(&htim5) != HAL_OK) {
 			Error_Handler();
 		}
 	}
-	((&htim2)->Instance ->CNT = (0));
-	if(HAL_TIM_Base_Start(&htim2) != HAL_OK) {
+	((&htim5)->Instance ->CNT = (0));
+	if(HAL_TIM_Base_Start(&htim5) != HAL_OK) {
 		Error_Handler();
 	}
-	while(((&htim2)->Instance ->CNT) < xus) {
+	while(((&htim5)->Instance ->CNT) < xus) {
 		
 	}
-	HAL_TIM_Base_Stop(&htim2);
+	HAL_TIM_Base_Stop(&htim5);
 }
