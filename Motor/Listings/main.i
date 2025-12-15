@@ -28251,55 +28251,212 @@ void IC_Init(void);
 
 
 #line 7 "Src\\main.c"
+#line 1 ".\\MyLib\\GY86.h"
+
+
+
+extern uint8_t already_init;
 
 
 
 
+
+
+#line 25 ".\\MyLib\\GY86.h"
+
+
+
+
+
+void MPU6050_WriteReg(uint8_t RegAddr, uint8_t data);
+void MPU6050_Init(void);
+uint8_t MPU6050_ReadReg(uint8_t RegAddr);
+void MPU6050_GetData(int16_t* AccX, int16_t* AccY, int16_t* AccZ, int16_t* GyroX, int16_t* GyroY, int16_t* GyroZ);
+uint8_t MPU6050_GetId(void);
+
+#line 50 ".\\MyLib\\GY86.h"
+
+void HMC5883L_Init(void);
+uint8_t HMC5883L_ReadReg(uint8_t RegAddr);
+void HMC5883L_GetData(int16_t* X, int16_t* Y, int16_t* Z);
+void HMC5883L_WriteReg(uint8_t RegAddr, uint8_t data);
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+typedef struct {
+    uint16_t C1; 
+    uint16_t C2; 
+    uint16_t C3; 
+    uint16_t C4; 
+    uint16_t C5; 
+    uint16_t C6; 
+} MS561101BA_CalibData_t;
+
+
+typedef struct {
+    float temperature; 
+    float pressure;    
+    float altitude;    
+} MS561101BA_Data_t;
+
+
+void MS561101BA_Reset(void);
+void MS561101BA_Init(void);
+uint16_t MS561101BA_ReadPROM(uint8_t index);
+void MS561101BA_ReadPROM_All(MS561101BA_CalibData_t* calib);
+void MS561101BA_StartConversionD1(uint8_t osr);
+void MS561101BA_StartConversionD2(uint8_t osr);
+uint32_t MS561101BA_ReadADC(void);
+uint32_t MS561101BA_ReadPressureRaw(uint8_t osr);
+uint32_t MS561101BA_ReadTemperatureRaw(uint8_t osr);
+uint8_t MS561101BA_GetData(MS561101BA_Data_t* data, uint8_t osr);
+
+#line 8 "Src\\main.c"
+
+#line 1 ".\\MyLib\\UART_Set.h"
+
+
+
+#line 5 ".\\MyLib\\UART_Set.h"
+
+extern UART_HandleTypeDef huart1;
+
+ 
+ 
+ 
+#line 24 ".\\MyLib\\UART_Set.h"
+
+ 
+
+
+
+ 
+#line 40 ".\\MyLib\\UART_Set.h"
+
+ 
+
+
+
+
+
+ 
+#line 54 ".\\MyLib\\UART_Set.h"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#line 10 "Src\\main.c"
+#line 1 ".\\MyLib\\ReadPeripherals.h"
+
+
+
+void ReadPeripherals_Init(void);
+void ReadPeripherals_Process(void);
+
+#line 11 "Src\\main.c"
 
 TIM_HandleTypeDef htim3;
+UART_HandleTypeDef huart1;
 uint16_t PWM_IN_Wid[4];
 
 
 void SystemClock_Config(void)
 {
-   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+    RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+    RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
-   
-   RCC_OscInitStruct.OscillatorType = ((uint32_t)0x00000001U);
-   RCC_OscInitStruct.HSEState = ((uint8_t)0x01U);
-   RCC_OscInitStruct.PLL.PLLState = ((uint8_t)0x02U);
-   RCC_OscInitStruct.PLL.PLLSource = 0x00400000U;
-   RCC_OscInitStruct.PLL.PLLM = 8;             
-   RCC_OscInitStruct.PLL.PLLN = 336;           
-   RCC_OscInitStruct.PLL.PLLP = ((uint32_t)0x00000004U); 
-   RCC_OscInitStruct.PLL.PLLQ = 7;             
+     
+    do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x10000000U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x10000000U)); ((void)(tmpreg)); } while(0);
+    do { volatile uint32_t tmpreg = 0x00U; (((((PWR_TypeDef *) (0x40000000U + 0x7000U))->CR)) = ((((((((PWR_TypeDef *) (0x40000000U + 0x7000U))->CR))) & (~(0x0000C000U))) | ((0x00008000U))))); tmpreg = ((((PWR_TypeDef *) (0x40000000U + 0x7000U))->CR) & (0x0000C000U)); ((void)(tmpreg)); } while(0);
 
-   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-   {
-       Error_Handler();
-   }
+     
+    RCC_OscInitStruct.OscillatorType = ((uint32_t)0x00000002U);
+    RCC_OscInitStruct.HSIState = ((uint8_t)0x01U); 
+    RCC_OscInitStruct.HSICalibrationValue = ((uint32_t)0x10U);
+    RCC_OscInitStruct.PLL.PLLState = ((uint8_t)0x02U);         
+    RCC_OscInitStruct.PLL.PLLSource = 0x00000000U; 
+    RCC_OscInitStruct.PLL.PLLM = 8;                      
+    RCC_OscInitStruct.PLL.PLLN = 84;                     
+    RCC_OscInitStruct.PLL.PLLP = ((uint32_t)0x00000002U);          
+    RCC_OscInitStruct.PLL.PLLQ = 4;                      
 
-   
-   RCC_ClkInitStruct.ClockType = ((uint32_t)0x00000002U) | ((uint32_t)0x00000001U) | ((uint32_t)0x00000004U) | ((uint32_t)0x00000008U);
-   RCC_ClkInitStruct.SYSCLKSource = 0x00000002U;
-   RCC_ClkInitStruct.AHBCLKDivider = 0x00000000U; 
-   RCC_ClkInitStruct.APB1CLKDivider = 0x00001000U;  
-   RCC_ClkInitStruct.APB2CLKDivider = 0x00000000U;  
+    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+    {
+        Error_Handler();
+    }
 
-   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, 0x00000002U) != HAL_OK)
-   {
-       Error_Handler();
-   }
+     
+    RCC_ClkInitStruct.ClockType = ((uint32_t)0x00000002U) | ((uint32_t)0x00000001U) |
+                                  ((uint32_t)0x00000004U) | ((uint32_t)0x00000008U);
+    RCC_ClkInitStruct.SYSCLKSource = 0x00000002U; 
+    RCC_ClkInitStruct.AHBCLKDivider = 0x00000000U;        
+    RCC_ClkInitStruct.APB1CLKDivider = 0x00001000U;         
+    RCC_ClkInitStruct.APB2CLKDivider = 0x00000000U;         
+
+    if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, 0x00000002U) != HAL_OK)
+    {
+        Error_Handler();
+    }
 }
+
 
 int main(void)
 {
     HAL_Init();
     SystemClock_Config();
     OLED_Init();
+
     IC_Init();
     BLDC_Init();
+
+    ReadPeripherals_Init();
+    do { do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB2ENR) |= (0x00000010U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB2ENR) & (0x00000010U)); ((void)(tmpreg)); } while(0); do { GPIO_InitTypeDef GPIO_InitStruct = {0}; do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1ENR) |= (0x00000001U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1ENR) & (0x00000001U)); ((void)(tmpreg)); } while(0); GPIO_InitStruct . Pin = ((uint16_t)0x0200U) | ((uint16_t)0x0400U); GPIO_InitStruct . Mode = ((uint32_t)0x00000002U); GPIO_InitStruct . Pull = ((uint32_t)0x00000000U); GPIO_InitStruct . Speed = ((uint32_t)0x00000003U); GPIO_InitStruct . Alternate = ((uint8_t)0x07U); HAL_GPIO_Init(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0000U)), &GPIO_InitStruct); } while(0); do { huart1 . Instance = ((USART_TypeDef *) ((0x40000000U + 0x00010000U) + 0x1000U)); huart1 . Init . BaudRate = 9600; huart1 . Init . WordLength = ((uint32_t)0x00000000U); huart1 . Init . StopBits = ((uint32_t)0x00000000U); huart1 . Init . Parity = ((uint32_t)0x00000000U); huart1 . Init . Mode = ((uint32_t)(0x0008U |0x0004U)); huart1 . Init . HwFlowCtl = ((uint32_t)0x00000000U); huart1 . Init . OverSampling = ((uint32_t)0x00000000U); if(HAL_UART_Init(&huart1) != HAL_OK) { Error_Handler(); } } while(0); do { HAL_NVIC_SetPriority(USART1_IRQn, 0, 0); HAL_NVIC_EnableIRQ(USART1_IRQn); } while(0); } while(0);
     
     
     
@@ -28307,6 +28464,8 @@ int main(void)
     {
         
         
+        ReadPeripherals_Process();
+        HAL_Delay(5);
     }
 }
 

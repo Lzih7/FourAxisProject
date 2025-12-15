@@ -1906,30 +1906,6 @@
     <File>
       <GroupNumber>7</GroupNumber>
       <FileNumber>138</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>.\MyLib\BMP180.c</PathWithFileName>
-      <FilenameWithoutPath>BMP180.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>7</GroupNumber>
-      <FileNumber>139</FileNumber>
-      <FileType>5</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>.\MyLib\BMP180.h</PathWithFileName>
-      <FilenameWithoutPath>BMP180.h</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>7</GroupNumber>
-      <FileNumber>140</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1941,7 +1917,7 @@
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
-      <FileNumber>141</FileNumber>
+      <FileNumber>139</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1953,7 +1929,7 @@
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
-      <FileNumber>142</FileNumber>
+      <FileNumber>140</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1965,7 +1941,7 @@
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
-      <FileNumber>143</FileNumber>
+      <FileNumber>141</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1977,7 +1953,7 @@
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
-      <FileNumber>144</FileNumber>
+      <FileNumber>142</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1989,13 +1965,37 @@
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
-      <FileNumber>145</FileNumber>
+      <FileNumber>143</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>.\MyLib\Receive_IC.h</PathWithFileName>
       <FilenameWithoutPath>Receive_IC.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>7</GroupNumber>
+      <FileNumber>144</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\MyLib\ReadPeripherals.c</PathWithFileName>
+      <FilenameWithoutPath>ReadPeripherals.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>7</GroupNumber>
+      <FileNumber>145</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\MyLib\ReadPeripherals.h</PathWithFileName>
+      <FilenameWithoutPath>ReadPeripherals.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

@@ -1096,16 +1096,6 @@
               <FilePath>.\MyLib\OLED_Font.h</FilePath>
             </File>
             <File>
-              <FileName>BMP180.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\MyLib\BMP180.c</FilePath>
-            </File>
-            <File>
-              <FileName>BMP180.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\MyLib\BMP180.h</FilePath>
-            </File>
-            <File>
               <FileName>USART_Set.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\MyLib\USART_Set.h</FilePath>
@@ -1134,6 +1124,16 @@
               <FileName>Receive_IC.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\MyLib\Receive_IC.h</FilePath>
+            </File>
+            <File>
+              <FileName>ReadPeripherals.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\MyLib\ReadPeripherals.c</FilePath>
+            </File>
+            <File>
+              <FileName>ReadPeripherals.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\MyLib\ReadPeripherals.h</FilePath>
             </File>
           </Files>
         </Group>
