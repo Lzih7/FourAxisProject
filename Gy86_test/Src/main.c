@@ -1,7 +1,8 @@
 #include "main.h"
 #include "GPIO_Set.h"
 #include "ReadPeripherals.h"
-#include "UART_Set.h"
+// #include "UART_Set.h"
+#include "OLED.h"
 
 UART_HandleTypeDef huart1;
 void SystemClock_Config(void)
@@ -50,7 +51,8 @@ int main(void)
     /* 配置系统时钟 */
     SystemClock_Config();
     ReadPeripherals_Init();
-    UART1_FULL_INIT(9600);
+    OLED_Init();
+    // UART1_FULL_INIT(9600);
     while(1) {
         ReadPeripherals_Process();
         HAL_Delay(5);

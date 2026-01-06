@@ -19,8 +19,14 @@ void BLDC_Init(void)
     __HAL_RCC_GPIOB_CLK_ENABLE();   // 默认映射在 GPIOB，可按需修改
     __HAL_RCC_TIM3_CLK_ENABLE();    // 使用 TIM3 产生 PWM
 
-    // PWM 引脚复用到 TIM3_CH3（50Hz伺服脉冲：1~2ms）
+    // PWM 引脚复用到 TIM3_CHx（50Hz伺服脉冲：1~2ms）
+    GPIO_AF_CFG(BLDC_PWM_GPIO_1, BLDC_PWM_PIN_1,
+                GPIO_MODE_AF_PP, GPIO_SPEED_FREQ_HIGH, GPIO_NOPULL, BLDC_PWM_AF);
+    GPIO_AF_CFG(BLDC_PWM_GPIO_2, BLDC_PWM_PIN_2,
+                GPIO_MODE_AF_PP, GPIO_SPEED_FREQ_HIGH, GPIO_NOPULL, BLDC_PWM_AF);
     GPIO_AF_CFG(BLDC_PWM_GPIO_3, BLDC_PWM_PIN_3,
+                GPIO_MODE_AF_PP, GPIO_SPEED_FREQ_HIGH, GPIO_NOPULL, BLDC_PWM_AF);
+    GPIO_AF_CFG(BLDC_PWM_GPIO_4, BLDC_PWM_PIN_4,
                 GPIO_MODE_AF_PP, GPIO_SPEED_FREQ_HIGH, GPIO_NOPULL, BLDC_PWM_AF);
 
     // 定时器基础配置: 84MHz / 84 / 20000 -> 50Hz，周期 20000us
@@ -30,13 +36,28 @@ void BLDC_Init(void)
     if (HAL_TIM_PWM_Init(&htim3) != HAL_OK) {
         Error_Handler();
     }
+    TIM_PWM_CFG(TIM3, TIM_OCMODE_PWM1, BLDC_MIN_US, TIM_OCPOLARITY_HIGH, BLDC_PWM_CHANNEL_1);
+    TIM_PWM_CFG(TIM3, TIM_OCMODE_PWM1, BLDC_MIN_US, TIM_OCPOLARITY_HIGH, BLDC_PWM_CHANNEL_2);
     TIM_PWM_CFG(TIM3, TIM_OCMODE_PWM1, BLDC_MIN_US, TIM_OCPOLARITY_HIGH, BLDC_PWM_CHANNEL_3);
+    TIM_PWM_CFG(TIM3, TIM_OCMODE_PWM1, BLDC_MIN_US, TIM_OCPOLARITY_HIGH, BLDC_PWM_CHANNEL_4);
 
     // 启动 PWM
+    if (HAL_TIM_PWM_Start(&htim3, BLDC_PWM_CHANNEL_1) != HAL_OK) {
+        Error_Handler();
+    }
+    __HAL_TIM_SET_COMPARE(&htim3, BLDC_PWM_CHANNEL_1, BLDC_OFF_US);
+    if (HAL_TIM_PWM_Start(&htim3, BLDC_PWM_CHANNEL_2) != HAL_OK) {
+        Error_Handler();
+    }
+    __HAL_TIM_SET_COMPARE(&htim3, BLDC_PWM_CHANNEL_2, BLDC_OFF_US);
     if (HAL_TIM_PWM_Start(&htim3, BLDC_PWM_CHANNEL_3) != HAL_OK) {
         Error_Handler();
     }
-    __HAL_TIM_SET_COMPARE(&htim3, BLDC_PWM_CHANNEL_3, BLDC_OFF_US);
+    __HAL_TIM_SET_COMPARE(&htim3, BLDC_PWM_CHANNEL_3, BLDC_OFF_US);    
+    if (HAL_TIM_PWM_Start(&htim3, BLDC_PWM_CHANNEL_4) != HAL_OK) {
+        Error_Handler();
+    }
+    __HAL_TIM_SET_COMPARE(&htim3, BLDC_PWM_CHANNEL_4, BLDC_OFF_US);
 }
 
 void BLDC_SetThrottle_us(uint16_t pulse_us, uint8_t idx)

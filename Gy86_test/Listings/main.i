@@ -27782,54 +27782,21 @@ void ReadPeripherals_Init(void);
 void ReadPeripherals_Process(void);
 
 #line 4 "Src\\main.c"
-#line 1 ".\\MyLib\\UART_Set.h"
+
+#line 1 ".\\MyLib\\OLED.h"
 
 
 
-#line 5 ".\\MyLib\\UART_Set.h"
+void OLED_Init(void);
+void OLED_Clear(void);
+void OLED_ShowChar(uint8_t Line, uint8_t Column, char Char);
+void OLED_ShowString(uint8_t Line, uint8_t Column, char *String);
+void OLED_ShowNum(uint8_t Line, uint8_t Column, uint32_t Number, uint8_t Length);
+void OLED_ShowSignedNum(uint8_t Line, uint8_t Column, int32_t Number, uint8_t Length);
+void OLED_ShowHexNum(uint8_t Line, uint8_t Column, uint32_t Number, uint8_t Length);
+void OLED_ShowBinNum(uint8_t Line, uint8_t Column, uint32_t Number, uint8_t Length);
 
-extern UART_HandleTypeDef huart1;
-
- 
- 
- 
-#line 24 ".\\MyLib\\UART_Set.h"
-
- 
-
-
-
- 
-#line 40 ".\\MyLib\\UART_Set.h"
-
- 
-
-
-
-
-
- 
-#line 54 ".\\MyLib\\UART_Set.h"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#line 5 "Src\\main.c"
+#line 6 "Src\\main.c"
 
 UART_HandleTypeDef huart1;
 void SystemClock_Config(void)
@@ -27878,7 +27845,8 @@ int main(void)
      
     SystemClock_Config();
     ReadPeripherals_Init();
-    do { do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB2ENR) |= (0x00000010U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB2ENR) & (0x00000010U)); ((void)(tmpreg)); } while(0); do { GPIO_InitTypeDef GPIO_InitStruct = {0}; do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1ENR) |= (0x00000001U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->AHB1ENR) & (0x00000001U)); ((void)(tmpreg)); } while(0); GPIO_InitStruct . Pin = ((uint16_t)0x0200U) | ((uint16_t)0x0400U); GPIO_InitStruct . Mode = ((uint32_t)0x00000002U); GPIO_InitStruct . Pull = ((uint32_t)0x00000000U); GPIO_InitStruct . Speed = ((uint32_t)0x00000003U); GPIO_InitStruct . Alternate = ((uint8_t)0x07U); HAL_GPIO_Init(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0000U)), &GPIO_InitStruct); } while(0); do { huart1 . Instance = ((USART_TypeDef *) ((0x40000000U + 0x00010000U) + 0x1000U)); huart1 . Init . BaudRate = 9600; huart1 . Init . WordLength = ((uint32_t)0x00000000U); huart1 . Init . StopBits = ((uint32_t)0x00000000U); huart1 . Init . Parity = ((uint32_t)0x00000000U); huart1 . Init . Mode = ((uint32_t)0x0008U); huart1 . Init . HwFlowCtl = ((uint32_t)0x00000000U); huart1 . Init . OverSampling = ((uint32_t)0x00000000U); if(HAL_UART_Init(&huart1) != HAL_OK) { Error_Handler(); } } while(0); } while(0);
+    OLED_Init();
+    
     while(1) {
         ReadPeripherals_Process();
         HAL_Delay(5);

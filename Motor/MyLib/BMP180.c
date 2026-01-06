@@ -1,3 +1,7 @@
+/** 
+ * @brief 已经弃用，换为MS561101BA
+*/
+
 #include "BMP180.h"
 #include "MyI2C.h"
 #include "main.h"

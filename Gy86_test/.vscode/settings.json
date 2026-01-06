@@ -17,6 +17,7 @@
         "compare": "c",
         "cstddef": "c",
         "stdint.h": "c",
-        "uart_set.h": "c"
+        "uart_set.h": "c",
+        "oled.h": "c"
     }
 }
