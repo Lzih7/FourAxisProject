@@ -15,3 +15,8 @@ extern TIM_HandleTypeDef htim2;
 void TIM2_IRQHandler(void) {
 	HAL_TIM_IRQHandler(&htim2);
 }
+
+extern TIM_HandleTypeDef htim4;
+void TIM4_IRQHandler(void) {
+	HAL_TIM_IRQHandler(&htim4);
+}

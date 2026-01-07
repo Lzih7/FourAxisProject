@@ -4,7 +4,7 @@
 // TIM2 CH1 -> PA0
 // TIM2 CH2 -> PA1
 // TIM2 CH3 -> PB10
-// TIM2 CH4 -> PB11
+// TIM4 CH2 -> PB7
 
 #define IC_PORT_A GPIOA
 #define IC_PORT_B GPIOB
