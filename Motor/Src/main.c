@@ -13,7 +13,7 @@ TIM_HandleTypeDef htim3;
 UART_HandleTypeDef huart1;
 uint16_t PWM_IN_Wid[4];
 
-// HAL库时钟配置函数 - HSE + 84MHz系统时钟 + 48MHz USB
+// HAL库时钟配置函数
 void SystemClock_Config(void)
 {
     RCC_OscInitTypeDef RCC_OscInitStruct = {0};

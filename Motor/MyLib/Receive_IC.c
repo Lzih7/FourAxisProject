@@ -38,7 +38,7 @@ void IC_Init(void) {
 	GPIO_InitStructure.Alternate = GPIO_AF1_TIM2;
 	HAL_GPIO_Init(IC_PORT_B, &GPIO_InitStructure);
 
-	// PB7 ->  TIM4 CH4
+	// PB7 ->  TIM4 CH2
 	GPIO_InitStructure.Pin = IC_PIN_CH4;
 	GPIO_InitStructure.Alternate = GPIO_AF2_TIM4;
 	HAL_GPIO_Init(IC_PORT_B, &GPIO_InitStructure);

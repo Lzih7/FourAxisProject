@@ -44,12 +44,11 @@ extern UART_HandleTypeDef huart1;
     HAL_NVIC_EnableIRQ(USART1_IRQn); \
 } while(0)
 
-/* 完整初始化宏（包含时钟、GPIO、UART配置和中断） */
+/* 完整初始化宏（包含时钟、GPIO、UART配置） */
 #define UART1_FULL_INIT(_BaudRate) do { \
     __HAL_RCC_USART1_CLK_ENABLE(); \
     UART1_GPIO_CONFIG(); \
     UART1_CFG(_BaudRate, UART_WORDLENGTH_8B, UART_STOPBITS_1, UART_PARITY_NONE, UART_MODE_TX_RX, UART_HWCONTROL_NONE, UART_OVERSAMPLING_16); \
-    UART1_IT_CONFIG(); \
 } while(0)
 
 #endif
