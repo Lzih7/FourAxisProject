@@ -27796,10 +27796,19 @@ extern TIM_HandleTypeDef htim3;
 #line 5 "MyLib\\BLDC.h"
 
 
-#line 19 "MyLib\\BLDC.h"
 
+
+
+
+#line 20 "MyLib\\BLDC.h"
 
 #line 30 "MyLib\\BLDC.h"
+
+#line 40 "MyLib\\BLDC.h"
+
+#line 50 "MyLib\\BLDC.h"
+
+#line 60 "MyLib\\BLDC.h"
 
 void BLDC_Init(void);
 void BLDC_SetThrottle_us(uint16_t pulse_us, uint8_t idx);
@@ -27825,7 +27834,13 @@ void BLDC_Init(void)
     do { volatile uint32_t tmpreg = 0x00U; ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) |= (0x00000002U)); tmpreg = ((((RCC_TypeDef *) ((0x40000000U + 0x00020000U) + 0x3800U))->APB1ENR) & (0x00000002U)); ((void)(tmpreg)); } while(0);    
 
     
+    do { GPIO_InitTypeDef GPIO_InitStructure = {0}; GPIO_InitStructure . Pin = ((uint16_t)0x0040U); GPIO_InitStructure . Mode = ((uint32_t)0x00000002U); GPIO_InitStructure . Speed = ((uint32_t)0x00000002U); GPIO_InitStructure . Pull = ((uint32_t)0x00000000U); GPIO_InitStructure . Alternate = ((uint8_t)0x02U); HAL_GPIO_Init(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0000U)), &GPIO_InitStructure); } while(0);
+
+    do { GPIO_InitTypeDef GPIO_InitStructure = {0}; GPIO_InitStructure . Pin = ((uint16_t)0x0080U); GPIO_InitStructure . Mode = ((uint32_t)0x00000002U); GPIO_InitStructure . Speed = ((uint32_t)0x00000002U); GPIO_InitStructure . Pull = ((uint32_t)0x00000000U); GPIO_InitStructure . Alternate = ((uint8_t)0x02U); HAL_GPIO_Init(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0000U)), &GPIO_InitStructure); } while(0);
+
     do { GPIO_InitTypeDef GPIO_InitStructure = {0}; GPIO_InitStructure . Pin = ((uint16_t)0x0001U); GPIO_InitStructure . Mode = ((uint32_t)0x00000002U); GPIO_InitStructure . Speed = ((uint32_t)0x00000002U); GPIO_InitStructure . Pull = ((uint32_t)0x00000000U); GPIO_InitStructure . Alternate = ((uint8_t)0x02U); HAL_GPIO_Init(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0400U)), &GPIO_InitStructure); } while(0);
+
+    do { GPIO_InitTypeDef GPIO_InitStructure = {0}; GPIO_InitStructure . Pin = ((uint16_t)0x0002U); GPIO_InitStructure . Mode = ((uint32_t)0x00000002U); GPIO_InitStructure . Speed = ((uint32_t)0x00000002U); GPIO_InitStructure . Pull = ((uint32_t)0x00000000U); GPIO_InitStructure . Alternate = ((uint8_t)0x02U); HAL_GPIO_Init(((GPIO_TypeDef *) ((0x40000000U + 0x00020000U) + 0x0400U)), &GPIO_InitStructure); } while(0);
 
 
     
@@ -27835,13 +27850,28 @@ void BLDC_Init(void)
     if (HAL_TIM_PWM_Init(&htim3) != HAL_OK) {
         Error_Handler();
     }
+    do { TIM_OC_InitTypeDef TIM_OC_InitStruct = {0}; TIM_OC_InitStruct . OCMode = (0x0020U | 0x0040U); TIM_OC_InitStruct . Pulse = 1000; TIM_OC_InitStruct . OCPolarity = ((uint32_t)0x00000000U); TIM_OC_InitStruct . OCFastMode = ((uint32_t)0x00000000U); if(HAL_TIM_PWM_ConfigChannel(&htim3, &TIM_OC_InitStruct, ((uint32_t)0x00000000U)) != HAL_OK) { Error_Handler(); } } while(0);
+    do { TIM_OC_InitTypeDef TIM_OC_InitStruct = {0}; TIM_OC_InitStruct . OCMode = (0x0020U | 0x0040U); TIM_OC_InitStruct . Pulse = 1000; TIM_OC_InitStruct . OCPolarity = ((uint32_t)0x00000000U); TIM_OC_InitStruct . OCFastMode = ((uint32_t)0x00000000U); if(HAL_TIM_PWM_ConfigChannel(&htim3, &TIM_OC_InitStruct, ((uint32_t)0x00000004U)) != HAL_OK) { Error_Handler(); } } while(0);
     do { TIM_OC_InitTypeDef TIM_OC_InitStruct = {0}; TIM_OC_InitStruct . OCMode = (0x0020U | 0x0040U); TIM_OC_InitStruct . Pulse = 1000; TIM_OC_InitStruct . OCPolarity = ((uint32_t)0x00000000U); TIM_OC_InitStruct . OCFastMode = ((uint32_t)0x00000000U); if(HAL_TIM_PWM_ConfigChannel(&htim3, &TIM_OC_InitStruct, ((uint32_t)0x00000008U)) != HAL_OK) { Error_Handler(); } } while(0);
+    do { TIM_OC_InitTypeDef TIM_OC_InitStruct = {0}; TIM_OC_InitStruct . OCMode = (0x0020U | 0x0040U); TIM_OC_InitStruct . Pulse = 1000; TIM_OC_InitStruct . OCPolarity = ((uint32_t)0x00000000U); TIM_OC_InitStruct . OCFastMode = ((uint32_t)0x00000000U); if(HAL_TIM_PWM_ConfigChannel(&htim3, &TIM_OC_InitStruct, ((uint32_t)0x0000000CU)) != HAL_OK) { Error_Handler(); } } while(0);
 
     
+    if (HAL_TIM_PWM_Start(&htim3, ((uint32_t)0x00000000U)) != HAL_OK) {
+        Error_Handler();
+    }
+    (*(volatile uint32_t *)(&((&htim3)->Instance ->CCR1) + ((((uint32_t)0x00000000U)) >> 2U)) = (1000));
+    if (HAL_TIM_PWM_Start(&htim3, ((uint32_t)0x00000004U)) != HAL_OK) {
+        Error_Handler();
+    }
+    (*(volatile uint32_t *)(&((&htim3)->Instance ->CCR1) + ((((uint32_t)0x00000004U)) >> 2U)) = (1000));
     if (HAL_TIM_PWM_Start(&htim3, ((uint32_t)0x00000008U)) != HAL_OK) {
         Error_Handler();
     }
-    (*(volatile uint32_t *)(&((&htim3)->Instance ->CCR1) + ((((uint32_t)0x00000008U)) >> 2U)) = (1000));
+    (*(volatile uint32_t *)(&((&htim3)->Instance ->CCR1) + ((((uint32_t)0x00000008U)) >> 2U)) = (1000));    
+    if (HAL_TIM_PWM_Start(&htim3, ((uint32_t)0x0000000CU)) != HAL_OK) {
+        Error_Handler();
+    }
+    (*(volatile uint32_t *)(&((&htim3)->Instance ->CCR1) + ((((uint32_t)0x0000000CU)) >> 2U)) = (1000));
 }
 
 void BLDC_SetThrottle_us(uint16_t pulse_us, uint8_t idx)
